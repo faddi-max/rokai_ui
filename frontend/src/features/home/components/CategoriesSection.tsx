@@ -1,8 +1,22 @@
 import { ArrowUpLeft, ArrowUpRight } from "lucide-react";
 import { categories } from "@/features/home/data/categories";
+import { gsap, motion } from "@/shared/animations";
+import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
 import CategoryCard from "./CategoryCard";
 
 export default function CategoriesSection() {
+  const animateArrow = (target: HTMLElement, scale: number) => {
+    const arrow = target.querySelector("[data-category-arrow]");
+
+    if (arrow) {
+      gsap.to(arrow, {
+        scale,
+        duration: motion.duration.hover,
+        ease: motion.ease.hover,
+      });
+    }
+  };
+
   return (
     <section className="relative bg-black overflow-hidden py-20 lg:py-28">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(150,15,20,0.35),transparent_60%)]" />
@@ -25,14 +39,18 @@ export default function CategoriesSection() {
             <button
               aria-label="Previous category"
               className="w-14 h-14 rounded-full bg-white flex items-center justify-center text-black hover:opacity-80 transition-opacity"
+              onMouseEnter={(event) => animateArrow(event.currentTarget, 1.2)}
+              onMouseLeave={(event) => animateArrow(event.currentTarget, 1)}
             >
-              <ArrowUpLeft size={20} strokeWidth={2.5} />
+              <AnimatedArrow icon={ArrowUpLeft} data-category-arrow size={20} strokeWidth={2.5} />
             </button>
             <button
               aria-label="Next category"
               className="w-14 h-14 rounded-full bg-white flex items-center justify-center text-black hover:opacity-80 transition-opacity"
+              onMouseEnter={(event) => animateArrow(event.currentTarget, 1.2)}
+              onMouseLeave={(event) => animateArrow(event.currentTarget, 1)}
             >
-              <ArrowUpRight size={20} strokeWidth={2.5} />
+              <AnimatedArrow icon={ArrowUpRight} data-category-arrow size={20} strokeWidth={2.5} />
             </button>
           </div>
 

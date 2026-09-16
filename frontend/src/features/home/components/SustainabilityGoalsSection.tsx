@@ -1,6 +1,7 @@
 import { ArrowUpRight, Recycle } from "lucide-react";
 import SectionEyebrow from "./SectionEyebrow";
 import { sustainabilityGoals } from "@/features/home/data/sustainabilityGoals";
+import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
 
 const SustainabilityGoalsSection = () => {
   const {
@@ -86,7 +87,7 @@ const SustainabilityGoalsSection = () => {
             <span className="font-space-grotesk text-[16px] font-medium leading-[20px]">
               {ctaText}
             </span>
-            <ArrowUpRight className="h-5 w-5 shrink-0" />
+            <AnimatedArrow icon={ArrowUpRight} className="h-5 w-5 shrink-0" />
           </a>
         </div>
 

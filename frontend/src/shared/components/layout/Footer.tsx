@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import {
   CreditCard,
   BriefcaseBusiness,
@@ -12,9 +13,14 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { logo } from "@/assets";
 
+type FooterLink = {
+  label: string;
+  href: string;
+};
+
 type FooterColumn = {
   title: string;
-  links: string[];
+  links: FooterLink[];
 };
 
 type SecurityItem = {
@@ -32,49 +38,49 @@ const footerColumns: FooterColumn[] = [
   {
     title: "Products",
     links: [
-      "Boxing",
-      "MMA",
-      "BJJ & Gears",
-      "Fight Wear",
-      "Protective Gear",
-      "Trending Equipment",
-      "All Products",
+      { label: "BJJ Training Gis", href: "/categories#catalog" },
+      { label: "Competition Gis", href: "/categories#catalog" },
+      { label: "Performance Rashguards", href: "/categories#catalog" },
+      { label: "Fight & Grappling Shorts", href: "/categories#catalog" },
+      { label: "MMA & Protective Gear", href: "/categories#catalog" },
+      { label: "Academy Teamwear", href: "/categories#catalog" },
+      { label: "Full Product Catalog", href: "/categories" },
     ],
   },
   {
     title: "Solutions",
     links: [
-      "Brands",
-      "Academies",
-      "Gyms & Clubs",
-      "Distributors",
-      "Teams & Organizations",
-      "Athletes & Coaches",
-      "Events Organizers",
+      { label: "Combat Sports Brands", href: "/services#capabilities" },
+      { label: "BJJ Academies & Dojos", href: "/programs#programs-catalog" },
+      { label: "Academy Wholesale Club", href: "/programs#programs-catalog" },
+      { label: "Private Label OEM", href: "/services#capabilities" },
+      { label: "Brand Incubator", href: "/programs#programs-catalog" },
+      { label: "Athlete Sponsorship", href: "/programs#programs-catalog" },
+      { label: "Affiliate Program", href: "/programs#programs-catalog" },
     ],
   },
   {
     title: "Resources",
     links: [
-      "Buying Guides",
-      "Manufacturing Guides",
-      "Technical Resources",
-      "Industry Thoughts",
-      "Case Studies",
-      "FAQs",
-      "Downloads",
+      { label: "2026 Spec Sheets & Catalog", href: "/resources#downloads" },
+      { label: "BJJ Gi Sizing Matrix", href: "/resources#sizing-matrix" },
+      { label: "Vector Tech Pack Templates", href: "/resources#downloads" },
+      { label: "IBJJF Compliance Guide", href: "/blogs" },
+      { label: "Fabric Science & GSM", href: "/blogs" },
+      { label: "Order Physical Swatches", href: "/contact#swatches" },
+      { label: "All Technical Resources", href: "/resources" },
     ],
   },
   {
-    title: "About",
+    title: "Company",
     links: [
-      "Our Story",
-      "Our Manufacturing",
-      "Sustainability",
-      "Blogs",
-      "About Us",
-      "News",
-      "Contact Us",
+      { label: "Our Manufacturing", href: "/services" },
+      { label: "AI Sizing Grading", href: "/services#capabilities" },
+      { label: "Lab Testing Protocols", href: "/services" },
+      { label: "Rokai Journal & Blogs", href: "/blogs" },
+      { label: "Partnership Programs", href: "/programs" },
+      { label: "Get a Production Quote", href: "/contact" },
+      { label: "Factory Direct Contact", href: "/contact" },
     ],
   },
 ];
@@ -136,7 +142,9 @@ const Footer = () => {
       <div className="mx-auto w-full max-w-[1250px] border-t border-[#222] px-5 pb-8 pt-12 sm:px-8 md:pt-14 lg:px-0 lg:pt-16">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.35fr_repeat(4,1fr)] lg:gap-0">
           <div className="lg:pr-12">
-            <img src={logo} alt="Rokai" className="h-auto w-[150px]" />
+            <Link to="/" className="inline-block">
+              <img src={logo} alt="Rokai" className="h-auto w-[150px]" />
+            </Link>
             <p className="mt-7 max-w-[390px] font-space-grotesk text-[17px] font-light leading-[23px] text-white">
               We specialize in custom BJJ apparel, jiu jitsu gear and private label manufacturing
               for academies, brands and athletes worldwide.
@@ -154,6 +162,7 @@ const Footer = () => {
                 </a>
               ))}
             </div>
+          
           </div>
 
           {footerColumns.map((column) => (
@@ -167,13 +176,13 @@ const Footer = () => {
               </h2>
               <ul className="mt-5 flex flex-col gap-2.5">
                 {column.links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href={`#${link.toLowerCase().replaceAll(" ", "-")}`}
+                  <li key={link.label}>
+                    <Link
+                      to={link.href}
                       className="font-space-grotesk text-[14px] font-light leading-[18px] text-white transition-colors hover:text-[#E51B24]"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -206,15 +215,15 @@ const Footer = () => {
         <div className="mt-8 flex flex-col gap-4 border-t border-[#222] pt-6 font-space-grotesk text-[14px] font-light leading-[18px] text-white sm:flex-row sm:items-center sm:justify-between">
           <p>2026 ROKAI CORP. All Rights Reserved.</p>
           <nav aria-label="Legal" className="flex flex-wrap gap-4">
-            <a href="#privacy" className="transition-colors hover:text-[#E51B24]">
-              Privacy
-            </a>
-            <a href="#terms" className="transition-colors hover:text-[#E51B24]">
-              Terms
-            </a>
-            <a href="#cookies" className="transition-colors hover:text-[#E51B24]">
-              Cookies
-            </a>
+            <Link to="/contact" className="transition-colors hover:text-[#E51B24]">
+              Privacy Policy
+            </Link>
+            <Link to="/contact" className="transition-colors hover:text-[#E51B24]">
+              Terms of Manufacturing
+            </Link>
+            <Link to="/contact" className="transition-colors hover:text-[#E51B24]">
+              Cookie Preferences
+            </Link>
           </nav>
         </div>
       </div>

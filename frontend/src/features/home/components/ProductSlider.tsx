@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { ArrowUpLeft, ArrowUpRight } from "lucide-react";
 import type { ManufactureProduct } from "@/features/home/data/manufactureProducts";
+import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
 
 interface ProductSliderProps {
   products: ManufactureProduct[];
@@ -27,7 +28,7 @@ const ProductSlider = ({ products }: ProductSliderProps) => {
         aria-label="Previous product"
         className="order-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-black transition-transform hover:scale-105 sm:order-none sm:h-12 sm:w-12"
       >
-        <ArrowUpLeft className="h-5 w-5" />
+        <AnimatedArrow icon={ArrowUpLeft} className="h-5 w-5" />
       </button>
 
       <div
@@ -54,7 +55,7 @@ const ProductSlider = ({ products }: ProductSliderProps) => {
         aria-label="Next product"
         className="order-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-black transition-transform hover:scale-105 sm:order-none sm:h-12 sm:w-12"
       >
-        <ArrowUpRight className="h-5 w-5" />
+        <AnimatedArrow icon={ArrowUpRight} className="h-5 w-5" />
       </button>
     </div>
   );

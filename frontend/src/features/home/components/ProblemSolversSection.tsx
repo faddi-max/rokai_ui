@@ -1,5 +1,7 @@
-import { ArrowUp } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
 import ChecklistItem from "./ChecklistItem";
+import { gsap, motion } from "@/shared/animations";
 import {
   problemSolversChecklist,
   problemSolversCta,
@@ -9,6 +11,14 @@ import {
 
 const ProblemSolversSection = () => {
   const { titleTop, titleBottom, description } = problemSolversHeading;
+
+  const animateImage = (target: HTMLImageElement, scale: number) => {
+    gsap.to(target, {
+      scale,
+      duration: motion.duration.hover,
+      ease: motion.ease.hover,
+    });
+  };
 
   return (
     <section className="w-full bg-black">
@@ -65,15 +75,17 @@ const ProblemSolversSection = () => {
               <span className="font-space-grotesk text-[16px] font-light leading-[20px]">
                 {problemSolversCta.text}
               </span>
-              <ArrowUp className="h-4 w-4 shrink-0" />
+              <AnimatedArrow icon={ArrowUpRight} className="h-4 w-4 shrink-0" />
             </a>
           </div>
 
-          <div className="relative mx-auto aspect-[560/420] w-full max-w-[560px] lg:aspect-auto lg:h-full">
+          <div className="relative mx-auto aspect-[560/420] w-full max-w-[560px] overflow-hidden rounded-xl lg:aspect-auto lg:h-full">
             <img
               src={problemSolversImage}
               alt="Rokai combat sports manufacturing services"
               className="h-full min-h-full w-full rounded-xl object-cover"
+              onMouseEnter={(event) => animateImage(event.currentTarget, 1.04)}
+              onMouseLeave={(event) => animateImage(event.currentTarget, 1)}
             />
           </div>
         </div>

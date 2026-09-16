@@ -1,5 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import type { PartnershipProgram } from "@/features/home/data/partnershipPrograms";
+import { gsap, motion } from "@/shared/animations";
+import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
 
 interface ProgramCardProps {
   program: PartnershipProgram;
@@ -8,10 +10,26 @@ interface ProgramCardProps {
 const ProgramCard = ({ program }: ProgramCardProps) => {
   const { image, title, subtitle, description, ctaText, ctaHref } = program;
 
+  const animateImageFrame = (target: HTMLDivElement, scale: number) => {
+    gsap.to(target, {
+      scale,
+      duration: motion.duration.hover,
+      ease: motion.ease.hover,
+    });
+  };
+
   return (
     <article className="flex flex-col overflow-hidden bg-white">
-      <div className="relative mx-4 mt-4 aspect-[365/230] overflow-hidden rounded-lg border-2 border-black/10">
-        <img src={image} alt={title} className="h-full w-full object-cover" />
+      <div
+        className="relative mx-4 mt-4 aspect-[365/230] overflow-hidden rounded-lg border-2 border-black/10"
+        onMouseEnter={(event) => animateImageFrame(event.currentTarget, 1.14)}
+        onMouseLeave={(event) => animateImageFrame(event.currentTarget, 1)}
+      >
+        <img
+          src={image}
+          alt={title}
+          className="h-full w-full object-cover"
+        />
       </div>
 
       <div className="flex flex-1 flex-col gap-3 px-6 py-6 sm:px-8 sm:py-7">
@@ -57,7 +75,7 @@ const ProgramCard = ({ program }: ProgramCardProps) => {
         <span className="min-w-0 flex-1 break-words font-space-grotesk text-[14px] font-light leading-[18px] sm:text-[16px] sm:leading-[20px]">
           {ctaText}
         </span>
-        <ArrowUpRight className="h-6 w-6 shrink-0" />
+        <AnimatedArrow icon={ArrowUpRight} className="h-6 w-6 shrink-0" />
       </a>
     </article>
   );

@@ -1,15 +1,50 @@
 import { ArrowUpRight } from "lucide-react";
+import { useRef } from "react";
 import type { FeatureItem } from "@/features/home/data/engineeredBenchmark";
+import { gsap, motion, useGSAP } from "@/shared/animations";
+import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
+import { usePrefersReducedMotion } from "@/shared/hooks/usePrefersReducedMotion";
 
 interface FeatureCardProps {
   feature: FeatureItem;
 }
 
 const FeatureCard = ({ feature }: FeatureCardProps) => {
+  const cardRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const { image, title, description, ctaText, ctaHref } = feature;
 
+  useGSAP(
+    () => {
+      if (prefersReducedMotion) return;
+
+      gsap.set("[data-feature-copy]", { autoAlpha: 0, y: 12 });
+    },
+    { scope: cardRef, dependencies: [prefersReducedMotion], revertOnUpdate: true }
+  );
+
+  const animateFeatureCopy = (visible: boolean) => {
+    if (prefersReducedMotion) return;
+
+    const copy = cardRef.current?.querySelectorAll("[data-feature-copy]");
+    if (!copy) return;
+
+    gsap.to(copy, {
+      autoAlpha: visible ? 1 : 0,
+      y: visible ? 0 : 12,
+      duration: motion.duration.normal,
+      ease: motion.ease.enter,
+      stagger: motion.stagger,
+    });
+  };
+
   return (
-    <article className="mx-auto flex h-[clamp(500px,40vw,621px)] w-full max-w-[326px] min-w-0 flex-col overflow-hidden">
+    <article
+      ref={cardRef}
+      className="mx-auto flex h-[clamp(500px,40vw,621px)] w-full max-w-[326px] min-w-0 flex-col overflow-hidden"
+      onMouseEnter={() => animateFeatureCopy(true)}
+      onMouseLeave={() => animateFeatureCopy(false)}
+    >
       <div className="relative min-h-0 flex-1 overflow-hidden">
         <img src={image} alt={title} className="absolute inset-0 h-full w-full object-cover" />
 
@@ -18,6 +53,7 @@ const FeatureCard = ({ feature }: FeatureCardProps) => {
 
         <div className="absolute inset-x-0 bottom-0 flex min-w-0 flex-col gap-2 p-4 sm:p-6">
           <h3
+            data-feature-copy
             className="font-space-grotesk font-bold text-white"
             style={{
               fontSize: "clamp(22px, 0.8vw + 18px, 30px)",
@@ -29,6 +65,7 @@ const FeatureCard = ({ feature }: FeatureCardProps) => {
           </h3>
 
           <p
+            data-feature-copy
             className="font-space-grotesk font-light text-white/80"
             style={{
               fontSize: "clamp(15px, 0.35vw + 13px, 18px)",
@@ -48,7 +85,7 @@ const FeatureCard = ({ feature }: FeatureCardProps) => {
         <span className="min-w-0 flex-1 break-words font-space-grotesk text-[14px] font-light leading-[18px] sm:text-[16px] sm:leading-[20px]">
           {ctaText}
         </span>
-        <ArrowUpRight className="h-5 w-5 shrink-0" />
+        <AnimatedArrow icon={ArrowUpRight} className="h-5 w-5 shrink-0" />
       </a>
     </article>
   );

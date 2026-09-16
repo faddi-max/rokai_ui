@@ -1,19 +1,52 @@
+import { useRef } from "react";
 import ProgramCard from "./ProgramCard";
 import {
   partnershipPrograms,
   partnershipProgramsHeading,
 } from "@/features/home/data/partnershipPrograms";
+import { gsap, motion, useGSAP } from "@/shared/animations";
+import { usePrefersReducedMotion } from "@/shared/hooks/usePrefersReducedMotion";
 
 const PartnershipProgramsSection = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const { titleTop, titleBottomLines, description } = partnershipProgramsHeading;
 
+  useGSAP(
+    () => {
+      if (prefersReducedMotion) return;
+
+      gsap.set("[data-partnership-intro]", { autoAlpha: 0 });
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+
+          gsap.to("[data-partnership-intro]", {
+            autoAlpha: 1,
+            duration: motion.duration.normal,
+            ease: motion.ease.enter,
+            stagger: motion.stagger,
+          });
+          observer.disconnect();
+        },
+        { threshold: 0.25 }
+      );
+
+      if (sectionRef.current) observer.observe(sectionRef.current);
+
+      return () => observer.disconnect();
+    },
+    { scope: sectionRef, dependencies: [prefersReducedMotion], revertOnUpdate: true }
+  );
+
   return (
-    <section className="relative w-full overflow-hidden bg-black">
+    <section ref={sectionRef} className="relative w-full overflow-hidden bg-black">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(150,15,20,0.3),transparent_60%)]" />
 
       <div className="relative mx-auto w-full max-w-[1512px] px-6 py-16 sm:px-10 md:py-20 lg:px-20 lg:py-24">
         <div className="mb-10 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-start lg:justify-between">
-          <h2 className="font-space-grotesk text-white">
+          <h2 data-partnership-intro className="font-space-grotesk text-white">
             <span
               className="block font-bold"
               style={{
@@ -42,6 +75,7 @@ const PartnershipProgramsSection = () => {
           </h2>
 
           <p
+            data-partnership-intro
             className="font-space-grotesk font-light text-white lg:max-w-[420px] lg:text-left"
             style={{
               fontSize: "clamp(16px, 0.5vw + 14px, 20px)",

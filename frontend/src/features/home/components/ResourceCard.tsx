@@ -1,6 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import type { ToolResource } from "@/features/home/data/toolsResources";
+import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
 
 interface ResourceCardProps {
   resource: ToolResource;
@@ -49,7 +50,7 @@ const ResourceCard = ({ resource }: ResourceCardProps) => {
           className="mt-auto inline-flex items-center gap-3 bg-[#E51B24] px-4 py-3 text-[12px] font-medium uppercase leading-[14px] text-white transition-colors hover:bg-[#c9161e] sm:px-5 sm:py-3.5"
         >
           <span className="font-space-grotesk">{resource.buttonText}</span>
-          <ArrowUpRight className="h-4 w-4 shrink-0" />
+          <AnimatedArrow icon={ArrowUpRight} className="h-4 w-4 shrink-0" />
         </a>
       </div>
     </motion.article>

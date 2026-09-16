@@ -1,26 +1,107 @@
-import HomePage from "@/features/home/HomePage";
-import Navbar from "@/shared/components/layout/Navbar";
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import RootLayout from "@/shared/components/layout/RootLayout";
+import { PageLoader } from "@/shared/components/feedback";
+import { useRef } from "react";
+import { ArrowLeft } from "lucide-react";
+import { gsap, useGSAP } from "@/shared/animations";
+import Button from "@/shared/components/ui/Button";
 
-const BlackPage = () => (
-  <main className="min-h-screen bg-black">
-    <Navbar />
-  </main>
-);
+// Code-split route pages with lazy loading
+const HomePage = lazy(() => import("@/features/home/HomePage"));
+const CategoriesPage = lazy(() => import("@/features/categories/CategoriesPage"));
+const ServicesPage = lazy(() => import("@/features/services/ServicesPage"));
+const ProgramsPage = lazy(() => import("@/features/programs/ProgramsPage"));
+const ContactPage = lazy(() => import("@/features/contact/ContactPage"));
+const BlogsPage = lazy(() => import("@/features/blogs/BlogsPage"));
+const ResourcesPage = lazy(() => import("@/features/resources/ResourcesPage"));
+
+const NotFoundPage = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const badgeRef = useRef<HTMLSpanElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      const tl = gsap.timeline({
+        defaults: { ease: "power3.out" },
+      });
+
+      tl.from(badgeRef.current, {
+        y: 20,
+        opacity: 0,
+        duration: 0.5,
+      })
+        .from(
+          headingRef.current,
+          { y: 40, opacity: 0, duration: 0.7 },
+          "-=0.25"
+        )
+        .from(
+          textRef.current,
+          { y: 30, opacity: 0, duration: 0.6 },
+          "-=0.4"
+        )
+        .from(
+          ctaRef.current,
+          { y: 20, opacity: 0, duration: 0.5 },
+          "-=0.3"
+        );
+    },
+    { scope: containerRef }
+  );
+
+  return (
+    <div
+      ref={containerRef}
+      className="flex min-h-[65vh] flex-col items-center justify-center px-6 text-center"
+    >
+      <span
+        ref={badgeRef}
+        className="font-space-grotesk text-sm font-bold uppercase tracking-[0.2em] text-[#E51B24]"
+      >
+        404 Error
+      </span>
+      <h1
+        ref={headingRef}
+        className="mt-3 font-space-grotesk text-4xl sm:text-6xl font-bold uppercase text-white"
+      >
+        PAGE NOT FOUND
+      </h1>
+      <p
+        ref={textRef}
+        className="mt-4 max-w-md font-space-grotesk text-sm sm:text-base text-white/70"
+      >
+        The equipment or specification page you are looking for has been moved or does not exist.
+      </p>
+      <div ref={ctaRef} className="mt-8">
+        <Button href="/" icon={ArrowLeft} variant="outline" size="14px">
+          Return to Home
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/categories" element={<BlackPage />} />
-        <Route path="/services" element={<BlackPage />} />
-        <Route path="/programs" element={<BlackPage />} />
-        <Route path="/contact" element={<BlackPage />} />
-        <Route path="/blogs" element={<BlackPage />} />
-        <Route path="/resources" element={<BlackPage />} />
-        <Route path="*" element={<BlackPage />} />
-      </Routes>
+      <Suspense fallback={<PageLoader message="LOADING ROKAI PRODUCTION INTERFACE..." />}>
+        <Routes>
+          <Route element={<RootLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/categories" element={<NotFoundPage />} />
+            <Route path="/services" element={<NotFoundPage />} />
+            <Route path="/programs" element={<NotFoundPage />} />
+            <Route path="/contact" element={<NotFoundPage />} />
+            <Route path="/blogs" element={<NotFoundPage />} />
+            <Route path="/resources" element={<NotFoundPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

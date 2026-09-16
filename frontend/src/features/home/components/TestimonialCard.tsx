@@ -34,7 +34,12 @@ const TestimonialCard = ({ testimonial, onPlay }: TestimonialCardProps) => {
         transition={{ duration: 0.25, ease: "easeOut" }}
         className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#E51B24] shadow-[0_8px_24px_rgba(229,27,36,0.45)] sm:h-16 sm:w-16"
       >
-        <Play className="ml-0.5 h-5 w-5 fill-white text-white sm:h-6 sm:w-6" />
+        <motion.span
+          variants={{ rest: { scale: 1 }, hover: { scale: 1.25 } }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+        >
+          <Play className="ml-0.5 h-5 w-5 fill-white text-white sm:h-6 sm:w-6" />
+        </motion.span>
       </motion.span>
 
       <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">

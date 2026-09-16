@@ -1,5 +1,3 @@
-import Footer from "@/shared/components/layout/Footer";
-import Navbar from "@/shared/components/layout/Navbar";
 import CategoriesSection from "./components/CategoriesSection";
 import EngineeredBenchmarkSection from "./components/EngineeredBenchmarkSection";
 import FAQSection from "./components/FAQSection";
@@ -17,8 +15,7 @@ import WhatWeManufactureSection from "./components/WhatWeManufactureSection";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen">
-      <Navbar />
+    <div className="min-h-screen">
       <HeroSection />
       <HeroTrustBadges />
       <CategoriesSection />
@@ -33,7 +30,6 @@ export default function HomePage() {
       <ToolsResourcesSection />
       <FAQSection />
       <TrustBadges />
-      <Footer />
-    </main>
+    </div>
   );
 }

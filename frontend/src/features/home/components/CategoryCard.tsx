@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import type { Category } from "@/features/home/data/categories";
+import { gsap, motion } from "@/shared/animations";
 import Button from "@/shared/components/ui/Button";
 
 type CategoryCardProps = {
@@ -7,12 +8,22 @@ type CategoryCardProps = {
 };
 
 export default function CategoryCard({ category }: CategoryCardProps) {
+  const animateModel = (target: HTMLImageElement, scale: number) => {
+    gsap.to(target, {
+      scale,
+      duration: motion.duration.hover,
+      ease: motion.ease.hover,
+    });
+  };
+
   return (
     <div className="flex flex-col items-center gap-6 rounded-2xl bg-white p-5 sm:flex-row sm:gap-8 sm:p-8">
       <img
         src={category.image}
         alt={category.title}
         className="h-[280px] w-full max-w-[220px] shrink-0 rounded-xl object-contain sm:h-[320px] sm:w-[220px]"
+        onMouseEnter={(event) => animateModel(event.currentTarget, 1.04)}
+        onMouseLeave={(event) => animateModel(event.currentTarget, 1)}
       />
 
       <div className="flex flex-col gap-4">

@@ -1,14 +1,48 @@
 import { Play, ArrowUpRight } from "lucide-react";
+import { useRef } from "react";
 import { scalingBrands } from "@/features/home/data/scalingBrands";
+import { gsap, revealLeft, revealRight, revealVisible, useGSAP } from "@/shared/animations";
 import Button from "@/shared/components/ui/Button";
+import { usePrefersReducedMotion } from "@/shared/hooks/usePrefersReducedMotion";
 
 export default function ScalingBrands() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  useGSAP(
+    () => {
+      if (prefersReducedMotion) return;
+
+      gsap.set("[data-scaling-model]", revealLeft());
+      gsap.set("[data-scaling-content]", revealRight());
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+
+          gsap
+            .timeline()
+            .to("[data-scaling-model]", revealVisible)
+            .to("[data-scaling-content]", revealVisible, "-=0.2");
+
+          observer.disconnect();
+        },
+        { threshold: 0.25 }
+      );
+
+      if (sectionRef.current) observer.observe(sectionRef.current);
+
+      return () => observer.disconnect();
+    },
+    { scope: sectionRef, dependencies: [prefersReducedMotion], revertOnUpdate: true }
+  );
+
   return (
-    <section className="relative bg-black overflow-hidden py-20 lg:py-28">
+    <section ref={sectionRef} className="relative bg-black overflow-hidden py-20 lg:py-28">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(150,15,20,0.3),transparent_60%)]" />
 
       <div className="relative max-w-[1512px] mx-auto px-6 md:px-10 lg:px-16 grid lg:grid-cols-2 gap-12 items-center">
-        <div className="relative rounded-2xl overflow-hidden">
+        <div data-scaling-model className="relative rounded-2xl overflow-hidden">
           <img
             src={scalingBrands.videoThumbnail}
             alt="Rokai BJJ team"
@@ -25,7 +59,7 @@ export default function ScalingBrands() {
           </a>
         </div>
 
-        <div className="flex flex-col gap-6">
+        <div data-scaling-content className="flex flex-col gap-6">
           <h2 className="font-space-grotesk text-[clamp(2rem,9vw,4.375rem)] font-bold leading-[1.02] text-white lg:leading-[68px]">
             {scalingBrands.headingLine1}
             <br />

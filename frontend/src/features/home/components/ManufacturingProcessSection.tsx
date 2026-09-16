@@ -1,20 +1,51 @@
 import { Play } from "lucide-react";
 import { motion } from "framer-motion";
+import { useRef } from "react";
 import SectionEyebrow from "./SectionEyebrow";
 import { manufacturingProcess } from "@/features/home/data/manufacturingProcess";
+import { gsap, motion as gsapMotion, revealLeft, revealVisible, useGSAP } from "@/shared/animations";
+import { usePrefersReducedMotion } from "@/shared/hooks/usePrefersReducedMotion";
 
 const ManufacturingProcessSection = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const { eyebrow, titleTop, titleBottom, image, videoUrl } =
     manufacturingProcess;
 
+  useGSAP(
+    () => {
+      if (prefersReducedMotion) return;
+
+      gsap.set("[data-manufacturing-text]", revealLeft());
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+
+          gsap.to("[data-manufacturing-text]", {
+            ...revealVisible,
+            stagger: gsapMotion.stagger,
+          });
+          observer.disconnect();
+        },
+        { threshold: 0.25 }
+      );
+
+      if (sectionRef.current) observer.observe(sectionRef.current);
+
+      return () => observer.disconnect();
+    },
+    { scope: sectionRef, dependencies: [prefersReducedMotion], revertOnUpdate: true }
+  );
+
   return (
-    <section className="w-full bg-black">
+    <section ref={sectionRef} className="w-full bg-black">
       <div className="mx-auto w-full max-w-[1440px] px-6 py-16 sm:px-10 md:py-20 lg:px-[34px] lg:py-24">
-        <div className="mb-6 sm:mb-8">
+        <div data-manufacturing-text className="mb-6 sm:mb-8">
           <SectionEyebrow label={eyebrow} />
         </div>
 
-        <h2 className="mb-8 font-space-grotesk text-white sm:mb-10 lg:mb-12">
+        <h2 data-manufacturing-text className="mb-8 font-space-grotesk text-white sm:mb-10 lg:mb-12">
           <span
             className="block font-bold"
             style={{
