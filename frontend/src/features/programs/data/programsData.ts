@@ -8,21 +8,21 @@ import {
   avatar2,
   avatar3,
   avatar4,
-  productCardImage,
 } from "@/assets";
 import type {
   ContentCardData,
   FAQItemData,
-  PageHeroProps,
   ProcessStep,
   SplitMediaData,
 } from "@/shared/types/sections";
+import type { HeroContent } from "@/shared/types/hero";
 
-export const programsHeroData: PageHeroProps = {
-  eyebrow: "PARTNERSHIP PROGRAMS & ACADEMY SOLUTIONS",
-  headingLine1: "ENGINEERING INFINITE",
-  headingLine2: "GROWTH FOR COMBAT",
-  headingHighlight: "ACADEMIES & BRANDS",
+export const programsHeroData: HeroContent = {
+  headingLines: [
+    { text: "ENGINEERING INFINITE" },
+    { text: "GROWTH FOR COMBAT" },
+    { text: "ACADEMIES & BRANDS", highlight: true },
+  ],
   description:
     "Empowering BJJ academies, head coaches, and emerging combat brands with high-margin custom apparel, priority factory slots, and dedicated brand incubation services.",
   primaryCta: {
@@ -33,13 +33,15 @@ export const programsHeroData: PageHeroProps = {
     label: "Apply For Partnership",
     href: "/contact#partnership",
   },
-  avatars: [avatar1, avatar2, avatar3, avatar4],
-  joinText: "Over 500+ academies and 40+ combat brands grow with Rokai",
-  heroImage: clubPartnershipImage,
-  productCard: {
-    image: productCardImage,
-    name: "Academy Pro Gi Kit",
-    subtitle: "Turnkey Pro Shop Bundle",
+  secondaryRow: {
+    type: "join",
+    avatars: [avatar1, avatar2, avatar3, avatar4],
+    joinText: "Over 500+ academies and 40+ combat brands grow with Rokai",
+  },
+  visual: {
+    type: "image",
+    image: clubPartnershipImage,
+    imageAlt: "Rokai academy partnership apparel",
   },
 };
 

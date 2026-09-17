@@ -1,19 +1,24 @@
-import { avatar1, avatar2, avatar3, avatar4, heroMain, productCardImage } from "@/assets";
+import { avatar1, avatar2, avatar3, avatar4, heroMain } from "@/assets";
+import type { HeroContent } from "@/shared/types/hero";
 
-export const heroContent = {
-  headingLine1: "THE FIRST",
-  headingLine2: "AI-INTEGRATED",
-  headingLine3: "BJJ APPAREL",
-  headingLine4: "MANUFACTURER",
+export const heroContent: HeroContent = {
+  headingLines: [
+    { text: "THE FIRST" },
+    { text: "AI-INTEGRATED" },
+    { text: "BJJ APPAREL" },
+    { text: "MANUFACTURER", highlight: true },
+  ],
   description: "Premium quality. Precision engineering. Built for academies. Trusted by brands.",
   primaryCta: { label: "Get Your Free Assessment", href: "#assessment" },
   secondaryCta: { label: "Get a Quote", href: "#quote" },
-  joinText: "Join 100+ academies and brands growing with ROKAI",
-  avatars: [avatar1, avatar2, avatar3, avatar4],
-  heroImage: heroMain,
-  productCard: {
-    image: productCardImage,
-    name: "R JIU-JITSU HOODIE",
+  secondaryRow: {
+    type: "join",
+    avatars: [avatar1, avatar2, avatar3, avatar4],
+    joinText: "Join 100+ academies and brands growing with ROKAI",
   },
-  estdText: "ESTD 2019",
+  visual: {
+    type: "image",
+    image: heroMain,
+    imageAlt: "Rokai hoodie model",
+  },
 };

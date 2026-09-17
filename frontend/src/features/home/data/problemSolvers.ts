@@ -1,26 +1,24 @@
-import { problemSolversImage } from "@/assets";
+import { herocatagory } from "@/assets";
+
 
 export const problemSolversHeading = {
-  titleTop: "WE ARE",
-  titleBottom: "PROBLEM SOLVERS",
+  eyebrow: "Manufacturing Control",
+  titleTop: "WHAT WE",
+  titleBottom: "CONTROL",
   description:
-    "We use our experience to help you at every level of combat sports manufacturing:",
+    "Every detail is managed for consistent fit, durability, branding accuracy and reliable production at scale.",
 };
 
 export const problemSolversChecklist: string[] = [
-  "Precision Pattern Making & Development",
-  "Sample Development & Prototyping",
-  "Custom Fittings & Measurements",
-  "Quality Inspection & Finishing",
-  "Reliable Delivery & Order Support",
-  "Fabric Sourcing & Material Selection",
-  "Bulk Production & Manufacturing",
-  "Packaging & Final Preparation",
+  "Fabric sourcing (premium cotton & high GSM options)",
+  "Pattern engineering (standardized & size-accurate cuts)",
+  "Stitch reinforcement (competition-grade durability)",
+  "Branding accuracy (logos, patches, embroidery placement)",
+  "Batch consistency (uniform production across bulk orders)",
+  "Quality control checks at every stage",
+  "Scalable production for growing brands",
+  "Athlete-tested performance on the mat",
+  "Consistent sizing across all units",
 ];
 
-export const problemSolversCta = {
-  text: "Supplementary Services",
-  href: "#supplementary-services",
-};
-
-export { problemSolversImage };
+export { herocatagory };

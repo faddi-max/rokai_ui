@@ -64,7 +64,7 @@ const HeroBadgeIcon = ({ type }: { type: HeroBadge["icon"] }) => {
 
 const HeroTrustBadges = () => {
   return (
-    <section className="relative z-10 -mt-10 px-5 sm:-mt-12 sm:px-8 lg:-mt-14 lg:px-0">
+    <section className="relative z-10 -mt-10 px-5 sm:-mt-12 sm:px-8 lg:-mt-30 lg:px-0">
       <div className="mx-auto grid w-full max-w-[1140px] grid-cols-1 bg-[#F4F4F4] sm:min-h-[150px] sm:grid-cols-2 lg:grid-cols-5">
         {heroBadges.map((badge, index) => (
           <div

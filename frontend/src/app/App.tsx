@@ -88,11 +88,11 @@ const NotFoundPage = () => {
 export default function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<PageLoader message="LOADING ROKAI PRODUCTION INTERFACE..." />}>
+      <Suspense fallback={<PageLoader message="LOADING..." />}>
         <Routes>
           <Route element={<RootLayout />}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/categories" element={<NotFoundPage />} />
+            <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/services" element={<NotFoundPage />} />
             <Route path="/programs" element={<NotFoundPage />} />
             <Route path="/contact" element={<NotFoundPage />} />

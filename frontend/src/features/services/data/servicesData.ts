@@ -8,21 +8,21 @@ import {
   avatar3,
   avatar4,
   manufactureGiImage,
-  productCardImage,
 } from "@/assets";
 import type {
   ContentCardData,
   FAQItemData,
-  PageHeroProps,
   ProcessStep,
   SplitMediaData,
 } from "@/shared/types/sections";
+import type { HeroContent } from "@/shared/types/hero";
 
-export const servicesHeroData: PageHeroProps = {
-  eyebrow: "CONTRACT MANUFACTURING & OEM/ODM",
-  headingLine1: "END-TO-END",
-  headingLine2: "COMBAT SPORTS",
-  headingHighlight: "MANUFACTURING SERVICES",
+export const servicesHeroData: HeroContent = {
+  headingLines: [
+    { text: "END-TO-END" },
+    { text: "COMBAT SPORTS" },
+    { text: "MANUFACTURING SERVICES", highlight: true },
+  ],
   description:
     "We act as your dedicated production facility. From proprietary pattern creation and AI-assisted sizing to certified raw material procurement and global direct-to-gym shipping.",
   primaryCta: {
@@ -33,13 +33,15 @@ export const servicesHeroData: PageHeroProps = {
     label: "Book a Factory Consultation",
     href: "/contact#consultation",
   },
-  avatars: [avatar1, avatar2, avatar3, avatar4],
-  joinText: "Over 1.2M garments produced with 99.4% on-time delivery rate",
-  heroImage: manufacturingProcessImage,
-  productCard: {
-    image: productCardImage,
-    name: "OEM Tech Pack Service",
-    subtitle: "Turnkey Design to Delivery",
+  secondaryRow: {
+    type: "join",
+    avatars: [avatar1, avatar2, avatar3, avatar4],
+    joinText: "Over 1.2M garments produced with 99.4% on-time delivery rate",
+  },
+  visual: {
+    type: "image",
+    image: manufacturingProcessImage,
+    imageAlt: "Rokai garment manufacturing process",
   },
 };
 

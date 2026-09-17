@@ -23,7 +23,31 @@ import testimonial1 from "./testimonial-1.png";
 import testimonial2 from "./testimonial-2.png";
 import testimonial3 from "./testimonial-3.png";
 import sustainabilityForestImage from "./sustainability-forest.png";
+import herocatagory from "./herocatagory.png";
+import catagoriespage1 from "./catagoriespage1.png";
+import catagoriespage2 from "./catagoriespage2.png";
+import group from './Group.png'
+import gi from './gi1.png'
+import gi1 from './gi2.png'
+import work1 from './work1.png'
+import work2 from './work2.png'
+import work3 from './work3.png'
+import work4 from './work4.png'
+import work5 from './work5.png'
+import work6 from './work6.png'
 export {
+  work1,
+  work2,
+  work3,
+  work4,
+  work5,
+  work6,
+  gi,
+  gi1,
+  group,
+  catagoriespage1,
+  catagoriespage2,
+  herocatagory,
   logo,
   trainingGiCategoryImage,
   competitionGiCategoryImage,

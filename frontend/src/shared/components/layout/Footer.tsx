@@ -1,14 +1,13 @@
 import { Link } from "react-router-dom";
 import {
   CreditCard,
-  BriefcaseBusiness,
-  Camera,
   Globe2,
-  LockKeyhole,
-  Music2,
-  Pin,
+  Camera,
   Play,
+  BriefcaseBusiness,
+  Music2,
   ShieldCheck,
+  LockKeyhole,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { logo } from "@/assets";
@@ -38,49 +37,49 @@ const footerColumns: FooterColumn[] = [
   {
     title: "Products",
     links: [
-      { label: "BJJ Training Gis", href: "/categories#catalog" },
-      { label: "Competition Gis", href: "/categories#catalog" },
-      { label: "Performance Rashguards", href: "/categories#catalog" },
-      { label: "Fight & Grappling Shorts", href: "/categories#catalog" },
-      { label: "MMA & Protective Gear", href: "/categories#catalog" },
-      { label: "Academy Teamwear", href: "/categories#catalog" },
-      { label: "Full Product Catalog", href: "/categories" },
+      { label: "Boxing", href: "/categories#catalog" },
+      { label: "MMA", href: "/categories#catalog" },
+      { label: "BJJ & Gears", href: "/categories#catalog" },
+      { label: "Fight Wear", href: "/categories#catalog" },
+      { label: "Protective Gear", href: "/categories#catalog" },
+      { label: "Trending Equipment", href: "/categories#catalog" },
+      { label: "All Products", href: "/categories" },
     ],
   },
   {
     title: "Solutions",
     links: [
-      { label: "Combat Sports Brands", href: "/services#capabilities" },
-      { label: "BJJ Academies & Dojos", href: "/programs#programs-catalog" },
-      { label: "Academy Wholesale Club", href: "/programs#programs-catalog" },
-      { label: "Private Label OEM", href: "/services#capabilities" },
-      { label: "Brand Incubator", href: "/programs#programs-catalog" },
-      { label: "Athlete Sponsorship", href: "/programs#programs-catalog" },
-      { label: "Affiliate Program", href: "/programs#programs-catalog" },
+      { label: "Brands", href: "/services#capabilities" },
+      { label: "Academies", href: "/programs#programs-catalog" },
+      { label: "Gyms & Clubs", href: "/programs#programs-catalog" },
+      { label: "Distributors", href: "/programs#programs-catalog" },
+      { label: "Teams & Organizations", href: "/programs#programs-catalog" },
+      { label: "Athletes & Coaches", href: "/programs#programs-catalog" },
+      { label: "Events Organizers", href: "/programs#programs-catalog" },
     ],
   },
   {
     title: "Resources",
     links: [
-      { label: "2026 Spec Sheets & Catalog", href: "/resources#downloads" },
-      { label: "BJJ Gi Sizing Matrix", href: "/resources#sizing-matrix" },
-      { label: "Vector Tech Pack Templates", href: "/resources#downloads" },
-      { label: "IBJJF Compliance Guide", href: "/blogs" },
-      { label: "Fabric Science & GSM", href: "/blogs" },
-      { label: "Order Physical Swatches", href: "/contact#swatches" },
-      { label: "All Technical Resources", href: "/resources" },
+      { label: "Buying Guides", href: "/resources#downloads" },
+      { label: "Manufacturing Guides", href: "/resources#sizing-matrix" },
+      { label: "Technical Resources", href: "/resources#downloads" },
+      { label: "Industry Thoughts", href: "/blogs" },
+      { label: "Case Studies", href: "/blogs" },
+      { label: "FAQs", href: "/contact#swatches" },
+      { label: "Downloads", href: "/resources" },
     ],
   },
   {
-    title: "Company",
+    title: "About",
     links: [
-      { label: "Our Manufacturing", href: "/services" },
-      { label: "AI Sizing Grading", href: "/services#capabilities" },
-      { label: "Lab Testing Protocols", href: "/services" },
-      { label: "Rokai Journal & Blogs", href: "/blogs" },
-      { label: "Partnership Programs", href: "/programs" },
-      { label: "Get a Production Quote", href: "/contact" },
-      { label: "Factory Direct Contact", href: "/contact" },
+      { label: "Our Story", href: "/services" },
+      { label: "Our Manufacturing", href: "/services#capabilities" },
+      { label: "Sustainability", href: "/services" },
+      { label: "Blogs", href: "/blogs" },
+      { label: "About Us", href: "/programs" },
+      { label: "News", href: "/blogs" },
+      { label: "Contact Us", href: "/contact" },
     ],
   },
 ];
@@ -90,7 +89,6 @@ const socialLinks: SocialLink[] = [
   { label: "Instagram", icon: Camera },
   { label: "YouTube", icon: Play },
   { label: "LinkedIn", icon: BriefcaseBusiness },
-  { label: "Pinterest", icon: Pin },
   { label: "TikTok", icon: Music2 },
 ];
 
@@ -139,13 +137,13 @@ const PaymentMethods = () => (
 const Footer = () => {
   return (
     <footer className="bg-black text-white">
-      <div className="mx-auto w-full max-w-[1250px] border-t border-[#222] px-5 pb-8 pt-12 sm:px-8 md:pt-14 lg:px-0 lg:pt-16">
+      <div className="mx-auto w-full max-w-[1250px] px-5 pb-8 pt-12 sm:px-8 md:pt-14 lg:px-0 lg:pt-16">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.35fr_repeat(4,1fr)] lg:gap-0">
           <div className="lg:pr-12">
             <Link to="/" className="inline-block">
               <img src={logo} alt="Rokai" className="h-auto w-[150px]" />
             </Link>
-            <p className="mt-7 max-w-[390px] font-space-grotesk text-[17px] font-light leading-[23px] text-white">
+            <p className="mt-7 max-w-[390px] font-space-grotesk text-[15px] font-light leading-[21px] text-white">
               We specialize in custom BJJ apparel, jiu jitsu gear and private label manufacturing
               for academies, brands and athletes worldwide.
             </p>
@@ -162,16 +160,11 @@ const Footer = () => {
                 </a>
               ))}
             </div>
-          
           </div>
 
           {footerColumns.map((column) => (
-            <nav
-              key={column.title}
-              aria-label={column.title}
-              className="lg:border-l lg:border-[#222] lg:px-7 first:lg:pl-0"
-            >
-              <h2 className="font-space-grotesk text-[16px] font-bold leading-[20px] text-[#E51B24]">
+            <nav key={column.title} aria-label={column.title} className="lg:px-7 first:lg:pl-0">
+              <h2 className="bg-gradient-to-r from-[#E51B24] to-[#690106] bg-clip-text font-space-grotesk text-[18px] font-bold leading-[15px] tracking-[0%] text-transparent">
                 {column.title}
               </h2>
               <ul className="mt-5 flex flex-col gap-2.5">
@@ -216,13 +209,13 @@ const Footer = () => {
           <p>2026 ROKAI CORP. All Rights Reserved.</p>
           <nav aria-label="Legal" className="flex flex-wrap gap-4">
             <Link to="/contact" className="transition-colors hover:text-[#E51B24]">
-              Privacy Policy
+              Privacy
             </Link>
             <Link to="/contact" className="transition-colors hover:text-[#E51B24]">
-              Terms of Manufacturing
+              Terms
             </Link>
             <Link to="/contact" className="transition-colors hover:text-[#E51B24]">
-              Cookie Preferences
+              Cookies
             </Link>
           </nav>
         </div>

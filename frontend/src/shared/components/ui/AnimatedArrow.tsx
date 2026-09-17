@@ -24,7 +24,7 @@ export default function AnimatedArrow({ icon: Icon, ...props }: AnimatedArrowPro
   return (
     <Icon
       ref={iconRef}
-      {...props}
+    {...props}
       onMouseEnter={() => rotate(motion.rotation.iconHover)}
       onMouseLeave={() => rotate(0)}
     />

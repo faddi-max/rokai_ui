@@ -24,9 +24,9 @@ export default function Navbar() {
   return (
     <header
       ref={navRef}
-      className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/95 backdrop-blur-md"
+      className="sticky top-0 z-50 w-full bg-[#111111] shadow-[-6px_-8px_17px_0px_#F6F6F6]"
     >
-      <nav className="mx-auto flex max-w-[1512px] items-center justify-between px-6 py-4 md:px-10 lg:px-16">
+      <nav className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-2.5 px-3 py-2.5">
         <Link
           to="/"
           className="flex shrink-0 items-center gap-2"
@@ -35,7 +35,7 @@ export default function Navbar() {
             setActiveDropdown(null);
           }}
         >
-          <img src={logo} alt="Rokai logo" className="h-10 w-auto sm:h-12" />
+          <img src={logo} alt="Rokai logo" className="h-9 w-auto sm:h-11" />
         </Link>
 
         {/* Desktop Navigation */}
@@ -139,7 +139,7 @@ export default function Navbar() {
 
       {/* Mobile Navigation Drawer */}
       {isMobileOpen && (
-        <div className="border-b border-white/10 bg-black/98 px-6 pb-6 pt-2 lg:hidden flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-200 max-h-[85vh] overflow-y-auto">
+        <div className="flex max-h-[85vh] flex-col gap-4 overflow-y-auto border-t border-white/10 bg-[#111111] px-6 pb-6 pt-2 animate-in fade-in slide-in-from-top-2 duration-200 lg:hidden">
           <ul className="flex flex-col gap-2">
             {navLinks.map((link) => {
               const hasDropdown = Boolean(link.hasDropdown && link.dropdownItems?.length);

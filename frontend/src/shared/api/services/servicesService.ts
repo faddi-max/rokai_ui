@@ -9,13 +9,13 @@ import {
 import type {
   ContentCardData,
   FAQItemData,
-  PageHeroProps,
   ProcessStep,
   SplitMediaData,
 } from "@/shared/types/sections";
+import type { HeroContent } from "@/shared/types/hero";
 
 export interface ServicesPageData {
-  hero: PageHeroProps;
+  hero: HeroContent;
   capabilities: ContentCardData[];
   steps: ProcessStep[];
   labTesting: SplitMediaData;

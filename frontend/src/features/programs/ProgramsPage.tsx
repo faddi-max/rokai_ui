@@ -1,4 +1,4 @@
-import PageHero from "@/shared/components/sections/PageHero";
+import HeroSection from "@/shared/components/sections/HeroSection";
 import ContentGridSection from "@/shared/components/sections/ContentGridSection";
 import SplitMediaSection from "@/shared/components/sections/SplitMediaSection";
 import ProcessStepsSection from "@/shared/components/sections/ProcessStepsSection";
@@ -25,7 +25,7 @@ export default function ProgramsPage() {
       {(pageData) => (
         <div className="bg-black">
           {/* Hero Section */}
-          <PageHero {...pageData.hero} />
+          <HeroSection {...pageData.hero} />
 
           {/* Floating Trust Badges */}
           <TrustBadgesSection floating />
