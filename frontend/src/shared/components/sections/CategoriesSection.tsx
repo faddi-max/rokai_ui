@@ -34,7 +34,7 @@ export default function CategoriesSection({
 
   return (
     <section className="relative bg-black overflow-hidden py-20 lg:py-28">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(150,15,20,0.35),transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(150,15,20,0.3),transparent_60%)]" />
 
       <div className="relative max-w-[1512px] mx-auto px-6 md:px-10 lg:px-16">
         {/* Eyebrow + heading | description */}

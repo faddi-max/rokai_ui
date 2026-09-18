@@ -44,7 +44,25 @@ export interface HeroImageVisual {
   imageAlt: string;
 }
 
-export type HeroVisual = HeroModelVisual | HeroImageVisual;
+/** Positioned in px against the unpadded 1512px hero frame, same coordinate space as HeroGlow. */
+export interface HeroImagePosition {
+  width: number;
+  height: number;
+  top: number;
+  left: number;
+  opacity?: number;
+  angle?: number;
+}
+
+/** Full-bleed background photo, positioned like the glows (used by the blog hero). */
+export interface HeroBackgroundVisual {
+  type: "background";
+  image: string;
+  imageAlt: string;
+  position: HeroImagePosition;
+}
+
+export type HeroVisual = HeroModelVisual | HeroImageVisual | HeroBackgroundVisual;
 
 /** One blurred glow shape, in px, positioned against the unpadded 1512px hero frame. */
 export interface HeroGlow {
@@ -63,12 +81,30 @@ export interface HeroBackground {
   glows?: HeroGlow[];
 }
 
+export interface HeroSubscribeCta {
+  placeholder: string;
+  buttonLabel: string;
+  onSubmit?: (email: string) => void;
+}
+
 export interface HeroContent {
   headingLines: HeroHeadingLine[];
   description: string;
-  primaryCta: HeroCta;
-  secondaryCta: HeroCta;
-  secondaryRow: HeroSecondaryRow;
+  /** Omit both when using `subscribe` instead. */
+  primaryCta?: HeroCta;
+  secondaryCta?: HeroCta;
+  secondaryRow?: HeroSecondaryRow;
   visual: HeroVisual;
   background?: HeroBackground;
+  /** Renders an email input + button in place of primaryCta/secondaryCta. */
+  subscribe?: HeroSubscribeCta;
+}
+export interface BlogCategory {
+  image: string;
+  title: string;
+}
+
+export interface BlogPageData {
+  hero: HeroContent;
+  categories: BlogCategory[];
 }

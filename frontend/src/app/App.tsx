@@ -6,15 +6,13 @@ import { useRef } from "react";
 import { ArrowLeft } from "lucide-react";
 import { gsap, useGSAP } from "@/shared/animations";
 import Button from "@/shared/components/ui/Button";
+import BlogCategoryPage from "@/features/blogs/blogCatagoryPage";
 
 // Code-split route pages with lazy loading
 const HomePage = lazy(() => import("@/features/home/HomePage"));
 const CategoriesPage = lazy(() => import("@/features/categories/CategoriesPage"));
-const ServicesPage = lazy(() => import("@/features/services/ServicesPage"));
-const ProgramsPage = lazy(() => import("@/features/programs/ProgramsPage"));
-const ContactPage = lazy(() => import("@/features/contact/ContactPage"));
 const BlogsPage = lazy(() => import("@/features/blogs/BlogsPage"));
-const ResourcesPage = lazy(() => import("@/features/resources/ResourcesPage"));
+
 
 const NotFoundPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -96,8 +94,9 @@ export default function App() {
             <Route path="/services" element={<NotFoundPage />} />
             <Route path="/programs" element={<NotFoundPage />} />
             <Route path="/contact" element={<NotFoundPage />} />
-            <Route path="/blogs" element={<NotFoundPage />} />
+            <Route path="/blogs" element={<BlogsPage />} />
             <Route path="/resources" element={<NotFoundPage />} />
+            <Route path="/blogs/category/:slug" element={<BlogCategoryPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>

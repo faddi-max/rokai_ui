@@ -2,6 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import { useRef } from "react";
 import { gsap, motion, revealLeft, revealRight, revealUp, revealVisible, useGSAP } from "@/shared/animations";
 import { usePrefersReducedMotion } from "@/shared/hooks/usePrefersReducedMotion";
+import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
 import { giSystemsData } from "../data/giSystems.data";
 import type { GiSystemCard, GiSystemsData } from "../data/giSystems.data";
 
@@ -137,8 +138,9 @@ function GiSystemCardItem({ card }: { card: GiSystemCard }) {
               className="group/btn inline-flex items-center gap-2 rounded-md bg-[#E51B24] px-5 py-3 text-[14px] font-semibold text-white transition-colors duration-300 hover:bg-[#c8151d]"
             >
               {card.ctaLabel}
-              <ArrowUpRight
-                className="h-4 w-4 transition-transform duration-300 ease-out group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
+              <AnimatedArrow
+                icon={ArrowUpRight}
+                className="h-4 w-4"
                 strokeWidth={2.5}
               />
             </a>

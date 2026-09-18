@@ -25,8 +25,8 @@ export class ApiError extends Error {
 
 const API_BASE_URL =
   (import.meta as unknown as { env?: { VITE_API_URL?: string } }).env?.VITE_API_URL ||
-  "/api";
-
+  "/api/v1";
+console.log("API_BASE_URL:", API_BASE_URL);
 export const apiClient = {
   /**
    * Performs an HTTP GET request

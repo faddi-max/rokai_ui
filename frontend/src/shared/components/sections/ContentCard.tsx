@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import Button from "@/shared/components/ui/Button";
+import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
 import type { ContentCardData } from "@/shared/types/sections";
 
 interface ContentCardProps {
@@ -59,7 +60,7 @@ export default function ContentCard({ card }: ContentCardProps) {
           <span className="font-space-grotesk text-sm font-medium">
             {ctaText}
           </span>
-          <ArrowUpRight className="h-5 w-5 shrink-0" />
+          <AnimatedArrow icon={ArrowUpRight} className="h-5 w-5 shrink-0" />
         </a>
       </article>
     );
@@ -184,7 +185,7 @@ export default function ContentCard({ card }: ContentCardProps) {
           <span className="font-space-grotesk text-sm sm:text-base font-medium">
             {ctaText}
           </span>
-          <ArrowUpRight className="h-5 w-5 shrink-0" />
+          <AnimatedArrow icon={ArrowUpRight} className="h-5 w-5 shrink-0" />
         </a>
       </div>
     </article>

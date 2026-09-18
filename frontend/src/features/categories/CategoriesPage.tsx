@@ -27,7 +27,7 @@ export default function CategoriesPage() {
       onRetry={refetch}
     >
       {(pageData) => (
-        <div className="bg-black">
+        <div className="">
           <HeroSection {...pageData.hero} />
          <CategoriesSection
   eyebrow="Premium Quality"
