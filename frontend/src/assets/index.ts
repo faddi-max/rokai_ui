@@ -37,9 +37,11 @@ import work5 from './work5.png'
 import work6 from './work6.png'
 import bloghero from './bloghero.png'
 import blogcatagory from './blogcatagory.png' 
+import affiliateProgramhero from './affiliatehero.png'
 export {
   blogcatagory,
   bloghero,
+  affiliateProgramhero,
   work1,
   work2,
   work3,

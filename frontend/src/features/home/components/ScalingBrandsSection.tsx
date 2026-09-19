@@ -38,42 +38,62 @@ export default function ScalingBrands() {
   );
 
   return (
-    <section ref={sectionRef} className="relative bg-black overflow-hidden py-20 lg:py-28">
+    <section ref={sectionRef} className="relative overflow-hidden bg-black py-16 lg:py-20">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(150,15,20,0.3),transparent_60%)]" />
 
-      <div className="relative max-w-[1512px] mx-auto px-6 md:px-10 lg:px-16 grid lg:grid-cols-2 gap-12 items-center">
-        <div data-scaling-model className="relative rounded-2xl overflow-hidden">
+      <div className="relative mx-auto grid max-w-[1512px] items-center gap-10 px-6 md:px-10 lg:grid-cols-2 lg:gap-14 lg:px-16">
+        <div
+          data-scaling-model
+          className="group relative mx-auto w-full max-w-[560px] overflow-hidden rounded-2xl border border-white/10 shadow-2xl transition-all duration-500 hover:border-[#E51B24]/40"
+        >
           <img
             src={scalingBrands.videoThumbnail}
             alt="Rokai BJJ team"
-            className="h-[360px] w-full object-cover object-top opacity-100 rotate-0 sm:h-[420px] lg:h-[500px] lg:w-[704px]"
+            className="max-h-[480px] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
           <a
             href={scalingBrands.videoUrl}
             aria-label="Play video"
-            className="absolute inset-0 flex items-center justify-center"
+            className="absolute inset-0 flex flex-col items-center justify-center gap-3"
           >
-            <span className="w-16 h-16 rounded-full bg-[#E51B24] flex items-center justify-center hover:opacity-90 transition-opacity">
-              <Play size={22} className="text-white fill-white ml-1" />
+            <div className="relative flex items-center justify-center">
+              {!prefersReducedMotion && (
+                <span className="absolute inset-0 animate-ping rounded-full bg-[#E51B24]/40 opacity-75" />
+              )}
+              <span className="relative flex h-12 w-12 items-center justify-center rounded-full bg-[#E51B24] shadow-[0_0_20px_rgba(229,27,36,0.6)] transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
+                <Play size={18} className="ml-0.5 fill-white text-white" />
+              </span>
+            </div>
+            <span className="font-space-grotesk text-xs font-medium uppercase tracking-widest text-white transition-colors duration-300 group-hover:text-[#E51B24]">
+              {scalingBrands.watchLabel ?? "Watch Our Story"}
             </span>
           </a>
         </div>
 
-        <div data-scaling-content className="flex flex-col gap-6">
-          <h2 className="font-space-grotesk text-[clamp(2rem,9vw,4.375rem)] font-bold leading-[1.02] text-white lg:leading-[68px]">
+        <div data-scaling-content className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <span className="font-space-grotesk text-xs uppercase tracking-wide text-white/60">
+              {scalingBrands.eyebrow ?? "A partner you can stand behind"}
+            </span>
+            <span className="h-px flex-1 max-w-[60px] bg-[#E51B24]" />
+          </div>
+
+          <h2 className="font-space-grotesk text-[clamp(1.75rem,5vw,2.75rem)] font-bold leading-[1.1] text-white">
             {scalingBrands.headingLine1}
             <br />
             {scalingBrands.headingLine2}
             <br />
             <span
-              className="bg-clip-text text-[clamp(1.875rem,8vw,3.75rem)] font-light leading-[1.02] text-transparent uppercase lg:leading-[51px]"
+              className="bg-clip-text text-transparent"
               style={{ backgroundImage: "linear-gradient(90deg, #E51B24 0%, #690106 100%)" }}
             >
               {scalingBrands.headingHighlight}
             </span>
           </h2>
 
-          <p className="max-w-xl font-space-grotesk text-[clamp(1rem,4.5vw,1.25rem)] font-light leading-[1.35] text-white/80 capitalize">
+          <p className="max-w-lg font-space-grotesk text-sm font-light leading-[1.5] text-white/70 sm:text-base">
             {scalingBrands.description}
           </p>
 
@@ -82,8 +102,8 @@ export default function ScalingBrands() {
             variant="primary"
             icon={ArrowUpRight}
             weight="medium"
-            size="20px"
-            className="w-fit px-6 h-[56px]"
+            size="14px"
+            className="mt-2 h-[40px] w-fit px-5"
           >
             {scalingBrands.ctaLabel}
           </Button>

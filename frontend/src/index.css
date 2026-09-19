@@ -13,3 +13,11 @@ body {
 img {
   max-width: 100%;
 }
+@keyframes float-badge {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}

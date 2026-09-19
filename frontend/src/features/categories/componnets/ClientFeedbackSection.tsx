@@ -25,7 +25,15 @@ const testimonials: Testimonial[] = [
 const StarRow = () => (
   <div className="flex items-center gap-1">
     {Array.from({ length: 5 }).map((_, i) => (
-      <Star key={i} className="h-3.5 w-3.5" fill="#E51B24" color="#E51B24" strokeWidth={0} />
+      <motion.span
+        key={i}
+        initial={{ scale: 0.8, opacity: 0 }}
+        whileInView={{ scale: 1, opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.1 * i, duration: 0.3 }}
+      >
+        <Star className="h-3.5 w-3.5" fill="#E51B24" color="#E51B24" strokeWidth={0} />
+      </motion.span>
     ))}
   </div>
 );
@@ -45,7 +53,14 @@ const ClientFeedbackSection = () => {
               <span className="font-space-grotesk text-[13px] font-light text-white/60">
                 Client Feedback
               </span>
-              <span className="h-0 w-[38px] shrink-0 border-t border-white/25" />
+              <motion.span
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                style={{ originX: 0 }}
+                className="h-0 w-[38px] shrink-0 border-t border-white/25"
+              />
             </div>
 
             <h2 className="mt-4 font-space-grotesk">
@@ -70,7 +85,7 @@ const ClientFeedbackSection = () => {
               </span>
             </h2>
           </motion.div>
-     <motion.div
+          <motion.div
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
@@ -79,10 +94,9 @@ const ClientFeedbackSection = () => {
           >
             <p className="font-space-grotesk text-[13px] font-light leading-[19px] text-white/60 sm:text-[14px] sm:leading-[20px]">
               Real feedback from academies and brands that rely on Rokai for consistent quality,
-            dependable production and performance-driven BJJ gear.
+              dependable production and performance-driven BJJ gear.
             </p>
           </motion.div>
-       
         </div>
 
         <div className="mt-12 grid grid-cols-1 gap-5 sm:mt-16 lg:grid-cols-2">
@@ -91,11 +105,16 @@ const ClientFeedbackSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.45, ease: "easeOut" }}
-            className="relative overflow-hidden rounded-md border border-white/10 bg-[#0d0908] p-6 sm:p-8"
+            whileHover={{
+              y: -6,
+              borderColor: "rgba(229, 27, 36, 0.4)",
+              boxShadow: "0 10px 30px -10px rgba(229, 27, 36, 0.25)",
+            }}
+            className="group relative overflow-hidden rounded-md border border-white/10 bg-[#0d0908] p-6 transition-colors duration-300 sm:p-8"
           >
-            <span className="absolute left-8 top-0 h-[3px] w-10 bg-[#E51B24]" />
+            <span className="absolute left-8 top-0 h-[3px] w-10 bg-[#E51B24] transition-all duration-300 group-hover:w-16" />
             <Quote
-              className="pointer-events-none absolute right-6 top-6 h-16 w-16 text-[#E51B24]/10"
+              className="pointer-events-none absolute right-6 top-6 h-16 w-16 text-[#E51B24]/10 transition-transform duration-500 group-hover:scale-110 group-hover:text-[#E51B24]/20"
               strokeWidth={0}
               fill="currentColor"
             />
@@ -127,11 +146,16 @@ const ClientFeedbackSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.45, delay: 0.08 * (index + 1), ease: "easeOut" }}
-                className="rounded-md border border-white/10 bg-[#0d0908] p-6"
+                whileHover={{
+                  y: -5,
+                  borderColor: "rgba(229, 27, 36, 0.4)",
+                  boxShadow: "0 10px 25px -10px rgba(229, 27, 36, 0.2)",
+                }}
+                className="group rounded-md border border-white/10 bg-[#0d0908] p-6 transition-colors duration-300"
               >
                 <div className="flex items-center justify-between">
                   <StarRow />
-                  <span className="font-space-grotesk text-[12px] font-light text-white/25">
+                  <span className="font-space-grotesk text-[12px] font-light text-white/25 transition-colors group-hover:text-white/50">
                     {item.number}
                   </span>
                 </div>
@@ -141,8 +165,8 @@ const ClientFeedbackSection = () => {
                 </p>
 
                 <div className="mt-6 flex items-center gap-2 border-t border-white/10 pt-4">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#E51B24]" />
-                  <span className="font-space-grotesk text-[11px] font-light uppercase tracking-[0.05em] text-white/35">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#E51B24] transition-transform duration-300 group-hover:scale-125" />
+                  <span className="font-space-grotesk text-[11px] font-light uppercase tracking-[0.05em] text-white/35 transition-colors group-hover:text-white/60">
                     {item.label}
                   </span>
                 </div>

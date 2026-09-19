@@ -86,6 +86,16 @@ export interface HeroSubscribeCta {
   buttonLabel: string;
   onSubmit?: (email: string) => void;
 }
+export interface HeroFloatingBadge {
+  value: string;
+  label: string;
+  position: {
+    top?: string;
+    bottom?: string;
+    left?: string;
+    right?: string;
+  };
+}
 
 export interface HeroContent {
   headingLines: HeroHeadingLine[];
@@ -99,12 +109,28 @@ export interface HeroContent {
   /** Renders an email input + button in place of primaryCta/secondaryCta. */
   subscribe?: HeroSubscribeCta;
 }
-export interface BlogCategory {
-  image: string;
-  title: string;
-}
+export type { BlogCategory } from "./blogs";
 
 export interface BlogPageData {
   hero: HeroContent;
-  categories: BlogCategory[];
+  categories: import("./blogs").BlogCategory[];
+}
+export interface HeroModelVisual {
+  type: "model";
+  image: string;
+  imageAlt: string;
+  productCard: {
+    image: string;
+    imageAlt: string;
+    name: string;
+  };
+  caption?: string;
+  floatingBadges?: HeroFloatingBadge[];
+}
+
+export interface HeroImageVisual {
+  type: "image";
+  image: string;
+  imageAlt: string;
+  floatingBadges?: HeroFloatingBadge[];
 }

@@ -49,7 +49,7 @@ export default function CategoryCard({ category, index }: CategoryCardProps) {
           href={category.buttonHref}
           variant="dark"
           icon={ArrowUpRight}
-          weight="semibold"
+          weight="bold"
           size="15px"
           className="mt-2 h-[46px] w-fit rounded-lg !bg-[#E51B24] px-5 text-white hover:!bg-[#c9161f]"
         >

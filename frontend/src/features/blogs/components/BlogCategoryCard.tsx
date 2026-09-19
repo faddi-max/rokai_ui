@@ -1,6 +1,7 @@
 import type { ReactNode, CSSProperties } from "react";
 import { ArrowUpRight } from "lucide-react";
 import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
+import { blogcatagory } from "@/assets";
 
 const FONT_STACK: CSSProperties = {
   fontFamily:
@@ -117,8 +118,11 @@ export default function BlogCard({
         <div className="relative h-[160px] w-full shrink-0 px-[8px] pt-[8px] sm:h-[190px] sm:px-[11px] sm:pt-[11px] md:h-[220px]">
           <div className="relative h-full w-full overflow-hidden rounded-t-[7px]">
             <img
-              src={image}
+              src={image || blogcatagory}
               alt={imageAlt}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = blogcatagory;
+              }}
               className="h-full w-full object-cover transition-transform duration-500 ease-out motion-safe:group-hover:scale-110"
             />
             <div
@@ -182,8 +186,11 @@ export default function BlogCard({
       <div className="relative h-[220px] w-full shrink-0 px-[8px] pt-[8px] sm:h-[280px] sm:px-[11px] sm:pt-[11px] md:h-[332px]">
         <div className="relative h-full w-full overflow-hidden rounded-t-[7px]">
           <img
-            src={image}
+            src={image || blogcatagory}
             alt={imageAlt}
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = blogcatagory;
+            }}
             className="h-full w-full object-cover transition-transform duration-500 ease-out motion-safe:group-hover:scale-110"
           />
           <div

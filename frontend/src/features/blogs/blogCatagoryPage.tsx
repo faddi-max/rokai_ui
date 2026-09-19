@@ -2,27 +2,29 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import HeroSection from "@/shared/components/sections/HeroSection";
 import SectionHeaderblog from "@/shared/components/sections/SectionHeaderblog";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
-import { categoriesService } from "@/shared/api/services/categoriesService";
+import { blogsService } from "@/shared/api/services/blogsService";
 import { DataLoader, PageLoader } from "@/shared/components/feedback";
 import FAQSection from "../home/components/FAQSection";
 import ManufacturingProcessSection from "../home/components/ManufacturingProcessSection";
 import BlogCard from "./components/BlogCategoryCard";
-import { getCategoryBySlug } from "./data/blogCategories";
-import { getPostsByCategorySlug } from "./data/blogPost";
 
 export default function BlogCategoryPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
- 
-  const { data, loading, error, refetch } = useAsyncData(() =>
-    categoriesService.getblogPageData()
-  );
+  const { data, loading, error, refetch } = useAsyncData(async () => {
+    const pageData = await blogsService.getBlogsPageData();
+    const category = slug ? await blogsService.getBlogCategoryBySlug(slug) : undefined;
+    const posts = slug ? await blogsService.getPostsByCategorySlug(slug) : [];
 
-  const category = slug ? getCategoryBySlug(slug) : undefined;
-  const posts = slug ? getPostsByCategorySlug(slug) : [];
+    return {
+      pageData,
+      category,
+      posts,
+    };
+  }, [slug]);
 
-  if (!category) {
+  if (!loading && (!data?.category)) {
     return (
       <section className="flex min-h-[50vh] flex-col items-center justify-center gap-4 bg-black px-5 py-16 text-center text-white">
         <p className="text-lg">This category doesn't exist.</p>
@@ -38,24 +40,24 @@ export default function BlogCategoryPage() {
       loading={loading}
       error={error}
       data={data}
-      skeleton={<PageLoader message="LOADING APPAREL CATALOG..." />}
+      skeleton={<PageLoader message="LOADING CATEGORY POSTS..." />}
       onRetry={refetch}
     >
-      {(pageData) => (
+      {({ pageData, category, posts }) => (
         <div>
           <HeroSection {...pageData.hero} />
 
-          <section
-            className="relative bg-black px-5 py-16 sm:px-8 md:px-10 lg:px-16 overflow-hidden"
-          >
+          <section className="relative bg-black px-5 py-16 sm:px-8 md:px-10 lg:px-16 overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(150,15,20,0.3),transparent_60%)]" />
             <div className="relative mx-auto max-w-[1512px]">
-              <SectionHeaderblog
-                eyebrow={category.title}
-                title="Recent Blog"
-                highlight="& News Post"
-                description={category.description}
-              />
+              {category && (
+                <SectionHeaderblog
+                  eyebrow={category.title}
+                  title="Recent Blog"
+                  highlight="& News Post"
+                  description={category.description}
+                />
+              )}
 
               {posts.length === 0 ? (
                 <p className="mt-10 text-white/60">

@@ -60,6 +60,7 @@ export default function HeroSection({
       if (document.querySelector("[data-hero-product-card], [data-hero-caption]")) {
         tl.fromTo("[data-hero-product-card], [data-hero-caption]", revealRight(), { ...revealVisible, stagger: motion.stagger }, "-=0.25");
       }
+      
     },
     { scope: heroRef, dependencies: [prefersReducedMotion], revertOnUpdate: true }
   );
@@ -68,15 +69,11 @@ export default function HeroSection({
     <section
       ref={heroRef}
       className={`relative overflow-hidden pb-8 lg:pb-0 ${
-        isBackgroundVisual ? "bg-[#111111] lg:h-[560px]" : "bg-black"
+        isBackgroundVisual ? "bg-black lg:h-[560px]" : "bg-black"
       } ${background?.sectionClassName ?? ""}`}
-    > 
-      
+    >
       <div className="pointer-events-none absolute inset-0">
-           
-         
         <div className="relative mx-auto hidden h-full max-w-[1512px] lg:block">
-           {/* <div className="pointer-events-none absolute inset-0 bg-black/40 " /> */}
           {glows.map((glow, index) => (
             <div
               key={index}
@@ -102,7 +99,6 @@ export default function HeroSection({
                 transform: visual.position.angle ? `rotate(${visual.position.angle}deg)` : undefined,
               }}
             >
-             
               <img
                 data-hero-visual
                 src={visual.image}
@@ -110,10 +106,7 @@ export default function HeroSection({
                 className="h-full w-full object-cover"
                 style={{ opacity: visual.position.opacity ?? 1 }}
               />
-            
-          
             </div>
-            
           )}
         </div>
 
@@ -122,8 +115,6 @@ export default function HeroSection({
           style={{ backgroundColor: "#E51B2470", filter: "blur(120px)" }}
         />
       </div>
-
-    
 
       <div className={`relative mx-auto grid max-w-[1512px] items-center gap-8 px-5 py-10 sm:px-8 md:px-10 ${isBackgroundVisual ? "" : "lg:grid-cols-2 lg:gap-5"} lg:px-16`}>
         <div className={`relative z-10 flex min-w-0 flex-col gap-6 ${isBackgroundVisual ? "max-w-2xl" : ""}`}>
@@ -142,7 +133,6 @@ export default function HeroSection({
             ))}
           </h1>
 
-          
           <div data-hero-divider className="flex items-center gap-2">
             <span className="h-[3px] w-12 bg-white" />
             <span className="h-[3px] w-3 bg-white" />
@@ -208,6 +198,31 @@ export default function HeroSection({
           <div className="relative flex w-full items-end justify-center gap-8 lg:gap-15">
             <div className={`relative z-10 w-full max-w-[320px] sm:max-w-[420px] lg:max-w-[480px] ${isModelVisual ? "lg:-translate-x-10" : ""}`}>
               <img data-hero-visual src={visual.image} alt={visual.imageAlt} className="h-auto w-full object-contain" />
+
+{visual.floatingBadges?.map((badge, index) => (
+  <div
+    key={`${badge.label}-${index}`}
+    data-hero-badge
+    className="absolute z-20 rounded-md bg-black/80 px-2 py-1.5 backdrop-blur-sm sm:px-3 sm:py-2"
+    style={{
+      top: badge.position.top,
+      bottom: badge.position.bottom,
+      left: badge.position.left,
+      right: badge.position.right,
+      animation: prefersReducedMotion
+        ? undefined
+        : `float-badge 3s ease-in-out ${index * 0.4}s infinite`,
+    }}
+  >
+    <p className="font-space-grotesk text-[10px] font-bold leading-none text-white sm:text-sm">
+      {badge.value}
+    </p>
+    <p className="mt-1 font-space-grotesk text-[7px] uppercase leading-none tracking-wide text-white/60 sm:text-[9px]">
+      {badge.label}
+    </p>
+  </div>
+))}
+
               {isModelVisual && (
                 <div data-hero-product-card className="absolute -top-1 right-0 flex w-[112px] flex-col rounded-md bg-white p-2.5 shadow-lg sm:-top-4 sm:-right-10 sm:w-[140px] sm:p-3 lg:-right-24">
                   <img src={visual.productCard.image} alt={visual.productCard.imageAlt} className="h-[88px] w-full rounded object-contain object-top sm:h-[110px]" />
@@ -225,7 +240,6 @@ export default function HeroSection({
         )}
       </div>
 
-      
       {isBackgroundVisual && (
         <div className="relative mt-6 w-full overflow-hidden lg:hidden">
           <img

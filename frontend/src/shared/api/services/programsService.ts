@@ -1,49 +1,32 @@
 import { apiClient } from "@/shared/api/apiClient";
-import {
-  programsHeroData,
-  programsCardsData,
-  academySplitData,
-  programSteps,
-  programsFaqs,
-} from "@/features/programs/data/programsData";
-import type {
-  ContentCardData,
-  FAQItemData,
-  ProcessStep,
-  SplitMediaData,
-} from "@/shared/types/sections";
+import { affiliateHeroContent } from "@/features/programs/data/heroContent";
+import { STEPS, Step } from "@/features/programs/data/steps.data";
+import { audienceTags } from "@/features/programs/data/audienceTags";
 import type { HeroContent } from "@/shared/types/hero";
 
 export interface ProgramsPageData {
   hero: HeroContent;
-  programs: ContentCardData[];
-  academyEconomics: SplitMediaData;
-  steps: ProcessStep[];
-  faqs: FAQItemData[];
+  steps: Step[];
+  audienceTags: string[];
 }
 
 export const programsService = {
   /**
    * Fetches the entire Programs page payload.
-   * Future API integration:
-   * return apiClient.get<ProgramsPageData>('/programs');
    */
   async getProgramsPageData(): Promise<ProgramsPageData> {
-    return apiClient.simulateCall<ProgramsPageData>({
-      hero: programsHeroData,
-      programs: programsCardsData,
-      academyEconomics: academySplitData,
-      steps: programSteps,
-      faqs: programsFaqs,
-    });
+    const fallback: ProgramsPageData = {
+      hero: affiliateHeroContent,
+      steps: STEPS,
+      audienceTags: audienceTags,
+    };
+    return apiClient.fetchWithFallback<ProgramsPageData>("/programs/page", fallback);
   },
 
   /**
-   * Fetches only the partnership program cards.
-   * Future API integration:
-   * return apiClient.get<ContentCardData[]>('/programs/cards');
+   * Fetches step-by-step process items for programs.
    */
-  async getPrograms(): Promise<ContentCardData[]> {
-    return apiClient.simulateCall<ContentCardData[]>(programsCardsData);
+  async getProgramSteps(): Promise<Step[]> {
+    return apiClient.fetchWithFallback<Step[]>("/programs/steps", STEPS);
   },
 };
