@@ -11,7 +11,7 @@ type StepSectionProps = {
 export default function StepSection({ steps = STEPS }: StepSectionProps) {
   return (
     <SectionGlow>
-      <section className="px-4  sm:px-6">
+      <section className="px-4 pb-10 sm:px-6">
         <SectionHeaderblog
           eyebrow="Three clear steps"
           title="Join. Share."

@@ -1,24 +1,21 @@
-import { avatar1, avatar2, avatar3, avatar4, heroMain } from "@/assets";
+import { heroMain } from "@/assets";
 import type { HeroContent } from "@/shared/types/hero";
 
 export const heroContent: HeroContent = {
+  eyebrow: "B2B Combat Sports Apparel Manufacturing",
   headingLines: [
-    { text: "THE FIRST" },
-    { text: "AI-INTEGRATED" },
-    { text: "BJJ APPAREL" },
-    { text: "MANUFACTURER", highlight: true },
+    { text: "Custom combat sports apparel" },
+    { text: "built around" },
+    { text: "your brand.", highlight: true },
   ],
-  description: "Premium quality. Precision engineering. Built for academies. Trusted by brands.",
-  primaryCta: { label: "Get Your Free Assessment", href: "#assessment" },
-  secondaryCta: { label: "Get a Quote", href: "#quote" },
-  secondaryRow: {
-    type: "join",
-    avatars: [avatar1, avatar2, avatar3, avatar4],
-    joinText: "Join 100+ academies and brands growing with ROKAI",
-  },
+  description:
+    "ROKAI develops and manufactures custom fightwear for combat sports brands, academies, gyms and teams, from product development and sampling to bulk production and worldwide delivery.",
+  primaryCta: { label: "Start your project", href: "/contact" },
+  secondaryCta: { label: "Explore manufacturing", href: "/custom-fightwear-manufacturing/" },
+
   visual: {
     type: "image",
     image: heroMain,
-    imageAlt: "Rokai hoodie model",
+    imageAlt: "Custom hoodie manufactured by ROKAI, worn by a model", 
   },
 };

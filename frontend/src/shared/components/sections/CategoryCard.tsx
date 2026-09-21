@@ -18,11 +18,13 @@ export default function CategoryCard({ category, index }: CategoryCardProps) {
   };
 
   return (
-    <div className="flex flex-col gap-6 rounded-2xl border border-white/5 bg-[#0d0808] p-6 sm:flex-row sm:items-center sm:gap-8 sm:p-8">
+    <article className="flex h-full flex-col gap-6 rounded-2xl border border-white/5 bg-[#0d0808] p-6 sm:flex-row sm:items-center sm:gap-8 sm:p-8">
       <div className="mx-auto h-[280px] w-full max-w-[200px] shrink-0 sm:mx-0 sm:h-[320px] sm:w-[200px]">
         <img
           src={category.image}
-          alt={category.title}
+          alt={category.imageAlt}
+          loading="lazy"
+          decoding="async"
           className="h-full w-full object-contain"
           onMouseEnter={(event) => animateModel(event.currentTarget, 1.04)}
           onMouseLeave={(event) => animateModel(event.currentTarget, 1)}
@@ -30,7 +32,10 @@ export default function CategoryCard({ category, index }: CategoryCardProps) {
       </div>
 
       <div className="flex flex-1 flex-col gap-3">
-        <span className="font-space-grotesk text-sm font-medium text-[#E51B24]">
+        <span
+          aria-hidden="true"
+          className="font-space-grotesk text-sm font-medium text-[#E51B24]"
+        >
           {String(index + 1).padStart(2, "0")}
         </span>
 
@@ -54,8 +59,10 @@ export default function CategoryCard({ category, index }: CategoryCardProps) {
           className="mt-2 h-[46px] w-fit rounded-lg !bg-[#E51B24] px-5 text-white hover:!bg-[#c9161f]"
         >
           {category.buttonLabel}
+          
+          <span className="sr-only">: {category.title}</span>
         </Button>
       </div>
-    </div>
+    </article>
   );
 }

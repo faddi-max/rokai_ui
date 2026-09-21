@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { gsap, useGSAP } from "@/shared/animations";
 import Button from "@/shared/components/ui/Button";
 import BlogCategoryPage from "@/features/blogs/blogCatagoryPage";
+import AmbassadorProgramPage, {  } from "@/features/programs/ambassador-program/AmbassadorProgram";
 
 // Code-split route pages with lazy loading
 const HomePage = lazy(() => import("@/features/home/HomePage"));
@@ -93,7 +94,7 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/services" element={<NotFoundPage />} />
-            <Route path="/programs" element={<ProgramsPage />} />
+            <Route path="/programs" element={<AmbassadorProgramPage />} />
             <Route path="/contact" element={<NotFoundPage />} />
             <Route path="/blogs" element={<BlogsPage />} />
             <Route path="/resources" element={<NotFoundPage />} />

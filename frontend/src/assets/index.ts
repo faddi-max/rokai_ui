@@ -38,10 +38,19 @@ import work6 from './work6.png'
 import bloghero from './bloghero.png'
 import blogcatagory from './blogcatagory.png' 
 import affiliateProgramhero from './affiliatehero.png'
+import ambassadorProgramhero from './ambassotorhero.png'
+import whatisambassador from './whatisambassator.png'
+import partnershipImage from './partnership.png'
+import resourse1 from './resourse1.png'
+import resourse2 from './resourse2.png'
 export {
+  resourse1,
+  resourse2,
+  whatisambassador,
   blogcatagory,
   bloghero,
   affiliateProgramhero,
+  ambassadorProgramhero,
   work1,
   work2,
   work3,
@@ -75,6 +84,7 @@ export {
   partner2 as sponsorshipProgramImage,
   partner3 as ambassadorProgramImage,
   partner4 as affiliateProgramImage,
+  partnershipImage,
   testimonial1,
   testimonial2,
   testimonial3,

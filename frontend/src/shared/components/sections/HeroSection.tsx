@@ -12,6 +12,7 @@ const DEFAULT_GLOWS: HeroGlow[] = [
 ];
 
 export default function HeroSection({
+  eyebrow, // SEO CHANGE: new prop
   headingLines,
   description,
   primaryCta,
@@ -27,6 +28,10 @@ export default function HeroSection({
   const isBackgroundVisual = visual.type === "background";
   const glows = background?.glows ?? DEFAULT_GLOWS;
   const [email, setEmail] = useState("");
+
+  const sectionBgColor = background?.bgColor ?? "#000000";
+  const sectionHeightPx = isBackgroundVisual ? background?.heightPx ?? 560 : undefined;
+  const photoOpacity = isBackgroundVisual ? visual.position.opacity ?? 1 : 1;
 
   const renderBadgeValue = (value: string) => {
     const accent = value.match(/(%|\+|\/7)$/)?.[0];
@@ -60,7 +65,6 @@ export default function HeroSection({
       if (document.querySelector("[data-hero-product-card], [data-hero-caption]")) {
         tl.fromTo("[data-hero-product-card], [data-hero-caption]", revealRight(), { ...revealVisible, stagger: motion.stagger }, "-=0.25");
       }
-      
     },
     { scope: heroRef, dependencies: [prefersReducedMotion], revertOnUpdate: true }
   );
@@ -68,12 +72,17 @@ export default function HeroSection({
   return (
     <section
       ref={heroRef}
-      className={`relative overflow-hidden pb-8 lg:pb-0 ${
-        isBackgroundVisual ? "bg-black lg:h-[560px]" : "bg-black"
-      } ${background?.sectionClassName ?? ""}`}
+      className={`relative overflow-hidden pb-8 lg:pb-0 ${background?.sectionClassName ?? ""}`}
+      style={{
+        backgroundColor: sectionBgColor,
+        ...(sectionHeightPx ? { minHeight: undefined } : {}),
+      }}
     >
       <div className="pointer-events-none absolute inset-0">
-        <div className="relative mx-auto hidden h-full max-w-[1512px] lg:block">
+        <div
+          className="relative mx-auto hidden max-w-[1512px] lg:block"
+          style={sectionHeightPx ? { height: sectionHeightPx } : { height: "100%" }}
+        >
           {glows.map((glow, index) => (
             <div
               key={index}
@@ -104,7 +113,10 @@ export default function HeroSection({
                 src={visual.image}
                 alt={visual.imageAlt}
                 className="h-full w-full object-cover"
-                style={{ opacity: visual.position.opacity ?? 1 }}
+              />
+              <div
+                className="absolute inset-0"
+                style={{ backgroundColor: sectionBgColor, opacity: 1 - photoOpacity }}
               />
             </div>
           )}
@@ -116,8 +128,18 @@ export default function HeroSection({
         />
       </div>
 
-      <div className={`relative mx-auto grid max-w-[1512px] items-center gap-8 px-5 py-10 sm:px-8 md:px-10 ${isBackgroundVisual ? "" : "lg:grid-cols-2 lg:gap-5"} lg:px-16`}>
+      <div
+        className={`relative mx-auto grid max-w-[1512px] items-center gap-8 px-5 py-10 sm:px-8 md:px-10 ${isBackgroundVisual ? "" : "lg:grid-cols-2 lg:gap-5"} lg:px-16`}
+        style={sectionHeightPx ? { minHeight: undefined } : undefined}
+      >
         <div className={`relative z-10 flex min-w-0 flex-col gap-6 ${isBackgroundVisual ? "max-w-2xl" : ""}`}>
+          {/* SEO CHANGE: eyebrow text above the H1 */}
+          {eyebrow && (
+            <p className="font-space-grotesk text-xs font-medium uppercase tracking-[0.2em] text-white/70">
+              {eyebrow}
+            </p>
+          )}
+
           <h1 data-hero-heading className="font-space-grotesk text-[clamp(2rem,9vw,3.5rem)] font-bold uppercase leading-[1.02] text-white lg:text-[70px] lg:leading-[68px]">
             {headingLines.map((line, index) => (
               <span
@@ -128,7 +150,14 @@ export default function HeroSection({
                     : undefined
                 }
               >
-                {line.text}{index < headingLines.length - 1 && <br />}
+                {/* SEO CHANGE: add a space before <br /> so text reads correctly */}
+                {line.text}
+                {index < headingLines.length - 1 && (
+                  <>
+                    {" "}
+                    <br />
+                  </>
+                )}
               </span>
             ))}
           </h1>
@@ -160,10 +189,21 @@ export default function HeroSection({
                 </button>
               </form>
             ) : (
-              primaryCta && secondaryCta && (
+              primaryCta && (
                 <>
-                  <Button href={primaryCta.href} variant="outline" icon={ArrowUpRight} className="h-[44px] w-full px-4 sm:w-auto sm:px-6">{primaryCta.label}</Button>
-                  <Button href={secondaryCta.href} icon={ArrowUpRight} className="h-[44px] w-full px-4 sm:w-auto sm:px-6">{secondaryCta.label}</Button>
+                  <Button
+                    href={primaryCta.href}
+                    variant={secondaryCta ? "outline" : "primary"}
+                    icon={ArrowUpRight}
+                    className="h-[44px] w-full px-4 sm:w-auto sm:px-6"
+                  >
+                    {primaryCta.label}
+                  </Button>
+                  {secondaryCta && (
+                    <Button href={secondaryCta.href} icon={ArrowUpRight} className="h-[44px] w-full px-4 sm:w-auto sm:px-6">
+                      {secondaryCta.label}
+                    </Button>
+                  )}
                 </>
               )
             )}
@@ -174,7 +214,14 @@ export default function HeroSection({
               {secondaryRow.type === "join" ? (
                 <div className="mt-2 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
                   <div className="flex shrink-0 -space-x-3">
-                    {secondaryRow.avatars.map((avatar, index) => <img key={`${avatar}-${index}`} src={avatar} alt="Rokai community member" className="h-10 w-10 rounded-full border-2 border-black object-cover" />)}
+                    {secondaryRow.avatars.map((avatar, index) => (
+                      <img
+                        key={`${avatar}-${index}`}
+                        src={avatar}
+                        alt="" // SEO CHANGE: decorative avatars get empty alt
+                        className="h-10 w-10 rounded-full border-2 border-black object-cover"
+                      />
+                    ))}
                   </div>
                   <p className="font-space-grotesk text-sm text-white/80">{secondaryRow.joinText}</p>
                 </div>
@@ -197,31 +244,41 @@ export default function HeroSection({
         {!isBackgroundVisual && (
           <div className="relative flex w-full items-end justify-center gap-8 lg:gap-15">
             <div className={`relative z-10 w-full max-w-[320px] sm:max-w-[420px] lg:max-w-[480px] ${isModelVisual ? "lg:-translate-x-10" : ""}`}>
-              <img data-hero-visual src={visual.image} alt={visual.imageAlt} className="h-auto w-full object-contain" />
+              {/* SEO CHANGE: width, height and priority so the main image loads fast */}
+              <img
+                data-hero-visual
+                src={visual.image}
+                alt={visual.imageAlt}
+                width={480}
+                height={640}
+                decoding="async"
+                fetchPriority="high"
+                className="h-auto w-full object-contain"
+              />
 
-{visual.floatingBadges?.map((badge, index) => (
-  <div
-    key={`${badge.label}-${index}`}
-    data-hero-badge
-    className="absolute z-20 rounded-md bg-black/80 px-2 py-1.5 backdrop-blur-sm sm:px-3 sm:py-2"
-    style={{
-      top: badge.position.top,
-      bottom: badge.position.bottom,
-      left: badge.position.left,
-      right: badge.position.right,
-      animation: prefersReducedMotion
-        ? undefined
-        : `float-badge 3s ease-in-out ${index * 0.4}s infinite`,
-    }}
-  >
-    <p className="font-space-grotesk text-[10px] font-bold leading-none text-white sm:text-sm">
-      {badge.value}
-    </p>
-    <p className="mt-1 font-space-grotesk text-[7px] uppercase leading-none tracking-wide text-white/60 sm:text-[9px]">
-      {badge.label}
-    </p>
-  </div>
-))}
+              {visual.floatingBadges?.map((badge, index) => (
+                <div
+                  key={`${badge.label}-${index}`}
+                  data-hero-badge
+                  className="absolute z-20 rounded-md bg-black/80 px-2 py-1.5 backdrop-blur-sm sm:px-3 sm:py-2"
+                  style={{
+                    top: badge.position.top,
+                    bottom: badge.position.bottom,
+                    left: badge.position.left,
+                    right: badge.position.right,
+                    animation: prefersReducedMotion
+                      ? undefined
+                      : `float-badge 3s ease-in-out ${index * 0.4}s infinite`,
+                  }}
+                >
+                  <p className="font-space-grotesk text-[10px] font-bold leading-none text-white sm:text-sm">
+                    {badge.value}
+                  </p>
+                  <p className="mt-1 font-space-grotesk text-[7px] uppercase leading-none tracking-wide text-white/60 sm:text-[9px]">
+                    {badge.label}
+                  </p>
+                </div>
+              ))}
 
               {isModelVisual && (
                 <div data-hero-product-card className="absolute -top-1 right-0 flex w-[112px] flex-col rounded-md bg-white p-2.5 shadow-lg sm:-top-4 sm:-right-10 sm:w-[140px] sm:p-3 lg:-right-24">
@@ -246,6 +303,10 @@ export default function HeroSection({
             src={visual.image}
             alt={visual.imageAlt}
             className="h-[220px] w-full object-cover sm:h-[280px] md:h-[340px]"
+          />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ backgroundColor: sectionBgColor, opacity: 1 - photoOpacity }}
           />
           <div
             className="pointer-events-none absolute inset-0"

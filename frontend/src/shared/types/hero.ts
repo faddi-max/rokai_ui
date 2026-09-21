@@ -70,17 +70,17 @@ export interface HeroGlow {
   height: number;
   top: number;
   left: number;
-  /** 8-digit hex (RRGGBBAA) or any valid CSS color. */
+ 
   color: string;
   blur: number;
 }
 
 export interface HeroBackground {
   sectionClassName?: string;
-  /** Overrides the default two-blob glow. Omit to use the shared default. */
+  bgColor?: string;  
+  heightPx?: number;   
   glows?: HeroGlow[];
 }
-
 export interface HeroSubscribeCta {
   placeholder: string;
   buttonLabel: string;
@@ -98,6 +98,7 @@ export interface HeroFloatingBadge {
 }
 
 export interface HeroContent {
+   eyebrow?: string;
   headingLines: HeroHeadingLine[];
   description: string;
   /** Omit both when using `subscribe` instead. */

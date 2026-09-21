@@ -13,7 +13,7 @@ export default function BenefitsSection({
 }: BenefitsSectionProps) {
   return (
     <SectionGlow>
-      <section className="px-4  sm:px-6 ">
+      <section className="px-4 py-1  sm:px-6 ">
         <SectionHeaderblog
           eyebrow="Partnership benefits"
           title="More than"

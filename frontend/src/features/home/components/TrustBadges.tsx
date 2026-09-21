@@ -1,3 +1,9 @@
+import { Fragment } from "react";
+import { ArrowUpRight } from "lucide-react";
+import SectionGlow from "@/shared/components/layout/SectionGlow";
+
+const CTA_HREF = "#contact";
+
 const trustStats = [
   { value: "250+", label: "Global Clients" },
   { value: "30+", label: "Countries Served" },
@@ -8,55 +14,47 @@ const trustStats = [
 
 const TrustBadges = () => {
   return (
-    <section className="w-full bg-black pb-20 pt-20 sm:pb-24 sm:pt-24 lg:pb-28 lg:pt-28">
-      <div className="mx-auto w-full max-w-[1250px] px-5 sm:px-8 lg:px-0">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
-          <h2 className="font-space-grotesk uppercase">
-            <span
-              className="block font-bold leading-[1] text-white"
-              style={{ fontSize: "clamp(38px, 3.9vw, 60px)" }}
-            >
-              TRUSTED BY COMBAT
-            </span>
-            <span
-              className="block bg-clip-text font-light leading-[1] text-transparent"
-              style={{
-                fontSize: "clamp(30px, 3.5vw, 54px)",
-                backgroundImage: "linear-gradient(90deg, #E51B24 0%, #690106 100%)",
-              }}
-            >
-              SPORTS BUSINESS WORLDWIDE
-            </span>
+    <SectionGlow className="relative w-full overflow-hidden pb-20 pt-20 sm:pb-24 sm:pt-24 lg:pb-28 lg:pt-24">
+      <div className="relative z-10 mx-auto w-full max-w-[1250px] px-5 sm:px-8 lg:px-0">
+        {/* --- CTA banner --- */}
+        <div className="flex flex-col items-start justify-between gap-6 rounded-[12px] bg-white px-7 py-9 shadow-[0px_0px_12px_3px_rgba(230,57,70,0.28)] sm:px-10 lg:h-[153px] lg:flex-row lg:items-center lg:gap-10 lg:px-12 lg:py-0">
+          <h2 className="max-w-[880px] font-space-grotesk text-[26px] font-bold uppercase leading-[1.1] tracking-[-0.01em] text-[#E63946] sm:text-[30px] lg:text-[34px]">
+            Ready to build your next combat apparel collection?
           </h2>
 
-          <p className="max-w-[290px] font-space-grotesk text-[clamp(1rem,4.5vw,1.125rem)] font-light leading-[1.35] text-white lg:mt-2">
-            Trusted by combat sports brands around the world for exceptional quality, reliable
-            manufacturing, and professional service.
-          </p>
+          <a
+            href={CTA_HREF}
+            className="flex h-[48px] shrink-0 items-center gap-6 rounded-[6px] bg-[#E63946] px-5 font-space-grotesk text-[14px] font-medium text-white transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E63946]"
+          >
+            Get in Touch
+            <ArrowUpRight size={14} aria-hidden />
+          </a>
         </div>
 
-        <div className="mt-10 grid min-h-[102px] grid-cols-1 bg-[#F6F6F6] sm:mt-12 sm:grid-cols-2 lg:mt-14 lg:grid-cols-5">
+        {/* --- Stats row --- */}
+        <div className="mt-9 flex flex-col gap-6 lg:min-h-[116px] lg:flex-row lg:items-center lg:justify-between lg:gap-0 lg:px-12">
           {trustStats.map((stat, index) => (
-            <div
-              key={stat.label}
-              className={`flex items-center px-8 py-6 lg:px-9 lg:py-0 ${
-                index > 0 ? "border-t border-[#D0D0D0] sm:border-l sm:border-t-0" : ""
-              }`}
-            >
+            <Fragment key={stat.label}>
+              {index > 0 && (
+                <span
+                  aria-hidden
+                  className="h-px w-full bg-white/15 lg:h-[80px] lg:w-px lg:bg-white/25"
+                />
+              )}
               <div>
                 <p className="font-space-grotesk text-[clamp(1.5rem,7vw,1.75rem)] font-bold leading-[1.15] text-[#E51B24]">
                   {stat.value}
                 </p>
-                <p className="mt-1 font-space-grotesk text-[clamp(0.9375rem,4vw,1.0625rem)] font-normal leading-[1.3] text-black">
+                <p className="mt-1 font-space-grotesk text-[clamp(0.9375rem,4vw,1.0625rem)] font-normal leading-[1.3] text-white">
                   {stat.label}
                 </p>
               </div>
-            </div>
+            </Fragment>
           ))}
         </div>
       </div>
-    </section>
+    </SectionGlow>
   );
 };
 
-export default TrustBadges
+export default TrustBadges;

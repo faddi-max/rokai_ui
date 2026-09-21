@@ -1,4 +1,4 @@
-import { competitionGiCategoryImage, trainingGiCategoryImage } from "@/assets";
+
 
 export type Category = {
   id: string;
@@ -7,25 +7,35 @@ export type Category = {
   description: string;
   buttonLabel: string;
   buttonHref: string;
+  imageAlt:string
 };
+
+
+import { catagoriespage1, catagoriespage2 } from "@/assets";
+
 
 export const categories: Category[] = [
   {
     id: "training-gis",
-    image: trainingGiCategoryImage,
-    title: "BJJ Training GIs",
+    image: catagoriespage1,
+    
+    imageAlt: "Custom BJJ training gi",
+    title: "BJJ Training Gis",
     description:
-      "Premium Bjj Training Gis And Jiu Jitsu Uniforms Built For Daily Grind Durable, Comfort Driven Bjj Apparel Designed For Bjj Academies And Teams",
-    buttonLabel: "BJJ Competition GIs",
-    buttonHref: "#training-gis",
+      "Custom training gis built for daily use, with reinforced stitching, breathable fabric and long-lasting comfort for academies, athletes and BJJ brands.",
+    buttonLabel: "Start Your Gi Line",
+    // Placeholder route: replace with the real page once it exists
+    buttonHref: "/bjj-apparel-manufacturing/#training-gis",
   },
   {
     id: "competition-gis",
-    image: competitionGiCategoryImage,
-    title: "BJJ Competition GIs",
+    image: catagoriespage2,
+    imageAlt: "Custom BJJ competition gi",
+    title: "IBJJF Competition Gis",
+    
     description:
-      "Premium Bjj Training Gis And Jiu Jitsu Uniforms Built For Daily Grind Durable, Comfort Driven Bjj Apparel Designed For Bjj Academies And Teams",
-    buttonLabel: "Explore Private Label Options",
-    buttonHref: "#competition-gis",
+      "Lightweight, performance-focused competition gis developed around your specifications and the demands of competition.",
+    buttonLabel: "Design Competition Ready Gi",
+    buttonHref: "/bjj-apparel-manufacturing/#competition-gis",
   },
 ];
