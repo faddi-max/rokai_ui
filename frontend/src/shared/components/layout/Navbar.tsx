@@ -10,15 +10,18 @@ import {
 import {
   navLinks,
   type NavLink as NavLinkType,
+  type NavSubItem,
 } from "@/shared/config/navigation";
 import Button from "@/shared/components/ui/Button";
 import { logo } from "@/assets";
-import { affiliateProgramhero } from "@/assets";
 
 export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState<boolean>(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+  const [hoveredProgram, setHoveredProgram] = useState<NavSubItem | null>(
+    null
+  );
 
   const navRef = useRef<HTMLDivElement>(null);
 
@@ -89,6 +92,7 @@ export default function Navbar() {
                   onMouseLeave={() => {
                     if (hasDropdown) {
                       setActiveDropdown(null);
+                      setHoveredProgram(null);
                     }
                   }}
                 >
@@ -124,70 +128,84 @@ export default function Navbar() {
                     programsLink && (
                       <div className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-[24px]">
                         <div className="w-[292px] rounded-[14px] border border-white/[0.04] bg-[#130E0F] p-[13px] shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
-                          {/* FEATURED IMAGE */}
-                          <Link
-                            to="/programs#affiliate"
-                            onClick={() =>
-                              setActiveDropdown(null)
-                            }
-                            className="group relative block h-[145px] w-full overflow-hidden rounded-[6px]"
+                          {/* IMAGE PREVIEW — only visible while hovering a specific link */}
+                          <div
+                            className={`overflow-hidden rounded-[6px] transition-all duration-300 ease-out ${
+                              hoveredProgram
+                                ? "mb-[13px] h-[145px] opacity-100"
+                                : "mb-0 h-0 opacity-0"
+                            }`}
                           >
-                            <img
-                              src={affiliateProgramhero}
-                              alt="BJJ Apparel Affiliate Program"
-                              className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
-                            />
+                            {hoveredProgram && (
+                              <Link
+                                to={hoveredProgram.href}
+                                onClick={() =>
+                                  setActiveDropdown(null)
+                                }
+                                className="group relative block h-[145px] w-full"
+                              >
+                                <img
+                                  src={hoveredProgram.image}
+                                  alt={hoveredProgram.label}
+                                  className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+                                />
 
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-                            <span className="absolute bottom-[14px] left-[15px] font-space-grotesk text-[13px] font-bold uppercase text-white">
-                              Affiliate Program
-                            </span>
-                          </Link>
+                                <span className="absolute bottom-[14px] left-[15px] font-space-grotesk text-[13px] font-bold uppercase text-white">
+                                  {hoveredProgram.label}
+                                </span>
+                              </Link>
+                            )}
+                          </div>
 
-                          {/* FEATURED PROGRAM */}
-                          <Link
-                            to="/programs#affiliate"
-                            onClick={() =>
-                              setActiveDropdown(null)
-                            }
-                            className="mt-[16px] flex h-[48px] items-center justify-between rounded-[6px] bg-[#EF3340] px-[14px] transition-colors hover:bg-[#f23d49]"
-                          >
-                            <span className="font-playfair text-[14px] text-white">
-                              BJJ Apparel Affiliate Program
-                            </span>
+                          {/* PROGRAM LIST */}
+                          <div>
+                            {programsLink.dropdownItems?.map(
+                              (program) => {
+                                const isHovered =
+                                  hoveredProgram?.label ===
+                                  program.label;
 
-                            <ArrowRight
-                              size={16}
-                              strokeWidth={1.5}
-                              className="text-white"
-                            />
-                          </Link>
+                                return (
+                                  <Link
+                                    key={program.label}
+                                    to={program.href}
+                                    onClick={() =>
+                                      setActiveDropdown(null)
+                                    }
+                                    onMouseEnter={() =>
+                                      setHoveredProgram(program)
+                                    }
+                                    className={`group flex min-h-[59px] items-center justify-between rounded-[6px] px-[14px] py-[10px] transition-colors duration-200 ${
+                                      isHovered
+                                        ? "bg-[#EF3340]"
+                                        : ""
+                                    }`}
+                                  >
+                                    <span
+                                      className={`max-w-[205px] font-space-grotesk leading-[18px] transition-all duration-200 ${
+                                        isHovered
+                                          ? "text-[15px] font-bold text-white"
+                                          : "text-[13px] text-white/55"
+                                      }`}
+                                    >
+                                      {program.label}
+                                    </span>
 
-                          {/* OTHER PROGRAMS */}
-                          <div className="mt-[7px]">
-                            {programsLink.dropdownItems
-                              ?.slice(1)
-                              .map((program) => (
-                                <Link
-                                  key={program.label}
-                                  to={program.href}
-                                  onClick={() =>
-                                    setActiveDropdown(null)
-                                  }
-                                  className="group flex min-h-[59px] items-center justify-between px-[14px] py-[10px]"
-                                >
-                                  <span className="max-w-[205px] font-space-grotesk text-[13px] leading-[18px] text-white/55 transition-colors group-hover:text-white">
-                                    {program.label}
-                                  </span>
-
-                                  <ArrowRight
-                                    size={15}
-                                    strokeWidth={1.4}
-                                    className="shrink-0 text-white/55 transition-all duration-200 group-hover:translate-x-1 group-hover:text-white"
-                                  />
-                                </Link>
-                              ))}
+                                    <ArrowRight
+                                      size={15}
+                                      strokeWidth={1.4}
+                                      className={`shrink-0 transition-all duration-200 ${
+                                        isHovered
+                                          ? "translate-x-1 text-white"
+                                          : "text-white/55"
+                                      }`}
+                                    />
+                                  </Link>
+                                );
+                              }
+                            )}
                           </div>
 
                           {/* EXPLORE ALL */}
@@ -340,72 +358,32 @@ export default function Navbar() {
                     )}
                   </div>
 
-                  {/* PROGRAMS MOBILE MENU */}
+                  {/* PROGRAMS MOBILE MENU — no hover on touch, so each item shows its own image inline */}
                   {isPrograms && isExpanded && (
                     <div className="mb-4 mt-2">
                       <div className="rounded-[10px] bg-[#130E0F] p-[10px]">
-                        {/* IMAGE */}
-                        <Link
-                          to="/programs#affiliate"
-                          onClick={() =>
-                            setIsMobileOpen(false)
-                          }
-                          className="relative block h-[145px] overflow-hidden rounded-[6px]"
-                        >
-                          <img
-                            src={affiliateProgramhero}
-                            alt="BJJ Apparel Affiliate Program"
-                            className="h-full w-full object-contain"
-                          />
-
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-
-                          <span className="absolute bottom-[13px] left-[14px] font-space-grotesk text-[13px] font-bold uppercase text-white">
-                            Affiliate Program
-                          </span>
-                        </Link>
-
-                        {/* ACTIVE ITEM */}
-                        <Link
-                          to="/programs#affiliate"
-                          onClick={() =>
-                            setIsMobileOpen(false)
-                          }
-                          className="mt-[16px] flex min-h-[48px] items-center justify-between rounded-[6px] bg-[#EF3340] px-[14px]"
-                        >
-                          <span className="font-playfair text-[14px] text-white">
-                            BJJ Apparel Affiliate Program
-                          </span>
-
-                          <ArrowRight
-                            size={16}
-                            strokeWidth={1.5}
-                          />
-                        </Link>
-
-                        {/* OTHER ITEMS */}
-                        {link.dropdownItems
-                          ?.slice(1)
-                          .map((program) => (
-                            <Link
-                              key={program.label}
-                              to={program.href}
-                              onClick={() =>
-                                setIsMobileOpen(false)
-                              }
-                              className="flex min-h-[59px] items-center justify-between px-[14px] py-[10px]"
-                            >
-                              <span className="max-w-[205px] font-space-grotesk text-[13px] leading-[18px] text-white/55">
+                        {link.dropdownItems?.map((program) => (
+                          <Link
+                            key={program.label}
+                            to={program.href}
+                            onClick={() =>
+                              setIsMobileOpen(false)
+                            }
+                            className="mb-[8px] block overflow-hidden rounded-[6px] last:mb-0"
+                          >
+                            <div className="relative h-[120px] w-full">
+                              <img
+                                src={program.image}
+                                alt={program.label}
+                                className="h-full w-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                              <span className="absolute bottom-[10px] left-[12px] font-space-grotesk text-[13px] font-bold uppercase text-white">
                                 {program.label}
                               </span>
-
-                              <ArrowRight
-                                size={15}
-                                strokeWidth={1.4}
-                                className="shrink-0 text-white/55"
-                              />
-                            </Link>
-                          ))}
+                            </div>
+                          </Link>
+                        ))}
 
                         {/* EXPLORE */}
                         <Link
@@ -413,7 +391,7 @@ export default function Navbar() {
                           onClick={() =>
                             setIsMobileOpen(false)
                           }
-                          className="block px-[14px] pb-[5px] pt-[10px] font-space-grotesk text-[15px] font-bold text-[#EF3340]"
+                          className="block px-[4px] pb-[5px] pt-[10px] font-space-grotesk text-[15px] font-bold text-[#EF3340]"
                         >
                           Explore all Programs
                         </Link>
