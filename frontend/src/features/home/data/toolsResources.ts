@@ -1,47 +1,48 @@
-import { resourse1, resourse2 } from "@/assets";
+import { resourse1,resourse2 } from "@/assets";
 
 export interface ToolResource {
   id: string;
+  image: string;
+  imageAlt: string;
   number: string;
   title: string;
   subtitle: string;
   description: string;
   buttonText: string;
   href: string;
-  image: string;
-  imageAlt: string;
 }
 
 export const toolsResourcesHeading = {
-  eyebrow: "Resources",
-  titleTop: "TOOLS TO HELP",
-  titleBottom: "YOU GROW.",
-  description: "Practical resources for building your BJJ brand.",
+  eyebrow: "Combat Sports Product Systems",
+  titleTop: "Choose Your",
+  titleBottom: "Fightwear System.",
+  description:
+    "Build the right apparel range around your sport, buyer and brand requirements—from training essentials to competition-ready equipment.",
 };
 
 export const toolsResources: ToolResource[] = [
   {
-    id: "ai-academy-scorecard",
-    number: "01",
-    title: "AI ACADEMY",
-    subtitle: "SCORE CARD",
-    description:
-      "Go from concept to premium custom apparel manufacturing in minutes. Our ecosystem automates design, tech-packs, and production tracking seamlessly.",
-    buttonText: "Start Your Brand Now",
-    href: "#ai-academy-scorecard",
+    id: "training-apparel",
     image: resourse1,
-    imageAlt: "Rokai AI Academy score card dashboard on a desktop monitor",
+    imageAlt: "ROKAI training apparel for academies and daily use",
+    number: "01",
+    title: "Training Apparel",
+    subtitle: "Designed for Repeat Use.",
+    description:
+      "Durable, comfortable and brand-ready apparel for academies, gyms, teams and everyday training. Includes performance fabrics, reinforced construction and custom branding.",
+    buttonText: "Explore Training Apparel",
+    href: "/training-apparel-manufacturing/",
   },
   {
-    id: "rokai-brand-growth",
-    number: "02",
-    title: "ROKAI BRAND",
-    subtitle: "GROWTH SCORE",
-    description:
-      "See how your cage score compares to the absolute top BJJ operations globally. Discover hidden gaps in your brand footprint, retention rate, and digital exposure.",
-    buttonText: "Get My Free Scorecard",
-    href: "#rokai-brand-growth",
+    id: "competition-fightwear",
     image: resourse2,
-    imageAlt: "Rokai brand growth score dashboard on a desktop monitor",
+    imageAlt: "ROKAI competition fightwear built for performance",
+    number: "02",
+    title: "Competition Fightwear",
+    subtitle: "Built for the Demands of Competition.",
+    description:
+      "Technical fightwear developed around mobility, performance, athlete use and competition requirements. Includes lightweight construction, mobility-focused cuts and competition-ready development.",
+    buttonText: "Explore Competition Fightwear",
+    href: "/competition-fightwear-manufacturing/",
   },
 ];

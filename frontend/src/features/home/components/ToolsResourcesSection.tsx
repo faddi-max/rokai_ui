@@ -22,7 +22,7 @@ const ToolsResourcesSection = () => {
       />
 
       <div className="relative z-10 mx-auto w-full max-w-[1250px] px-5 py-16 sm:px-8 md:py-20 lg:px-0 lg:py-24">
-        <div className="mb-10 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-center lg:justify-between">
+        <div className="mb-10 flex flex-col gap-2 lg:mb-14 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <motion.span
               initial={{ opacity: 0, y: 12 }}

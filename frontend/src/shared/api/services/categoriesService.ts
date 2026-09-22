@@ -7,6 +7,7 @@ import { affiliateHeroContent } from "@/features/programs/data/heroContent";
 import { categories as localCategories } from "@/features/categories/data/catagories";
 import type { Category } from "@/features/home/data/categories";
 import { ambassadorHeroContent } from "@/features/programs/ambassador-program/data/ambassadorHero";
+import { ambassadorHero} from "@/features/programs/sponsorship-program/data/ambassadorHero";
 
 export interface PageData {
   hero: HeroContent;
@@ -76,7 +77,17 @@ export const categoriesService = {
       hero: ambassadorHeroContent,
       categoryHeroContent: categoryHeroContent,
       blogCategories: blogCategories || [],
-    };
+    }
+    
+    return apiClient.fetchWithFallback<PageData>("/programs/page", fallback);
+  },
+   async getsponsershipPageData(): Promise<PageData> {
+    const fallback: PageData = {
+      hero: ambassadorHero,
+      categoryHeroContent: categoryHeroContent,
+      blogCategories: blogCategories || [],
+    }
+    
     return apiClient.fetchWithFallback<PageData>("/programs/page", fallback);
   },
 };

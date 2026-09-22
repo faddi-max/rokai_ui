@@ -43,7 +43,21 @@ import whatisambassador from './whatisambassator.png'
 import partnershipImage from './partnership.png'
 import resourse1 from './resourse1.png'
 import resourse2 from './resourse2.png'
+import capabilityFabricsImage from './capabilities1.png'
+import capabilityCatalogueImage from './capabilities2.png'
+import capabilityCustomizationImage from './capabilities3.png'
+import capabilitySizeGuideImage from './capabilities4.png'
+import whyrokai from './whyrokai.png'
+import sponserhero from './sponserhero.png'
+import sponser from './sponser.jpg'
 export {
+  sponser,
+  sponserhero,
+  whyrokai,
+  capabilitySizeGuideImage,
+  capabilityCustomizationImage,
+  capabilityFabricsImage,
+  capabilityCatalogueImage,
   resourse1,
   resourse2,
   whatisambassador,

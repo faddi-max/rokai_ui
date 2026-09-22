@@ -14,7 +14,7 @@ import AffiliateLoginSection from "./components/AffiliateLoginSection";
 import StepSection from "./components/StepSection";
 import BenefitsSection from "./components/BenefitsSection";
 
-export default function ProgramsPage() {
+export default function AffiliatePage() {
   const { data, loading, error, refetch } = useAsyncData(() =>
     categoriesService.getProgramsPageData()
   );

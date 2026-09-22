@@ -8,12 +8,14 @@ import { gsap, useGSAP } from "@/shared/animations";
 import Button from "@/shared/components/ui/Button";
 import BlogCategoryPage from "@/features/blogs/blogCatagoryPage";
 import AmbassadorProgramPage, {  } from "@/features/programs/ambassador-program/AmbassadorProgram";
+import AffiliatePage from "@/features/programs/Affiliate-page";
+import SponsorshipProgram from "@/features/programs/sponsorship-program/SponsorshipProgram";
 
 // Code-split route pages with lazy loading
 const HomePage = lazy(() => import("@/features/home/HomePage"));
 const CategoriesPage = lazy(() => import("@/features/categories/CategoriesPage"));
 const BlogsPage = lazy(() => import("@/features/blogs/BlogsPage"));
-const ProgramsPage = lazy(() => import("@/features/programs/ProgramsPage"));
+const ProgramsPage = lazy(() => import("@/features/programs/Affiliate-page"));
 
 
 const NotFoundPage = () => {
@@ -94,12 +96,33 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/services" element={<NotFoundPage />} />
-            <Route path="/programs" element={<AmbassadorProgramPage />} />
+            {/* <Route path="/programs" element={<AmbassadorProgramPage />} /> */}
             <Route path="/contact" element={<NotFoundPage />} />
             <Route path="/blogs" element={<BlogsPage />} />
             <Route path="/resources" element={<NotFoundPage />} />
             <Route path="/blogs/category/:slug" element={<BlogCategoryPage />} />
             <Route path="*" element={<NotFoundPage />} />
+            <Route path="/programs" element={<ProgramsPage />} />
+
+<Route
+  path="/programs/affiliate"
+  element={<AffiliatePage />}
+/>
+
+<Route
+  path="/programs/ambassador"
+  element={<AmbassadorProgramPage />}
+/>
+
+<Route
+  path="/programs/sponsorship"
+  element={<SponsorshipProgram />}
+/>
+
+<Route
+  path="/programs/partnership"
+  element={<NotFoundPage />}
+/>
           </Route>
         </Routes>
       </Suspense>

@@ -1,4 +1,4 @@
-import { ArrowUpRight, Recycle } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import SectionEyebrow from "./SectionEyebrow";
 import { sustainabilityGoals } from "@/features/home/data/sustainabilityGoals";
 import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
@@ -9,111 +9,133 @@ const SustainabilityGoalsSection = () => {
     titleTop,
     titleBottom,
     description,
+    goals,
     ctaText,
     ctaHref,
     image,
     caption,
   } = sustainabilityGoals;
 
-  const captionRow = (
-    <div className="flex items-start gap-4">
-      <Recycle className="h-8 w-8 shrink-0 text-white" strokeWidth={1.75} />
-      <div className="flex flex-col gap-1">
-        <p
-          className="font-space-grotesk font-bold text-white"
-          style={{ fontSize: "18px", lineHeight: "21px", letterSpacing: "0%" }}
-        >
-          {caption.title}
-        </p>
-        <p
-          className="font-space-grotesk font-light text-white/70"
-          style={{ fontSize: "12px", lineHeight: "15px", letterSpacing: "0%" }}
-        >
-          {caption.description}
-        </p>
-      </div>
-    </div>
-  );
-
   return (
-    <section className="w-full bg-black px-6 pb-24 pt-16 sm:px-10 lg:px-20 lg:pb-32 lg:pt-20">
-      <div className="relative mx-auto w-full max-w-[1512px] bg-[#F3F1ED] p-6 sm:p-10 lg:aspect-[1369/540] lg:p-0">
-        <div className="flex flex-col gap-6 lg:absolute lg:left-0 lg:top-0 lg:h-full lg:w-[51.13%] lg:justify-center lg:p-14">
+    <section className="relative w-full overflow-hidden bg-black px-6 py-16 sm:px-10 lg:px-20 lg:py-24">
+      {/* Ambient red glow, bottom-left — matches design's subtle vignette */}
+      <div
+        className="pointer-events-none absolute -bottom-1/4 -left-1/4 h-[60%] w-[50%]"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(165,20,24,0.18) 0%, transparent 70%)",
+        }}
+      />
+
+      <div className="relative mx-auto grid w-full max-w-[1512px] grid-cols-1 gap-14 lg:grid-cols-2 lg:gap-16">
+        {/* Left column */}
+        <div className="flex flex-col gap-8 lg:gap-10">
           <SectionEyebrow
             label={eyebrow}
-            textClassName="text-black"
-            lineClassName="border-[#E51B24]"
+            textClassName="text-white/50"
+            lineClassName="border-[#7A1017]"
           />
 
-          <h2 className="font-space-grotesk">
+          <h2 className="font-space-grotesk uppercase">
             <span
-              className="block font-bold text-black"
+              className="block font-bold text-white"
               style={{
-                fontSize: "clamp(32px, 2.9vw + 12px, 60px)",
-                lineHeight: "clamp(34px, 3.3vw + 12px, 68px)",
+                fontSize: "clamp(28px, 2.6vw + 12px, 52px)",
+                lineHeight: "clamp(30px, 2.6vw + 12px, 56px)",
                 letterSpacing: "0%",
               }}
             >
               {titleTop}
             </span>
             <span
-              className="block bg-clip-text font-light text-transparent"
+              className="block bg-clip-text font-bold text-transparent"
               style={{
-                fontSize: "clamp(30px, 2.9vw + 12px, 60px)",
-                lineHeight: "clamp(30px, 2.9vw + 12px, 60px)",
+                fontSize: "clamp(28px, 2.6vw + 12px, 52px)",
+                lineHeight: "clamp(30px, 2.6vw + 12px, 56px)",
                 letterSpacing: "0%",
-                backgroundImage: "linear-gradient(90deg, #E51B24 0%, #690106 100%)",
+                backgroundImage:
+                  "linear-gradient(90deg, #E51B24 0%, #690106 100%)",
               }}
             >
               {titleBottom}
             </span>
           </h2>
 
-          <p
-            className="font-space-grotesk font-light text-black/80"
-            style={{
-              fontSize: "clamp(16px, 0.5vw + 14px, 20px)",
-              lineHeight: "clamp(21px, 0.6vw + 17px, 25px)",
-              letterSpacing: "0%",
-            }}
-          >
-            {description}
-          </p>
+          <div className="grid grid-cols-3 gap-4 sm:gap-8">
+            {goals.map((goal) => (
+              <div key={goal.number} className="flex flex-col gap-3">
+                <span
+                  className="font-space-grotesk font-light leading-none text-white/40"
+                  style={{ fontSize: "clamp(28px, 1.6vw + 16px, 40px)" }}
+                >
+                  {goal.number}
+                </span>
+                <div className="h-[2px] w-full bg-gradient-to-r from-[#E51B24] to-transparent" />
+                <p
+                  className="font-space-grotesk font-bold uppercase text-white"
+                  style={{ fontSize: "13px", lineHeight: "17px" }}
+                >
+                  {goal.title}
+                </p>
+                <p
+                  className="font-space-grotesk font-light text-white/45"
+                  style={{ fontSize: "12px", lineHeight: "17px" }}
+                >
+                  {goal.description}
+                </p>
+              </div>
+            ))}
+          </div>
 
           <a
             href={ctaHref}
-            className="inline-flex w-fit items-center gap-2 bg-[#E51B24] px-5 py-3.5 text-white transition-colors hover:bg-[#c9161e]"
+            className="inline-flex w-fit items-center gap-2 rounded-[4px] bg-[#E63946] px-6 py-3.5 text-white transition-colors hover:bg-[#c92e3a]"
           >
-            <span className="font-space-grotesk text-[16px] font-medium leading-[20px]">
+            <span className="font-space-grotesk text-[14px] font-semibold leading-[18px]">
               {ctaText}
             </span>
-            <AnimatedArrow icon={ArrowUpRight} className="h-5 w-5 shrink-0" />
+            <AnimatedArrow icon={ArrowUpRight} className="h-4 w-4 shrink-0" />
           </a>
         </div>
 
-        <div className="mt-10 lg:hidden">
-          <div className="relative aspect-[624/402] w-full overflow-hidden">
-            <img
-              src={image}
-              alt="Trees in a sunlit forest"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
+        {/* Right column */}
+        <div className="flex flex-col gap-10 lg:pt-3">
+          <div className="border-l-2 border-[#E51B24] pl-5">
+            <p
+              className="font-space-grotesk font-light text-white/60"
+              style={{
+                fontSize: "clamp(14px, 0.3vw + 13px, 16px)",
+                lineHeight: "1.6",
+              }}
+            >
+              {description}
+            </p>
           </div>
-          <div className="bg-black px-6 py-6">{captionRow}</div>
-        </div>
 
-        <div className="hidden lg:block lg:absolute lg:bottom-0 lg:left-[51.13%] lg:right-0 lg:top-[17.04%] lg:bg-black" />
-
-        <div className="hidden lg:block lg:absolute lg:left-[51.13%] lg:top-[9.44%] lg:h-[74.44%] lg:w-[45.58%] lg:overflow-hidden">
-          <img
-            src={image}
-            alt="Trees in a sunlit forest"
-            className="h-full w-full object-cover"
-          />
-        </div>
-
-        <div className="hidden lg:flex lg:absolute lg:bottom-0 lg:left-[51.13%] lg:right-0 lg:top-[83.89%] lg:items-center lg:px-8">
-          {captionRow}
+          <div className="w-full">
+            <div className="relative aspect-[312/219] w-full overflow-hidden">
+              <img
+                src={image}
+                alt="Trees in a sunlit forest"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </div>
+            <div className="bg-[#151515] px-6 py-5">
+              {caption.map((line) => (
+                <p
+                  key={line}
+                  className="font-space-grotesk uppercase text-white/45"
+                  style={{
+                    fontSize: "11px",
+                    lineHeight: "1.9",
+                    letterSpacing: "0.15em",
+                  }}
+                >
+                  {line}
+                </p>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>

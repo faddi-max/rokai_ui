@@ -13,6 +13,7 @@ export type NavLink = {
 
 export const navLinks: NavLink[] = [
   { label: "Home", href: "/" },
+
   {
     label: "Categories",
     href: "/categories",
@@ -40,6 +41,7 @@ export const navLinks: NavLink[] = [
       },
     ],
   },
+
   {
     label: "Services",
     href: "/services",
@@ -48,52 +50,58 @@ export const navLinks: NavLink[] = [
       {
         label: "Full OEM / ODM Manufacturing",
         href: "/services#capabilities",
-        description: "Turnkey custom cut & sew production from 50 to 50,000 units",
+        description:
+          "Turnkey custom cut & sew production from 50 to 50,000 units",
       },
       {
         label: "AI Pattern Grading & Sizing",
         href: "/services#capabilities",
-        description: "Proprietary algorithm for zero-variance shrinkage control",
+        description:
+          "Proprietary algorithm for zero-variance shrinkage control",
       },
       {
         label: "Tajima Embroidery & Sublimation",
         href: "/services#capabilities",
-        description: "Industrial high-density stitching and Italian inks",
+        description:
+          "Industrial high-density stitching and Italian inks",
       },
       {
         label: "Private Label Packaging",
         href: "/services#capabilities",
-        description: "Custom damask neck tags, hang tags, and branded pouches",
+        description:
+          "Custom damask neck tags, hang tags, and branded pouches",
       },
     ],
   },
-  {
-    label: "Programs",
-    href: "/programs",
-    hasDropdown: false,
-    dropdownItems: [
-      {
-        label: "Academy Wholesale Club",
-        href: "/programs#programs-catalog",
-        description: "Wholesale discounts starting at 20 units for gyms",
-      },
-      {
-        label: "Brand Incubator & OEM",
-        href: "/programs#programs-catalog",
-        description: "Turnkey design & manufacturing for combat brands",
-      },
-      {
-        label: "Athlete Sponsorship",
-        href: "/programs#programs-catalog",
-        description: "Competition tournament gear for elite competitors",
-      },
-      {
-        label: "Affiliate & Ambassador",
-        href: "/programs#programs-catalog",
-        description: "Earn recurring commissions on gear recommendations",
-      },
-    ],
-  },
+
+ {
+  label: "Programs",
+  href: "/programs",
+  hasDropdown: true,
+  dropdownItems: [
+    {
+      label: "BJJ Apparel Affiliate Program",
+      href: "/programs/affiliate",
+      description: "Earn recurring commissions on gear recommendations",
+    },
+    {
+      label: "BJJ Apparel Ambassador Program",
+      href: "/programs/ambassador",
+      description: "Represent the brand and grow with Rokai",
+    },
+    {
+      label: "BJJ Apparel Club Sponsorship",
+      href: "/programs/sponsorship",
+      description: "Support your academy with premium team gear",
+    },
+    {
+      label: "BJJ Apparel Club Partnership",
+      href: "/programs/partnership",
+      description: "Build a long-term partnership with Rokai",
+    },
+  ],
+},
+
   { label: "Contact", href: "/contact" },
   { label: "Blogs", href: "/blogs" },
   { label: "Resources", href: "/resources" },

@@ -1,10 +1,11 @@
 import { manufacturingProcessImage } from "@/assets";
 
 export const manufacturingProcess = {
-  eyebrow: "Our Process",
-  titleTop: "OUR MANUFACTURING",
-  titleBottom: "PROCESS",
+  eyebrow: "Manufacturing Process",
+  titleTop: "From Product Concept",
+  titleBottom: "to International Delivery",
   image: manufacturingProcessImage,
-  description: "See how Rokai turns performance-driven designs into premium BJJ apparel.",
+  description:
+    "A controlled six-stage manufacturing workflow takes your combat sports apparel from requirements to approved samples, production and international delivery.",
   videoUrl: undefined as string | undefined,
 };

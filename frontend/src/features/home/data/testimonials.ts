@@ -1,41 +1,58 @@
 import {
   testimonialFactory1,
   testimonialFactory2,
-  testimonialFactory3,
 } from "@/assets";
 
 export interface Testimonial {
   id: string;
   image: string;
   videoUrl?: string;
-  title: string;
-  subtitle: string;
+  
+  clientType: string;
+  country: string;
+  project: string;
+  productCategory: string;
+}
+
+export interface TrustStat {
+  label: string;
 }
 
 export const testimonialsHeading = {
-  titleTop: "WHAT OUR",
-  titleBottom: "CLIENTS SAYS",
+  eyebrow: "Client & Partner Proof",
+  titleTop: "Trusted By Those",
+  titleBottom: "Who Build With Us.",
   description:
-    "Real feedback from academies and brands who trust us for consistent quality, reliability, and performance-driven BJJ gear.",
+    "Feedback from businesses working with ROKAI on custom combat sports apparel, product development and manufacturing.",
 };
 
+// TODO (content team): replace with real, permissioned client cases before
+// publishing. Per the SEO doc's Editorial Rule, fabricated or anonymous
+// testimonials must not go live — each entry needs client sign-off.
 export const testimonials: Testimonial[] = [
   {
-    id: "testimonial-cutting",
+    id: "testimonial-1",
     image: testimonialFactory1,
-    title: "Transparent. Efficient",
-    subtitle: "450 GSM Pearl Weave",
+    clientType: "BJJ Academy", // e.g. "BJJ Academy", "Combat Sports Brand"
+    country: "Country TBD",
+    project: "Project TBD", // e.g. "Custom Competition Gi Line"
+    productCategory: "Product Category TBD", // e.g. "BJJ Gis"
   },
   {
-    id: "testimonial-pressing",
+    id: "testimonial-2",
     image: testimonialFactory2,
-    title: "Transparent. Efficient",
-    subtitle: "450 GSM Pearl Weave",
+    clientType: "Combat Sports Brand",
+    country: "Country TBD",
+    project: "Project TBD",
+    productCategory: "Product Category TBD",
   },
-  {
-    id: "testimonial-embroidery",
-    image: testimonialFactory3,
-    title: "Transparent. Efficient",
-    subtitle: "450 GSM Pearl Weave",
-  },
+];
+
+// Non-numeric trust statements, per SEO doc Table 1 (verified capability
+// claims rather than unverified percentages/counts).
+export const trustStats: TrustStat[] = [
+  { label: "Direct Manufacturer" },
+  { label: "Custom Development" },
+  { label: "Scalable Production" },
+  { label: "Global Delivery" },
 ];

@@ -80,7 +80,7 @@ export default function HeroSection({
     >
       <div className="pointer-events-none absolute inset-0">
         <div
-          className="relative mx-auto hidden max-w-[1512px] lg:block"
+          className="relative  hidden max-w-[1512px] lg:block"
           style={sectionHeightPx ? { height: sectionHeightPx } : { height: "100%" }}
         >
           {glows.map((glow, index) => (

@@ -5,60 +5,82 @@ import {
   affiliateProgramImage,
 } from "@/assets";
 
+export interface PartnershipStat {
+  line1: string;
+  line2: string;
+  line3: string;
+}
+
 export interface PartnershipProgram {
   id: string;
   image: string;
-  title: string;
-  subtitle: string;
+  eyebrow: string;
+  headingRed: string;
+  headingWhite: string;
   description: string;
   ctaText: string;
   ctaHref: string;
+  stat: PartnershipStat;
 }
 
 export const partnershipProgramsHeading = {
-  titleTop: "ROKAI: FUELING THE GRIND.",
-  titleBottomLines: ["ENGINEERING INFINITE", "PARTNERSHIPS."],
+  eyebrow: "Partnerships",
+  titleWhite: "PARTNER WITH",
+  titleRed: "ROKAI",
   description:
-    "Empowering BJJ academies, coaches and brands with scalable solutions. Our programs are built to strengthen your identity, increase revenue and unify your students through premium BJJ apparel.",
+    "Programs for combat sports brands, academies, athletes and partners building with ROKAI.",
 };
 
 export const partnershipPrograms: PartnershipProgram[] = [
   {
     id: "club-partnership",
     image: clubPartnershipImage,
-    title: "Club Partnership Program",
-    subtitle: "TURN YOUR ACADEMY INTO A BRANDED BJJ POWERHOUSE",
+    eyebrow: "Club Partnership Program",
+    headingRed: "Grow Your Academy",
+    headingWhite: "With ROKAI",
     description:
-      "We help BJJ academies design and manufacture premium custom apparel that strengthens team identity, increases student retention, and opens new revenue opportunities through branded merchandise.",
-    ctaText: "Limited partnerships available each month.",
+      "Custom apparel and teamwear developed around your academy's identity, with production support built for bulk orders and member merchandise.",
+    ctaText: "Join the Program",
     ctaHref: "#club-partnership-program",
+    // TODO (content team): no verified figure exists yet for this program.
+    // Replace with a real, approved stat before publishing — see doc's
+    // Editorial Guardrails on unsupported numerical claims.
+    stat: { line1: "Built For", line2: "Academies", line3: "Worldwide" },
   },
   {
     id: "sponsorship",
     image: sponsorshipProgramImage,
-    title: "Sponsorship Program",
-    subtitle: "EXCLUSIVE BJJ SPONSORSHIP FOR SELECTED ACADEMIES ONLY",
+    eyebrow: "Sponsorship Program",
+    headingRed: "Take Your Academy",
+    headingWhite: "Further",
     description:
-      "We partner with a limited number of serious BJJ gyms each month to provide high-performance custom gear and branding support. If you qualify, you'll be contacted for onboarding immediately.",
-    ctaText: "Limited partnerships available each month.",
+      "Selective support for academies through custom gear, branding and long-term manufacturing partnership.",
+    ctaText: "Explore Sponsorship",
     ctaHref: "#sponsorship-program",
+    stat: { line1: "Selective", line2: "Partner", line3: "Program" },
   },
   {
     id: "ambassador",
     image: ambassadorProgramImage,
-    title: "Ambassador Program",
-    subtitle: "REP PREMIUM BJJ APPAREL AND GROW YOUR PERSONAL BRAND",
-    description: "Earn commissions while promoting high-performance Jiu Jitsu apparel.",
-    ctaText: "Join The Rokai Inner Circle",
-    ctaHref: "#ambassador-program",
+    eyebrow: "Ambassador Program",
+    headingRed: "Represent ROKAI.",
+    headingWhite: "Inspire Others.",
+    description:
+      "A selective partnership for athletes who represent discipline, performance and the values ROKAI is built on.",
+    ctaText: "Join the Inner Circle",
+    ctaHref: "/programs#ambassador",
+    stat: { line1: "Limited", line2: "Athlete", line3: "Selection" },
   },
   {
     id: "affiliate",
     image: affiliateProgramImage,
-    title: "Affiliate Program",
-    subtitle: "MONETIZE YOUR AUDIENCE WITH PREMIUM BJJ GEAR AND APPAREL",
-    description: "Earn passive income by offering trusted Brazilian Jiu Jitsu gear.",
-    ctaText: "Start Earning Commissions",
-    ctaHref: "#affiliate-program",
+    eyebrow: "Affiliate Program",
+    headingRed: "Share the Gear.",
+    headingWhite: "Earn With ROKAI.",
+    description:
+      "Recommend performance-driven combat sports apparel to your audience and earn commission on qualifying orders.",
+    ctaText: "Start Earning",
+    ctaHref: "/programs",
+    stat: { line1: "Commission", line2: "On Every", line3: "Referral" },
   },
 ];

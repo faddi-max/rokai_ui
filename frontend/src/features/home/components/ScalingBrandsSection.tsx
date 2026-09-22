@@ -47,10 +47,10 @@ export default function ScalingBrands() {
           className="group relative mx-auto w-full max-w-[560px] overflow-hidden rounded-2xl border border-white/10 shadow-2xl transition-all duration-500 hover:border-[#E51B24]/40"
         >
           <img
-            src={scalingBrands.videoThumbnail}
-            alt="Rokai BJJ team"
-            className="max-h-[480px] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          />
+  src={scalingBrands.videoThumbnail}
+  alt={scalingBrands.videoThumbnailAlt}
+  className="max-h-[480px] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+/>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
           <a

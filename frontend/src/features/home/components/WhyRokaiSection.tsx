@@ -1,9 +1,10 @@
 import { ArrowUpRight } from "lucide-react";
 import { useRef } from "react";
-import { whyRokai } from "@/features/home/data/whyRokai";
+
 import { gsap, revealLeft, revealRight, revealVisible, useGSAP } from "@/shared/animations";
 import Button from "@/shared/components/ui/Button";
 import { usePrefersReducedMotion } from "@/shared/hooks/usePrefersReducedMotion";
+import { whyRokai } from "../data/whyRokai";
 
 export default function WhyRokai() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -57,12 +58,15 @@ export default function WhyRokai() {
             <span className="text-[#E51B24]">{whyRokai.headingHighlight}</span>
           </h2>
 
-          <div className="mt-10 w-full max-w-[520px] overflow-hidden">
-            <img
-              src={whyRokai.whyrokai}
-              alt={whyRokai.mockupImageAlt}
-              className="h-auto w-full object-contain"
-            />
+          <div className="relative mt-10 h-[320px] w-full max-w-[480px] sm:h-[380px]">
+            <div className="absolute left-0 top-4 w-[62%] -rotate-3 overflow-hidden rounded-xl border border-white/10 bg-neutral-900 shadow-2xl transition-transform duration-500 ease-out hover:-translate-y-1 hover:rotate-0">
+              <img
+                src={whyRokai.mockupImage}
+                alt={whyRokai.mockupImageAlt}
+                className="h-full w-full object-cover"
+              />
+            </div>
+           
           </div>
         </div>
 
@@ -78,7 +82,7 @@ export default function WhyRokai() {
               return (
                 <div
                   key={feature.id}
-                  className="group rounded-xl border border-white/10 bg-[#111111] p-5 transition-colors duration-300 hover:border-[#E51B24]/40 hover:bg-white/[0.05]"
+                  className="group rounded-xl border border-white/10 bg-white/[0.03] p-5 transition-colors duration-300 hover:border-[#E51B24]/40 hover:bg-white/[0.05]"
                 >
                   <span className="font-space-grotesk text-[11px] font-medium text-white/40">
                     {feature.number}

@@ -47,7 +47,7 @@ const ManufacturingProcessSection = () => {
           "linear-gradient(180deg, rgba(105,1,6,0.35) 0%, rgba(0,0,0,0) 55%)",
       }}
     >
-      <div className="mx-auto w-full max-w-[1440px] px-6 pb-10 pt-16 sm:px-10 sm:pt-20 lg:px-[68px] lg:pb-12 lg:pt-24">
+      <div className="mx-auto w-full max-w-[1440px] px-6  pt-16 sm:px-10 sm:pt-20 lg:px-[68px] lg:pb-12 lg:pt-24">
         {/* Header row: heading (left) + description (right) */}
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div>

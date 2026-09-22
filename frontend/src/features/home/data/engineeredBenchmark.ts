@@ -10,47 +10,48 @@ export interface FeatureItem {
 }
 
 export const engineeredBenchmarkHeading = {
-  titleTop: "ENGINEERED",
-  titleBottom: "BENCHMARK",
+  eyebrow: "Product Development & R&D",
+  titleTop: "Engineered for Performance.",
+  titleBottom: "Built Around Your Brand.",
   description:
-    "Built to set the standard, every product is crafted for elite performance, durability, and consistent quality at scale.",
+    "Every product starts with the details that matter: fabric, fit, construction, reinforcement, branding and intended use. Our development process turns your concept into a production-ready combat sports apparel system.",
 };
 
 export const engineeredBenchmarkFeatures: FeatureItem[] = [
   {
-    id: "flagship-fabrics",
+    id: "reinforced-construction",
     image: engineeredBenchmarkImage,
-    title: "BJJ Flagships Fabrics",
+    title: "Reinforced Construction",
     description:
-      "Premium fabrics engineered for BJJ apparel, delivering unmatched durability, comfort, and performance for every roll.",
+      "Sport-specific stitching and construction built to withstand daily training and competition use.",
+    ctaText: "See How We Build",
+    ctaHref: "/custom-fightwear-manufacturing/",
+  },
+  {
+    id: "performance-fabrics",
+    image: engineeredBenchmarkImage,
+    title: "Performance Fabrics",
+    description:
+      "Fabrics selected around the intended use of each product, from training essentials to competition fightwear.",
     ctaText: "Explore Fabrics",
-    ctaHref: "#flagship-fabrics",
+    ctaHref: "/custom-fightwear-manufacturing/",
   },
   {
-    id: "catalogue",
+    id: "precision-patterning",
     image: engineeredBenchmarkImage,
-    title: "Our Catalogue",
+    title: "Precision Patterning",
     description:
-      "Discover a complete range of BJJ apparel, jiu jitsu gear and custom gear BJJ built for performance on and off the mats.",
-    ctaText: "View Catalogue",
-    ctaHref: "#catalogue",
+      "Size-accurate cuts and production-ready patterns engineered for fit and mobility.",
+    ctaText: "See Our Process",
+    ctaHref: "/manufacturing-process/",
   },
   {
-    id: "customization",
+    id: "branding-accuracy",
     image: engineeredBenchmarkImage,
-    title: "Bespoke & Customizations",
+    title: "Branding Accuracy",
     description:
-      "Create fully customized BJJ apparel and jiu jitsu uniforms with unique designs, branding and precision detailing.",
-    ctaText: "Customize Now",
-    ctaHref: "#customization",
-  },
-  {
-    id: "size-guideline",
-    image: engineeredBenchmarkImage,
-    title: "Size Guideline",
-    description:
-      "Find the perfect fit with our easy to follow BJJ sizing guide for all apparel, uniforms and training gear.",
-    ctaText: "Check Sizes",
-    ctaHref: "#size-guideline",
+      "Custom colors, graphics, labels, patches and embroidery placed with precision across every unit.",
+    ctaText: "Customize Your Brand",
+    ctaHref: "/custom-fightwear-manufacturing/",
   },
 ];

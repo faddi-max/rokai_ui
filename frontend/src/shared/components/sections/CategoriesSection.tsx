@@ -1,6 +1,5 @@
-import { useId } from "react";
+import { useId, useRef } from "react";
 import { ArrowUpLeft, ArrowUpRight } from "lucide-react";
-import { gsap, motion } from "@/shared/animations";
 import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
 import CategoryCard from "./CategoryCard";
 import type { Category } from "@/features/home/data/categories";
@@ -14,6 +13,9 @@ type CategoriesSectionProps = {
   showNav?: boolean;
 };
 
+const arrowButtonClass =
+  "flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white text-black transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+
 export default function CategoriesSection({
   eyebrow,
   headingLine1,
@@ -22,18 +24,17 @@ export default function CategoriesSection({
   categories,
   showNav = true,
 }: CategoriesSectionProps) {
-  // Unique per instance, so the section can be reused on other pages safely.
   const headingId = useId();
+  const trackRef = useRef<HTMLUListElement>(null);
 
-  const animateArrow = (target: HTMLElement, scale: number) => {
-    const arrow = target.querySelector("[data-category-arrow]");
-    if (arrow) {
-      gsap.to(arrow, {
-        scale,
-        duration: motion.duration.hover,
-        ease: motion.ease.hover,
-      });
-    }
+  const scrollByAmount = (direction: "prev" | "next") => {
+    const track = trackRef.current;
+    if (!track) return;
+    const amount = track.clientWidth * 0.6;
+    track.scrollBy({
+      left: direction === "next" ? amount : -amount,
+      behavior: "smooth",
+    });
   };
 
   return (
@@ -41,14 +42,12 @@ export default function CategoriesSection({
       aria-labelledby={headingId}
       className="relative bg-black overflow-hidden py-20 lg:py-28"
     >
-      {/* Decorative glow */}
       <div
         aria-hidden="true"
         className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(150,15,20,0.3),transparent_60%)]"
       />
 
       <div className="relative max-w-[1512px] mx-auto px-6 md:px-10 lg:px-16">
-        {/* Eyebrow + heading | description */}
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-10 mb-16">
           <div>
             <div className="flex items-center gap-3 mb-4">
@@ -73,45 +72,58 @@ export default function CategoriesSection({
           </div>
 
           <div className="flex items-start gap-4 max-w-sm lg:pt-2">
-            <span aria-hidden="true" className="mt-1 h-6 w-[2px] shrink-0 bg-[#E51B24]" />
+            <span aria-hidden="true" className="mt-8 h-8 w-[2px] shrink-0 bg-[#E51B24]" />
             <p className="font-space-grotesk text-[17px] font-light leading-[30px] tracking-[0%] text-white/80">
               {description}
             </p>
           </div>
         </div>
 
-        {/* Cards — semantic list; each CategoryCard renders an <h3> + a crawlable <a href> */}
-        <ul role="list" className="grid gap-6 lg:grid-cols-2 lg:gap-8">
+        {/* Horizontal, snap-scrolling track — shows 2 cards per view on desktop
+            (matches the previous 2-col grid), scrolls to reveal more when the
+            category list grows beyond that. */}
+        <ul
+          ref={trackRef}
+          role="list"
+          className="flex w-full snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-2 [-ms-overflow-style:none] [scrollbar-width:none] lg:gap-8 [&::-webkit-scrollbar]:hidden"
+        >
           {categories.map((category, index) => (
-            <li key={category.id} className="h-full">
+            <li
+              key={category.id}
+              className="h-full w-[85vw] shrink-0 snap-start sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-2rem)/2)]"
+            >
               <CategoryCard category={category} index={index} />
             </li>
           ))}
         </ul>
 
-        {/* Bottom nav — only shown when showNav is true */}
-        {showNav && (
-          <div className="mt-14 flex items-center justify-center gap-4">
-            <button
-              type="button"
-              aria-label="Previous category"
-              className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-black transition-opacity hover:opacity-80"
-              onMouseEnter={(event) => animateArrow(event.currentTarget, 1.2)}
-              onMouseLeave={(event) => animateArrow(event.currentTarget, 1)}
-            >
-              <AnimatedArrow icon={ArrowUpLeft} data-category-arrow size={20} strokeWidth={2.5} />
-            </button>
-            <button
-              type="button"
-              aria-label="Next category"
-              className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-black transition-opacity hover:opacity-80"
-              onMouseEnter={(event) => animateArrow(event.currentTarget, 1.2)}
-              onMouseLeave={(event) => animateArrow(event.currentTarget, 1)}
-            >
-              <AnimatedArrow icon={ArrowUpRight} data-category-arrow size={20} strokeWidth={2.5} />
-            </button>
-          </div>
-        )}
+        {
+      showNav && categories.length > 2 && (
+  <div className="mt-14 flex items-center justify-center gap-4">
+    <button
+      type="button"
+      aria-label="Previous category"
+      onClick={(e) => {
+        scrollByAmount("prev");
+        e.currentTarget.blur();
+      }}
+      className={arrowButtonClass}
+    >
+      <ArrowUpLeft size={20} strokeWidth={2.5} />
+    </button>
+    <button
+      type="button"
+      aria-label="Next category"
+      onClick={(e) => {
+        scrollByAmount("next");
+        e.currentTarget.blur();
+      }}
+      className={arrowButtonClass}
+    >
+      <ArrowUpRight size={20} strokeWidth={2.5} />
+    </button>
+  </div>
+)}
       </div>
     </section>
   );

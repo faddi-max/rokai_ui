@@ -2,14 +2,15 @@ import { scalingBrandsImage } from "@/assets";
 
 export const scalingBrands = {
   videoThumbnail: scalingBrandsImage,
+  videoThumbnailAlt: "ROKAI factory team producing custom BJJ apparel and fightwear",
   videoUrl: "#",
-  headingLine1: "Scaling Global",
-  headingLine2: "Brands Through",
-  headingHighlight: "Categories",
+  eyebrow: "Custom Fightwear Manufacturing",
+  headingLine1: "Your Product.",
+  headingLine2: "Your Brand.",
+  headingHighlight: "Our Manufacturing.",
   description:
-    "ROKAI Is More Than Just A Supplier — We Act As Your Dedicated Production Partner For Custom BJJ Apparel And Gear. We Work Closely With BJJ Clubs, Coaches, Academies, And Growing Brands To Bring Their Ideas To Life, Creating Products That Reflect. Academies, And Growing Brands To Bring Their Ideas To Life, Creating Products That Reflect.",
-  ctaLabel: "Secure Your Production Slot",
-  ctaHref: "#production-slot",
-  eyebrow: "A partner you can stand behind",
-watchLabel: "Watch Our Story",
+    "Turn your specifications into production-ready fightwear. ROKAI supports custom product development, fabric selection, pattern engineering, branding, sampling and scalable production for combat sports businesses.",
+  ctaLabel: "See How We Build Your Brand",
+  ctaHref: "/custom-fightwear-manufacturing/",
+  watchLabel: "Watch Our Story",
 };

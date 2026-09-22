@@ -6,12 +6,15 @@ interface SectionHeaderProps {
   title: string;
   highlight: string;
   afterHighlight?: string;
+  /** White text rendered inline right before the highlight, on the same line (e.g. "BUILD YOUR " + "BRAND."). */
+  highlightPrefix?: string;
   highlightPosition?: "line" | "start";
   description?: string;
   accentColor?: string;
-  /** When true, skips its own SectionGlow wrapper — use this when the
-   *  parent section already wraps everything (header + body) in one
-   *  shared SectionGlow, so the glow doesn't render twice. */
+  highlightGradient?: string;
+  highlightFontSize?: string;
+  highlightLineHeight?: string;
+  highlightFontWeight?: number | string;
   bare?: boolean;
 }
 
@@ -20,11 +23,31 @@ export default function SectionHeaderblog({
   title,
   highlight,
   afterHighlight,
+  highlightPrefix,
   highlightPosition = "line",
   description,
   accentColor = "#E51B24",
+  highlightGradient,
+  highlightFontSize,
+  highlightLineHeight,
+  highlightFontWeight,
   bare = false,
 }: SectionHeaderProps) {
+  const highlightStyle: React.CSSProperties = {
+    ...(highlightGradient
+      ? {
+          backgroundImage: highlightGradient,
+          WebkitBackgroundClip: "text",
+          backgroundClip: "text",
+          color: "transparent",
+          WebkitTextFillColor: "transparent",
+        }
+      : { color: accentColor }),
+    ...(highlightFontSize && { fontSize: highlightFontSize }),
+    ...(highlightLineHeight && { lineHeight: highlightLineHeight }),
+    ...(highlightFontWeight && { fontWeight: highlightFontWeight }),
+  };
+
   const content = (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -73,7 +96,7 @@ export default function SectionHeaderblog({
               transition={{ duration: 0.5, delay: 0.3 }}
               className="block"
             >
-              <span style={{ color: accentColor }}>{highlight}</span>
+              <span style={highlightStyle}>{highlight}</span>
               {afterHighlight && <span className="text-white">{afterHighlight}</span>}
             </motion.span>
           ) : (
@@ -83,9 +106,9 @@ export default function SectionHeaderblog({
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.3 }}
               className="block"
-              style={{ color: accentColor }}
             >
-              {highlight}
+              {highlightPrefix && <span className="text-white">{highlightPrefix}</span>}
+              <span style={highlightStyle}>{highlight}</span>
             </motion.span>
           )}
         </h2>

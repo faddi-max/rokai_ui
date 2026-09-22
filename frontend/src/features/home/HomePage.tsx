@@ -14,6 +14,8 @@ import ToolsResourcesSection from "./components/ToolsResourcesSection";
 import TrustBadges from "./components/TrustBadges";
 import WhatWeManufactureSection from "./components/WhatWeManufactureSection";
 import { categories } from "./data/categories";
+import CapabilitiesSection from "./components/CapabilitiesSection";
+import WhyRokaiSection from "@/shared/components/sections/WhyRokaiSection";
 
 export default function HomePage() {
   return (
@@ -33,7 +35,9 @@ export default function HomePage() {
         <TestimonialsSection />
         <ManufacturingProcessSection />
         <PartnershipProgramsSection />
-        <EngineeredBenchmarkSection />
+        <CapabilitiesSection />
+        {/* <EngineeredBenchmarkSection /> */}
+        <WhyRokaiSection />
         <SustainabilityGoalsSection />
         <WhatWeManufactureSection />
         <ToolsResourcesSection />

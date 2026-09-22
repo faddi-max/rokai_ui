@@ -3,18 +3,19 @@ import HeroSection from "@/shared/components/sections/HeroSection";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
 import { categoriesService } from "@/shared/api/services/categoriesService";
 import { DataLoader, PageLoader } from "@/shared/components/feedback";
-import ProgramOverviewSection from "./components/ProgramOverviewSection";
-import PartnershipSection from "./components/PartnershipSection";
-import WhoIsForSection from "./components/WhoIsForSection";
-import BenefitsSection from "./components/BenefitsSection";
-import ExpectationsSection from "./components/ExpectationsSection";;
-import ClientFeedbackSection from "@/features/categories/componnets/ClientFeedbackSection";
+import SectionHeaderblog from "@/shared/components/sections/SectionHeaderblog";
 import HowWeWorkSection from "@/features/categories/data/HowWeWorkSection";
-import FAQSection from "../../home/components/FAQSection";
-import { ambassadorProgramOverview } from "./data/programData";
-export default function AmbassadorProgramPage() {
+import ClientFeedbackSection from "@/features/categories/componnets/ClientFeedbackSection";
+import FAQSection from "@/features/home/components/FAQSection";
+import ProgramOverviewSection from "../ambassador-program/components/ProgramOverviewSection";
+import { ambassadorProgramOverview, sponsorshipProgramOverview } from "../ambassador-program/data/programData";
+import ClubSponsorshipValueSystem from "./components/ClubSponsorshipValueSystem";
+import EquipYourAcademySection from "./components/EquipYourAcademySection";
+
+
+export default function SponsorshipProgram() {
   const { data, loading, error, refetch } = useAsyncData(() =>
-    categoriesService.getAmbassadorPageData()
+    categoriesService.getsponsershipPageData()
   );
 
   return (
@@ -39,16 +40,15 @@ export default function AmbassadorProgramPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
-          <ProgramOverviewSection
-        data={ambassadorProgramOverview}
-      />
-           <PartnershipSection />
-           <WhoIsForSection />
-           <BenefitsSection />
-           <ExpectationsSection />
+     <ProgramOverviewSection
+           data={sponsorshipProgramOverview}
+         />
+         <ClubSponsorshipValueSystem />
+         <EquipYourAcademySection />
             <HowWeWorkSection />
   <ClientFeedbackSection />
   <FAQSection  />
+           
           </motion.div>
         </motion.div>
       )}
