@@ -21,3 +21,22 @@ img {
     transform: translateY(-8px);
   }
 }
+.hero {
+  display: flex;
+  gap: 40px;
+  padding: 80px 60px;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    gap: 24px;
+    padding: 50px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 40px 16px;
+  }
+}

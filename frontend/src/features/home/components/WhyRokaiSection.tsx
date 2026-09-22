@@ -61,7 +61,7 @@ export default function WhyRokai() {
           <div className="relative mt-10 h-[320px] w-full max-w-[480px] sm:h-[380px]">
             <div className="absolute left-0 top-4 w-[62%] -rotate-3 overflow-hidden rounded-xl border border-white/10 bg-neutral-900 shadow-2xl transition-transform duration-500 ease-out hover:-translate-y-1 hover:rotate-0">
               <img
-                src={whyRokai.mockupImage}
+                src={whyRokai.whyrokai}
                 alt={whyRokai.mockupImageAlt}
                 className="h-full w-full object-cover"
               />

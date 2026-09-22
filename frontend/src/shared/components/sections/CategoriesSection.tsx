@@ -1,6 +1,5 @@
 import { useId, useRef } from "react";
 import { ArrowUpLeft, ArrowUpRight } from "lucide-react";
-import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
 import CategoryCard from "./CategoryCard";
 import type { Category } from "@/features/home/data/categories";
 
@@ -72,16 +71,14 @@ export default function CategoriesSection({
           </div>
 
           <div className="flex items-start gap-4 max-w-sm lg:pt-2">
-            <span aria-hidden="true" className="mt-8 h-8 w-[2px] shrink-0 bg-[#E51B24]" />
+            <span aria-hidden="true" className=" h-8 w-[2px] shrink-0 bg-[#E51B24]" />
             <p className="font-space-grotesk text-[17px] font-light leading-[30px] tracking-[0%] text-white/80">
               {description}
             </p>
           </div>
         </div>
 
-        {/* Horizontal, snap-scrolling track — shows 2 cards per view on desktop
-            (matches the previous 2-col grid), scrolls to reveal more when the
-            category list grows beyond that. */}
+      
         <ul
           ref={trackRef}
           role="list"

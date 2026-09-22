@@ -31,7 +31,7 @@ export default function BlogCategoriesSection({
         description={description}
       />
 
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:mt-10 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-3 lg:mx-30 mx-5 py-5">
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:mt-10 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-2 lg:mx-50 mx-5 py-5">
         {categories.map((cat, i) => (
           <BlogCard
             key={cat.id}

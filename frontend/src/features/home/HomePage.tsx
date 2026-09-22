@@ -1,7 +1,6 @@
 import SeoHead from "@/shared/seo/SeoHead";
 import { homeSeo, homeJsonLd } from "./data/home.seo";
 import CategoriesSection from "../../shared/components/sections/CategoriesSection";
-import EngineeredBenchmarkSection from "./components/EngineeredBenchmarkSection";
 import FAQSection from "./components/FAQSection";
 import HeroSection from "./components/HeroSection";
 import HeroTrustBadges from "./components/HeroTrustBadges";
@@ -36,7 +35,6 @@ export default function HomePage() {
         <ManufacturingProcessSection />
         <PartnershipProgramsSection />
         <CapabilitiesSection />
-        {/* <EngineeredBenchmarkSection /> */}
         <WhyRokaiSection />
         <SustainabilityGoalsSection />
         <WhatWeManufactureSection />

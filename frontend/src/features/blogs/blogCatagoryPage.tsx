@@ -46,11 +46,7 @@ export default function BlogCategoryPage() {
       {({ pageData, category, posts }) => (
         <div>
           <HeroSection {...pageData.hero} />
-
-          <section className="relative bg-black px-5 py-16 sm:px-8 md:px-10 lg:px-16 overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(150,15,20,0.3),transparent_60%)]" />
-            <div className="relative mx-auto max-w-[1512px]">
-              {category && (
+{category && (
                 <SectionHeaderblog
                   eyebrow={category.title}
                   title="Recent Blog"
@@ -58,31 +54,34 @@ export default function BlogCategoryPage() {
                   description={category.description}
                 />
               )}
+       <section className="relative overflow-hidden bg-black px-5 py-16 sm:px-8 md:px-10 lg:px-16">
+  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(150,15,20,0.3),transparent_60%)]" />
 
-              {posts.length === 0 ? (
-                <p className="mt-10 text-white/60">
-                  No posts published in this category yet — check back soon.
-                </p>
-              ) : (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {posts.map((post) => (
-                    <BlogCard
-                      key={post.id}
-                      variant="article"
-                      image={post.image}
-                      badgeLabel={post.badgeLabel}
-                      author={post.author}
-                      tags={post.tags}
-                      highlightTitle={post.highlightTitle}
-                      bodyTitle={post.bodyTitle}
-                      description={post.description}
-                      onReadMore={() => navigate(`/blogs/post/${post.slug}`)}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          </section>
+  <div className="relative mx-auto w-full max-w-[1512px]">
+    {posts.length === 0 ? (
+      <p className="mt-10 text-white/60">
+        No posts published in this category yet — check back soon.
+      </p>
+    ) : (
+      <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => (
+          <BlogCard
+            key={post.id}
+            variant="article"
+            image={post.image}
+            badgeLabel={post.badgeLabel}
+            author={post.author}
+            tags={post.tags}
+            highlightTitle={post.highlightTitle}
+            bodyTitle={post.bodyTitle}
+            description={post.description}
+            onReadMore={() => navigate(`/blogs/post/${post.slug}`)}
+          />
+        ))}
+      </div>
+    )}
+  </div>
+</section>
 
           <ManufacturingProcessSection />
           <FAQSection />
