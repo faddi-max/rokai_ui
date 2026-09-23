@@ -50,7 +50,10 @@ import capabilitySizeGuideImage from './capabilities4.png'
 import whyrokai from './whyrokai.png'
 import sponserhero from './sponserhero.png'
 import sponser from './sponser.jpg'
+
+import clubpartnershipoverview from './clubpartnership.jpg'
 export {
+  clubpartnershipoverview,
   sponser,
   sponserhero,
   whyrokai,

@@ -3,18 +3,22 @@ import HeroSection from "@/shared/components/sections/HeroSection";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
 import { categoriesService } from "@/shared/api/services/categoriesService";
 import { DataLoader, PageLoader } from "@/shared/components/feedback";
-import ProgramOverviewSection from "./components/ProgramOverviewSection";
-import PartnershipSection from "./components/PartnershipSection";
-import WhoIsForSection from "./components/WhoIsForSection";
-import BenefitsSection from "./components/BenefitsSection";
-import ExpectationsSection from "./components/ExpectationsSection";;
+
 import ClientFeedbackSection from "@/features/categories/componnets/ClientFeedbackSection";
 import HowWeWorkSection from "@/features/categories/data/HowWeWorkSection";
 import FAQSection from "../../home/components/FAQSection";
-import { ambassadorProgramOverview } from "./data/programData";
-export default function AmbassadorProgramPage() {
+import ProgramOverviewSection from "../ambassador-program/components/ProgramOverviewSection";
+import { clubPartnershipOverview } from "./data/programData";
+import WhoIsForSection from "../ambassador-program/components/WhoIsForSection";
+import BenefitsSection from "../ambassador-program/components/BenefitsSection";
+import WhatYourClubUnlocksSection from "./components/Whatyourclubunlockssection";
+import ExpectationsSection from "../ambassador-program/components/ExpectationsSection";
+import ROIBreakdownSection from "./components/ROIBreakdownSection";
+import GuaranteeSection from "./components/GuaranteeSection";
+
+export default function ClubPartnershipProgram() {
   const { data, loading, error, refetch } = useAsyncData(() =>
-    categoriesService.getAmbassadorPageData()
+    categoriesService.clubPartnershipPageData()
   );
 
   return (
@@ -39,15 +43,15 @@ export default function AmbassadorProgramPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
-          <ProgramOverviewSection
-        data={ambassadorProgramOverview}
+ <ProgramOverviewSection
+        data={clubPartnershipOverview}
       />
-           {/* <PartnershipSection /> */}
-           <WhoIsForSection />
-           <BenefitsSection />
-           {/* <ExpectationsSection /> */}
-            <HowWeWorkSection />
-  <ClientFeedbackSection />
+      <WhatYourClubUnlocksSection />
+      <ROIBreakdownSection />
+      <GuaranteeSection />
+    
+     <WhoIsForSection />
+      <ExpectationsSection /> 
   <FAQSection  />
           </motion.div>
         </motion.div>

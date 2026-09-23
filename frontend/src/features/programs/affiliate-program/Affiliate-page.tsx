@@ -7,9 +7,9 @@ import SectionHeaderblog from "@/shared/components/sections/SectionHeaderblog";
 
 import { audienceTags } from "./data/audienceTags";
 import AudienceTagsSection from "./components/AudienceTagsSection";
-import FAQSection from "../home/components/FAQSection";
-import ClientFeedbackSection from "../categories/componnets/ClientFeedbackSection";
-import ScalingBrands from "../home/components/ScalingBrandsSection";
+import FAQSection from "../../home/components/FAQSection";
+import ClientFeedbackSection from "../../categories/componnets/ClientFeedbackSection";
+import ScalingBrands from "../../home/components/ScalingBrandsSection";
 import AffiliateLoginSection from "./components/AffiliateLoginSection";
 import StepSection from "./components/StepSection";
 import BenefitsSection from "./components/BenefitsSection";

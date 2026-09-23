@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Step } from "@/features/programs/data/steps.data";
+import { Step } from "@/features/programs/affiliate-program/data/steps.data";
 
 type StepCardProps = Omit<Step, "id" | "description"> & {
   /** 1-based position; rendered as "01", "02"… */
@@ -99,7 +99,7 @@ export default function StepCard({
           )}
 
           {footer && (
-            <p className="mt-auto border-t border-white/10 pt-[26px] text-center font-space-grotesk text-[12px] leading-[16px] text-[#E63946]">
+            <p className="mt- M border-t border-white/10 pt-[26px] text-center font-space-grotesk text-[12px] leading-[16px] text-[#E63946]">
               {footer}
             </p>
           )}

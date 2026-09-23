@@ -11,6 +11,7 @@ import {
   navLinks,
   type NavLink as NavLinkType,
   type NavSubItem,
+  type CategoryLink,
 } from "@/shared/config/navigation";
 import Button from "@/shared/components/ui/Button";
 import { logo } from "@/assets";
@@ -22,6 +23,11 @@ export default function Navbar() {
   const [hoveredProgram, setHoveredProgram] = useState<NavSubItem | null>(
     null
   );
+  const [hoveredCategory, setHoveredCategory] = useState<CategoryLink | null>(
+    null
+  );
+  const [mobileActiveCategory, setMobileActiveCategory] =
+    useState<CategoryLink | null>(null);
 
   const navRef = useRef<HTMLDivElement>(null);
 
@@ -44,6 +50,10 @@ export default function Navbar() {
 
   const programsLink = navLinks.find(
     (link) => link.label === "Programs"
+  );
+
+  const categoriesLink = navLinks.find(
+    (link) => link.label === "Categories"
   );
 
   return (
@@ -72,13 +82,14 @@ export default function Navbar() {
           <ul className="flex items-center gap-7">
             {navLinks.map((link: NavLinkType) => {
               const hasDropdown = Boolean(
-                link.hasDropdown && link.dropdownItems?.length
+                (link.hasDropdown && link.dropdownItems?.length) ||
+                  (link.categories?.length && link.label === "Categories")
               );
 
-              const isDropdownOpen =
-                activeDropdown === link.label;
+              const isDropdownOpen = activeDropdown === link.label;
 
               const isPrograms = link.label === "Programs";
+              const isCategories = link.label === "Categories";
 
               return (
                 <li
@@ -87,12 +98,15 @@ export default function Navbar() {
                   onMouseEnter={() => {
                     if (hasDropdown) {
                       setActiveDropdown(link.label);
+                      // No default selection — image + submenu only
+                      // appear once the user actually hovers a category.
                     }
                   }}
                   onMouseLeave={() => {
                     if (hasDropdown) {
                       setActiveDropdown(null);
                       setHoveredProgram(null);
+                      setHoveredCategory(null);
                     }
                   }}
                 >
@@ -222,9 +236,183 @@ export default function Navbar() {
                       </div>
                     )}
 
+                  {/* CATEGORIES MEGA MENU — nothing shown until hover; image + submenu animate in */}
+                  {isCategories &&
+                    isDropdownOpen &&
+                    categoriesLink?.categories && (
+                      <div className="absolute left-0 top-full z-50 pt-[24px]">
+                        <div
+                          className={`flex overflow-hidden rounded-[14px] border border-white/[0.04] bg-[#130E0F] shadow-[0_20px_60px_rgba(0,0,0,0.45)] transition-[width] duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                            hoveredCategory ? "w-[650px]" : "w-[230px]"
+                          }`}
+                        >
+                          {/* LEFT: image preview + category list */}
+                          <div className="w-[230px] shrink-0 border-r border-white/[0.06] p-[13px]">
+                            <div
+                              className={`overflow-hidden rounded-[6px] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                                hoveredCategory?.image
+                                  ? "mb-[13px] h-[140px] scale-100 opacity-100"
+                                  : "mb-0 h-0 scale-95 opacity-0"
+                              }`}
+                            >
+                              {hoveredCategory?.image && (
+                                <Link
+                                  to={hoveredCategory.href}
+                                  onClick={() => setActiveDropdown(null)}
+                                  className="group relative block h-[140px] w-full"
+                                >
+                                  <img
+                                    src={hoveredCategory.image}
+                                    alt={hoveredCategory.label}
+                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+                                  />
+
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+                                  <span className="absolute bottom-[12px] left-[13px] font-space-grotesk text-[12px] font-bold uppercase text-white">
+                                    {hoveredCategory.label}
+                                  </span>
+                                </Link>
+                              )}
+                            </div>
+
+                            <div>
+                              {categoriesLink.categories.map((category) => {
+                                const isHovered =
+                                  hoveredCategory?.label === category.label;
+
+                                return (
+                                  <Link
+                                    key={category.label}
+                                    to={category.href}
+                                    onClick={() => setActiveDropdown(null)}
+                                    onMouseEnter={() =>
+                                      setHoveredCategory(category)
+                                    }
+                                    className={`group flex min-h-[48px] items-center justify-between rounded-[6px] px-[12px] py-[8px] transition-all duration-200 ${
+                                      isHovered
+                                        ? "bg-[#EF3340]"
+                                        : "bg-transparent"
+                                    }`}
+                                  >
+                                    <span
+                                      className={`max-w-[160px] font-space-grotesk leading-[18px] transition-all duration-200 ${
+                                        isHovered
+                                          ? "text-[14px] font-bold text-white"
+                                          : "text-[13px] text-white/55"
+                                      }`}
+                                    >
+                                      {category.label}
+                                    </span>
+
+                                    <ArrowRight
+                                      size={14}
+                                      strokeWidth={1.4}
+                                      className={`shrink-0 transition-all duration-200 ${
+                                        isHovered
+                                          ? "translate-x-1 text-white"
+                                          : "text-white/55"
+                                      }`}
+                                    />
+                                  </Link>
+                                );
+                              })}
+                            </div>
+
+                            <Link
+                              to="/categories"
+                              onClick={() => setActiveDropdown(null)}
+                              className="mt-[4px] block px-[12px] pb-[4px] pt-[11px] font-space-grotesk text-[14px] font-bold text-[#EF3340] transition-colors hover:text-[#ff5964]"
+                            >
+                              Explore all categories
+                            </Link>
+                          </div>
+
+                          {/* RIGHT: grouped sub-items — fades/slides in once a category is hovered */}
+                          <div
+                            className={`w-[420px] shrink-0 p-[16px] transition-all duration-300 ease-out ${
+                              hoveredCategory
+                                ? "translate-x-0 opacity-100 delay-[80ms]"
+                                : "pointer-events-none translate-x-2 opacity-0"
+                            }`}
+                          >
+                            {hoveredCategory && (
+                              <>
+                                <div className="mb-[24px] flex items-center justify-between border-b border-white/[0.06] pb-[10px]">
+                                  <span className="flex items-center gap-[8px] font-space-grotesk text-[13px] font-bold uppercase tracking-wide text-white">
+                                    <span
+                                      aria-hidden
+                                      className="size-[6px] shrink-0 rotate-45 bg-[#E51B24]"
+                                    />
+                                    {hoveredCategory.label}
+                                  </span>
+
+                                  <Link
+                                    to={hoveredCategory.href}
+                                    onClick={() => setActiveDropdown(null)}
+                                    className="font-space-grotesk text-[11px] font-bold text-white/55 transition-colors hover:text-[#E51B24]"
+                                  >
+                                    View Category
+                                  </Link>
+                                </div>
+
+                                <div className="flex flex-col gap-[26px]">
+                                  {hoveredCategory.groups.map((group) => (
+                                    <div
+                                      key={group.title}
+                                      className="flex flex-col gap-[7px]"
+                                      style={{
+                                        width: 175.84,
+                                        borderLeft: "1px solid #333333",
+                                        paddingLeft: 14,
+                                        paddingRight: 14,
+                                      }}
+                                    >
+                                      <p className="font-space-grotesk text-[11px] font-bold uppercase leading-none text-[#EEEEEE]">
+                                        {group.title}
+                                      </p>
+
+                                      {group.items.map((item) => (
+                                        <Link
+                                          key={item.label}
+                                          to={item.href}
+                                          onClick={() =>
+                                            setActiveDropdown(null)
+                                          }
+                                          className="font-space-grotesk text-[12px] font-normal leading-none text-[#B5B5B5] transition-colors hover:text-[#E51B24]"
+                                        >
+                                          {item.label}
+                                        </Link>
+                                      ))}
+                                    </div>
+                                  ))}
+                                </div>
+
+                                {hoveredCategory.quickLinks?.length ? (
+                                  <div className="mt-[26px] flex flex-col gap-[9px]">
+                                    {hoveredCategory.quickLinks.map((quick) => (
+                                      <Link
+                                        key={quick.label}
+                                        to={quick.href}
+                                        onClick={() => setActiveDropdown(null)}
+                                        className="font-space-grotesk text-[12px] font-bold leading-none text-[#EF3340] transition-colors hover:text-[#ff5964]"
+                                      >
+                                        {quick.label}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                ) : null}
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                   {/* NORMAL DESKTOP DROPDOWN */}
                   {hasDropdown &&
                     !isPrograms &&
+                    !isCategories &&
                     isDropdownOpen && (
                       <div className="absolute left-0 top-full w-[340px] pt-2">
                         <div className="rounded-2xl border border-white/15 bg-[#121212] p-3 shadow-2xl backdrop-blur-xl">
@@ -303,14 +491,14 @@ export default function Navbar() {
           <ul className="flex flex-col gap-2">
             {navLinks.map((link) => {
               const hasDropdown = Boolean(
-                link.hasDropdown &&
-                  link.dropdownItems?.length
+                (link.hasDropdown && link.dropdownItems?.length) ||
+                  (link.categories?.length && link.label === "Categories")
               );
 
-              const isExpanded =
-                mobileExpanded === link.label;
+              const isExpanded = mobileExpanded === link.label;
 
               const isPrograms = link.label === "Programs";
+              const isCategories = link.label === "Categories";
 
               return (
                 <li
@@ -338,11 +526,16 @@ export default function Navbar() {
 
                     {hasDropdown && (
                       <button
-                        onClick={() =>
-                          setMobileExpanded(
-                            isExpanded ? null : link.label
-                          )
-                        }
+                        onClick={() => {
+                          const next = isExpanded ? null : link.label;
+                          setMobileExpanded(next);
+
+                          if (isCategories && !next) {
+                            setMobileActiveCategory(null);
+                          }
+                          // No default category — tap one of the chips
+                          // below to reveal its image + groups.
+                        }}
                         aria-label={`Expand ${link.label}`}
                         className="p-2 text-white/70 hover:text-white"
                       >
@@ -375,7 +568,7 @@ export default function Navbar() {
                               <img
                                 src={program.image}
                                 alt={program.label}
-                                className="h-full w-full object-cover"
+                                className="h-full w-full object-contain"
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                               <span className="absolute bottom-[10px] left-[12px] font-space-grotesk text-[13px] font-bold uppercase text-white">
@@ -399,9 +592,115 @@ export default function Navbar() {
                     </div>
                   )}
 
+                  {/* CATEGORIES MOBILE MENU — tap a category to switch the groups shown below */}
+                  {isCategories && isExpanded && (
+                    <div className="mb-4 mt-2">
+                      <div className="rounded-[10px] bg-[#130E0F] p-[10px]">
+                        <div className="mb-[8px] flex flex-wrap gap-[6px]">
+                          {link.categories?.map((category) => {
+                            const isActive =
+                              mobileActiveCategory?.label ===
+                              category.label;
+
+                            return (
+                              <button
+                                key={category.label}
+                                onClick={() =>
+                                  setMobileActiveCategory(category)
+                                }
+                                className={`rounded-[6px] px-[10px] py-[6px] font-space-grotesk text-[12px] font-bold transition-all duration-200 ${
+                                  isActive
+                                    ? "bg-[#EF3340] text-white"
+                                    : "bg-white/5 text-white/60"
+                                }`}
+                              >
+                                {category.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        <div
+                          className={`overflow-hidden transition-all duration-300 ease-out ${
+                            mobileActiveCategory?.image
+                              ? "mb-[10px] h-[110px] opacity-100"
+                              : "mb-0 h-0 opacity-0"
+                          }`}
+                        >
+                          {mobileActiveCategory?.image && (
+                            <div className="relative h-[110px] w-full rounded-[6px] overflow-hidden">
+                              <img
+                                src={mobileActiveCategory.image}
+                                alt={mobileActiveCategory.label}
+                                className="h-full w-full object-contain"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                              <span className="absolute bottom-[10px] left-[12px] font-space-grotesk text-[12px] font-bold uppercase text-white">
+                                {mobileActiveCategory.label}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {mobileActiveCategory && (
+                          <div className="flex flex-col gap-[20px] px-[2px] pb-[4px] transition-opacity duration-300 ease-out opacity-100">
+                            {mobileActiveCategory.groups.map((group) => (
+                              <div key={group.title} className="flex flex-col gap-[8px]">
+                                <p className="font-space-grotesk text-[11px] font-bold uppercase leading-none text-[#EEEEEE]">
+                                  {group.title}
+                                </p>
+
+                                {group.items.map((item) => (
+                                  <Link
+                                    key={item.label}
+                                    to={item.href}
+                                    onClick={() =>
+                                      setIsMobileOpen(false)
+                                    }
+                                    className="font-space-grotesk text-[12px] font-normal leading-none text-[#B5B5B5]"
+                                  >
+                                    {item.label}
+                                  </Link>
+                                ))}
+                              </div>
+                            ))}
+
+                            {mobileActiveCategory.quickLinks?.length ? (
+                              <div className="flex flex-col gap-[4px] border-t border-white/10 pt-[8px]">
+                                {mobileActiveCategory.quickLinks.map(
+                                  (quick) => (
+                                    <Link
+                                      key={quick.label}
+                                      to={quick.href}
+                                      onClick={() =>
+                                        setIsMobileOpen(false)
+                                      }
+                                      className="font-space-grotesk text-[12px] font-bold text-[#EF3340]"
+                                    >
+                                      {quick.label}
+                                    </Link>
+                                  )
+                                )}
+                              </div>
+                            ) : null}
+                          </div>
+                        )}
+
+                        <Link
+                          to="/categories"
+                          onClick={() => setIsMobileOpen(false)}
+                          className="mt-[10px] block px-[2px] pb-[5px] pt-[6px] font-space-grotesk text-[15px] font-bold text-[#EF3340]"
+                        >
+                          Explore all categories
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+
                   {/* NORMAL MOBILE SUBMENU */}
                   {hasDropdown &&
                     !isPrograms &&
+                    !isCategories &&
                     isExpanded && (
                       <div className="mb-2 ml-3 flex flex-col gap-1.5 border-l-2 border-[#E51B24]/40 pl-3 pt-1">
                         {link.dropdownItems?.map((sub) => (

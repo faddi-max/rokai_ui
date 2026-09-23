@@ -1,7 +1,7 @@
 import { apiClient } from "@/shared/api/apiClient";
-import { affiliateHeroContent } from "@/features/programs/data/heroContent";
-import { STEPS, Step } from "@/features/programs/data/steps.data";
-import { audienceTags } from "@/features/programs/data/audienceTags";
+import { affiliateHeroContent } from "@/features/programs/affiliate-program/data/heroContent";
+import { STEPS, Step } from "@/features/programs/affiliate-program/data/steps.data";
+import { audienceTags } from "@/features/programs/affiliate-program/data/audienceTags";
 import type { HeroContent } from "@/shared/types/hero";
 
 export interface ProgramsPageData {

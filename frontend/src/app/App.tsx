@@ -8,14 +8,15 @@ import { gsap, useGSAP } from "@/shared/animations";
 import Button from "@/shared/components/ui/Button";
 import BlogCategoryPage from "@/features/blogs/blogCatagoryPage";
 import AmbassadorProgramPage, {  } from "@/features/programs/ambassador-program/AmbassadorProgram";
-import AffiliatePage from "@/features/programs/Affiliate-page";
+import AffiliatePage from "@/features/programs/affiliate-program/Affiliate-page";
 import SponsorshipProgram from "@/features/programs/sponsorship-program/SponsorshipProgram";
 
+import ClubPartnershipProgram from "@/features/programs/club-partnership/ClubPartnershipProgram";
 // Code-split route pages with lazy loading
 const HomePage = lazy(() => import("@/features/home/HomePage"));
 const CategoriesPage = lazy(() => import("@/features/categories/CategoriesPage"));
 const BlogsPage = lazy(() => import("@/features/blogs/BlogsPage"));
-const ProgramsPage = lazy(() => import("@/features/programs/Affiliate-page"));
+const ProgramsPage = lazy(() => import("@/features/programs/affiliate-program/Affiliate-page"));
 
 
 const NotFoundPage = () => {
@@ -121,7 +122,7 @@ export default function App() {
 
 <Route
   path="/programs/partnership"
-  element={<NotFoundPage />}
+  element={<ClubPartnershipProgram />}
 />
           </Route>
         </Routes>

@@ -1,67 +1,82 @@
 import { ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import SectionGlow from "@/shared/components/layout/SectionGlow";
+import SectionHeaderblog from "@/shared/components/sections/SectionHeaderblog";
 
-type Expectation = {
-  label: string;
+
+type Benefit = {
+  number: string;
+  title: string;
   description: string;
 };
 
-const expectations: Expectation[] = [
+const benefits: Benefit[] = [
   {
-    label: "Integrity",
-    description: "Represent ROKAI with absolute integrity",
+    number: "01",
+    title: "New Revenue Stream",
+    description: "Generate consistent income beyond memberships",
   },
   {
-    label: "Gear",
-    description: "Wear ROKAI gear during training & events",
+    number: "02",
+    title: "Zero Inventory Risk",
+    description: "No upfront investment or unsold stock",
   },
   {
-    label: "Content",
-    description: "Share authentic content (training, lifestyle)",
+    number: "03",
+    title: "Done-For-You System",
+    description: "We handle everything operational",
   },
   {
-    label: "BJJ Community",
-    description: "Maintain active presence in the BJJ community",
+    number: "04",
+    title: "Stronger Team Identity",
+    description: "Build pride, loyalty, and retention",
+  },
+  {
+    number: "05",
+    title: "Proven Sales System",
+    description: "Convert students into repeat buyers",
+  },
+  {
+    number: "06",
+    title: "Fast Launch",
+    description: "Go live within 14 days",
+  },
+  {
+    number: "07",
+    title: "Risk-Aware Structure",
+    description: "Backed by a results-driven guarantee",
   },
 ];
 
 /* ------------------------------------------------------------------ */
-/* Card — same shell as StepCard (border / bg / glow / hover), but     */
-/* layout is label + line on top, description pinned to the bottom.    */
+/* Card                                                                */
 /* ------------------------------------------------------------------ */
-function ExpectationCard({
-  label,
-  description,
-  index,
-}: Expectation & { index: number }) {
+function BenefitCard({ number, title, description, index }: Benefit & { index: number }) {
   return (
     <motion.article
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.5, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{
-        y: -8,
-        scale: 1.02,
-        borderColor: "rgba(229, 27, 36, 0.5)",
-        boxShadow: "0px 12px 28px 6px rgba(229, 27, 36, 0.38)",
+        y: -6,
+        borderColor: "rgba(229, 27, 36, 0.55)",
+        boxShadow: "0px 12px 24px 4px rgba(229, 27, 36, 0.28)",
       }}
-      className="group flex min-h-[156px] w-full flex-col justify-between rounded-[8.03px] border border-white/10 bg-[#111111] px-9 pb-7 pt-9 shadow-[0px_0px_9.37px_4.02px_#E51B2447] transition-all duration-300 lg:h-[156px]"
+      className="group flex min-h-[132px] w-full flex-col justify-between rounded-[10px] border border-[#E51B24]/25 bg-[#111111] px-7 py-6 transition-all duration-300"
     >
-      <div className="flex items-center gap-3">
-        <span className="font-space-grotesk text-[13px] font-normal uppercase leading-none tracking-[0.02em] text-white/90 transition-colors duration-300 group-hover:text-white">
-          {label}
-        </span>
-        <span
-          aria-hidden
-          className="h-px w-8 bg-[#E51B24] transition-all duration-300 group-hover:w-12"
-        />
-      </div>
+      <span className="font-space-grotesk text-[13px] font-medium text-[#E51B24]">
+        {number}
+      </span>
 
-      <p className="max-w-[172px] font-space-grotesk text-[11px] leading-[1.5] text-white/60 transition-colors duration-300 group-hover:text-white/90">
-        {description}
-      </p>
+      <div className="mt-4">
+        <h3 className="font-space-grotesk text-[15px] font-bold uppercase leading-snug tracking-[-0.01em] text-white">
+          {title}
+        </h3>
+        <p className="mt-2 font-space-grotesk text-[12px] leading-[1.5] text-white/50">
+          {description}
+        </p>
+      </div>
     </motion.article>
   );
 }
@@ -69,63 +84,44 @@ function ExpectationCard({
 /* ------------------------------------------------------------------ */
 /* Section                                                             */
 /* ------------------------------------------------------------------ */
-export default function ExpectationsSection() {
+export default function WhyBeneficialSection() {
   return (
     <SectionGlow className="relative overflow-hidden">
-      <div className="relative z-10 mx-auto w-full max-w-[1440px] pb-24 pt-10">
-        {/* --- Header (left aligned, two lines) --- */}
-        <motion.header
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="px-5 sm:px-8 lg:px-[30px]"
-        >
-          <div className="flex items-center gap-3">
-            <span className="font-space-grotesk text-[12px] font-normal leading-none text-white">
-              The standard
-            </span>
-            <span aria-hidden className="h-px w-[46px] bg-[#E63946]" />
-          </div>
-
-          <h2 className="mt-4 font-space-grotesk uppercase leading-[0.95] tracking-[-0.02em]">
-            <span className="block text-[44px] font-bold text-white sm:text-[56px] lg:text-[64px]">
-              Ambassador
-            </span>
-            <span className="block bg-gradient-to-r from-[#E63946] to-[#7A1B22] bg-clip-text text-[44px] font-medium text-transparent sm:text-[56px] lg:text-[64px]">
-              Expectations
-            </span>
-          </h2>
-        </motion.header>
+          {/* --- Header --- */}
+        <SectionHeaderblog
+          bare
+          eyebrow="Why it works"
+          title="Why this program is"
+          highlight="beneficial for clubs."
+          highlightGradient="linear-gradient(90deg, #E63946 0%, #7A1B22 100%)"
+          accentColor="#E63946"
+          description="ROKAI is more than a partnership. It's a complete revenue system for your academy."
+        />
+      <div className="relative z-10 mx-auto w-full max-w-[1280px] px-5 pb-20 sm:px-8 lg:px-[30px]">
+    
 
         {/* --- Cards --- */}
-        <div className="mx-auto mt-16 grid w-full max-w-[1072px] grid-cols-1 gap-6 px-5 sm:grid-cols-2 sm:px-8 lg:mt-[72px] lg:grid-cols-4 lg:px-0">
-          {expectations.map((item, i) => (
-            <ExpectationCard key={item.label} index={i} {...item} />
+        <div className="mt-14 grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3">
+          {benefits.map((item, i) => (
+            <BenefitCard key={item.number} index={i} {...item} />
           ))}
         </div>
 
-        {/* --- CTA banner --- */}
+        {/* --- CTA --- */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-14 px-5 sm:px-8 lg:mt-[70px] lg:px-[44px]"
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-10 flex justify-end"
         >
-          <div className="flex flex-col items-start justify-between gap-6 rounded-[12px] bg-white px-7 py-9 shadow-[0px_0px_12px_3px_rgba(230,57,70,0.28)] sm:px-10 lg:h-[197px] lg:flex-row lg:items-center lg:gap-10 lg:px-[48px] lg:py-0">
-            <h3 className="font-space-grotesk text-[26px] font-bold uppercase leading-[1.1] tracking-[-0.01em] text-[#E63946] sm:text-[32px] lg:text-[36px]">
-              Ready to prove your worth?
-            </h3>
-
-            <a
-              href="#apply"
-              className="flex h-[56px] shrink-0 items-center gap-6 rounded-[6px] bg-[#E63946] px-4 font-space-grotesk text-[14px] font-medium text-white transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E63946]"
-            >
-              Join the Movement
-              <ArrowUpRight size={14} aria-hidden />
-            </a>
-          </div>
+          <a
+            href="#apply"
+            className="flex h-[48px] shrink-0 items-center gap-2 rounded-[6px] bg-[#E51B24] px-6 font-space-grotesk text-[13px] font-medium text-white transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E51B24]"
+          >
+            Start Now
+            <ArrowUpRight size={14} aria-hidden />
+          </a>
         </motion.div>
       </div>
     </SectionGlow>

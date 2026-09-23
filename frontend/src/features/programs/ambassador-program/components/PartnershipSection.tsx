@@ -75,8 +75,9 @@ function PartnershipCopy({
   return (
     <div className="flex w-full flex-col gap-[14px] border-l-2 border-[#E63946] pl-[19px] lg:w-[624px]">
       {/* White callout bar */}
-      <div className="flex min-h-[44px] items-center bg-white px-[18px] py-2">
-        <span className="font-space-grotesk text-[12px] font-bold leading-[16px] text-[#0d0d0d]">
+      <div className="flex min-h-[44px] items-center bg-[#e9bbc014]  px-[18px] py-2">
+        {/* <span className="relative  mt-0.5 size-[5px] shrink-0 rounded-full  shadow-[0_0_0_6px_rgba(230,57,70,0.12)]" /> */}
+        <span className="font-space-grotesk border-[#d89a9f] text-[12px] font-bold leading-[16px] text-white px-2">
           {callout}
         </span>
       </div>

@@ -5,20 +5,43 @@ export type NavSubItem = {
   image: string;
 };
 
+export type CategoryGroupItem = {
+  label: string;
+  href: string;
+};
+
+export type CategoryGroup = {
+  title: string;
+  items: CategoryGroupItem[];
+};
+
+export type CategoryLink = {
+  label: string;
+  href: string;
+  image: string;
+  groups: CategoryGroup[];
+  quickLinks?: CategoryGroupItem[];
+};
+
 export type NavLink = {
   label: string;
   href: string;
   hasDropdown?: boolean;
   dropdownItems?: NavSubItem[];
+  categories?: CategoryLink[];
 };
 
 import {
   affiliateProgramhero,
-  affiliateProgramImage,
   ambassadorProgramhero,
-  ambassadorProgramImage,
   sponserhero,
-  
+
+
+  competitionGiCategoryImage,
+  work1,
+  work2,
+  work3,
+  work4,
 } from "@/assets";
 
 export const navLinks: NavLink[] = [
@@ -27,31 +50,157 @@ export const navLinks: NavLink[] = [
   {
     label: "Categories",
     href: "/categories",
-    hasDropdown: false,
-    dropdownItems: [
+    hasDropdown: true,
+    categories: [
       {
-        label: "BJJ Training Gis",
-        href: "/categories#catalog",
-        description: "450 GSM Pearl Weave daily academy kimonos",
-        image: "",
+        label: "BJJ / Grappling",
+        href: "/categories/bjj-grappling",
+        image: work1,
+        groups: [
+          {
+            title: "GI",
+            items: [
+              { label: "Custom BJJ Gis", href: "/categories/bjj-grappling#gis" },
+              { label: "Competition Gis", href: "/categories/bjj-grappling#gis" },
+              { label: "Training Gis", href: "/categories/bjj-grappling#gis" },
+            ],
+          },
+          {
+            title: "RASH GUARDS",
+            items: [
+              { label: "Custom BJJ Rash Guards", href: "/categories/bjj-grappling#rashguards" },
+              { label: "Competition Rash Guards", href: "/categories/bjj-grappling#rashguards" },
+            ],
+          },
+          {
+            title: "GRAPPLING SHORTS",
+            items: [
+              { label: "Custom Grappling Shorts", href: "/categories/bjj-grappling#shorts" },
+            ],
+          },
+        ],
+        quickLinks: [
+          { label: "Fightwear", href: "/categories/fightwear" },
+          { label: "Team Apparel", href: "/categories/team-apparel" },
+        ],
       },
       {
-        label: "Competition Gis",
-        href: "/categories#catalog",
-        description: "IBJJF 2026 certified ultralight tournament uniforms",
-        image: "",
+        label: "Boxing",
+        href: "/categories/boxing",
+        image: work4,
+        groups: [
+          {
+            title: "GLOVES & WRAPS",
+            items: [
+              { label: "Custom Boxing Gloves", href: "/categories/boxing#gloves" },
+              { label: "Hand Wraps", href: "/categories/boxing#gloves" },
+            ],
+          },
+          {
+            title: "APPAREL",
+            items: [
+              { label: "Boxing Shorts", href: "/categories/boxing#apparel" },
+              { label: "Robes & Ring Jackets", href: "/categories/boxing#apparel" },
+            ],
+          },
+        ],
+        quickLinks: [
+          { label: "Fightwear", href: "/categories/fightwear" },
+          { label: "Team Apparel", href: "/categories/team-apparel" },
+        ],
       },
       {
-        label: "Performance Rashguards",
-        href: "/categories#catalog",
-        description: "Zero-chafing flatlock compression gear",
-        image: "",
+        label: "MMA",
+        href: "/categories/mma",
+        image: work2,
+        groups: [
+          {
+            title: "SHORTS",
+            items: [
+              { label: "Custom MMA Fight Shorts", href: "/categories/mma#shorts" },
+              { label: "Training Shorts", href: "/categories/mma#shorts" },
+            ],
+          },
+          {
+            title: "RASH GUARDS",
+            items: [
+              { label: "Custom MMA Rash Guards", href: "/categories/mma#rashguards" },
+            ],
+          },
+        ],
+        quickLinks: [
+          { label: "Fightwear", href: "/categories/fightwear" },
+          { label: "Team Apparel", href: "/categories/team-apparel" },
+        ],
       },
       {
-        label: "Fight Shorts & Teamwear",
-        href: "/categories#catalog",
-        description: "4-way stretch grappling shorts and academy fleece",
-        image: "",
+        label: "Muay Thai / Kickboxing",
+        href: "/categories/muay-thai-kickboxing",
+        image: work3,
+        groups: [
+          {
+            title: "SHORTS",
+            items: [
+              { label: "Custom Muay Thai Shorts", href: "/categories/muay-thai-kickboxing#shorts" },
+            ],
+          },
+          {
+            title: "APPAREL",
+            items: [
+              { label: "Kickboxing Rash Guards", href: "/categories/muay-thai-kickboxing#apparel" },
+            ],
+          },
+        ],
+        quickLinks: [
+          { label: "Fightwear", href: "/categories/fightwear" },
+          { label: "Team Apparel", href: "/categories/team-apparel" },
+        ],
+      },
+      {
+        label: "Wrestling",
+        href: "/categories/wrestling",
+        image: work4,
+        groups: [
+          {
+            title: "SINGLETS",
+            items: [
+              { label: "Custom Wrestling Singlets", href: "/categories/wrestling#singlets" },
+            ],
+          },
+          {
+            title: "APPAREL",
+            items: [
+              { label: "Wrestling Shorts", href: "/categories/wrestling#apparel" },
+            ],
+          },
+        ],
+        quickLinks: [
+          { label: "Fightwear", href: "/categories/fightwear" },
+          { label: "Team Apparel", href: "/categories/team-apparel" },
+        ],
+      },
+      {
+        label: "Martial Arts",
+        href: "/categories/martial-arts",
+        image: competitionGiCategoryImage,
+        groups: [
+          {
+            title: "UNIFORMS",
+            items: [
+              { label: "Custom Martial Arts Uniforms", href: "/categories/martial-arts#uniforms" },
+            ],
+          },
+          {
+            title: "APPAREL",
+            items: [
+              { label: "Training Apparel", href: "/categories/martial-arts#apparel" },
+            ],
+          },
+        ],
+        quickLinks: [
+          { label: "Fightwear", href: "/categories/fightwear" },
+          { label: "Team Apparel", href: "/categories/team-apparel" },
+        ],
       },
     ],
   },
@@ -78,8 +227,7 @@ export const navLinks: NavLink[] = [
       {
         label: "Tajima Embroidery & Sublimation",
         href: "/services#capabilities",
-        description:
-          "Industrial high-density stitching and Italian inks",
+        description: "Industrial high-density stitching and Italian inks",
         image: "",
       },
       {
