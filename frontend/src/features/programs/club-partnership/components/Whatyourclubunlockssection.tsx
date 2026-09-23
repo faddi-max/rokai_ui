@@ -125,7 +125,7 @@ function UnlockCard({
         delay: (index % 3) * 0.08,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="flex w-full flex-col justify-between rounded-[8.03px] p-[20px] transition-shadow duration-300 hover:shadow-[0px_0px_14px_6px_#E51B246E] sm:p-[24px] lg:p-0"
+     
       style={{
         maxWidth: 360.1611022949219,
         background: "#111111",

@@ -15,6 +15,7 @@ import WhatYourClubUnlocksSection from "./components/Whatyourclubunlockssection"
 import ExpectationsSection from "../ambassador-program/components/ExpectationsSection";
 import ROIBreakdownSection from "./components/ROIBreakdownSection";
 import GuaranteeSection from "./components/GuaranteeSection";
+import HeroTrustBadges from "@/features/home/components/HeroTrustBadges";
 
 export default function ClubPartnershipProgram() {
   const { data, loading, error, refetch } = useAsyncData(() =>
@@ -37,7 +38,7 @@ export default function ClubPartnershipProgram() {
           className="relative w-full"
         >
           <HeroSection {...pageData.hero} />
-
+ <HeroTrustBadges />
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

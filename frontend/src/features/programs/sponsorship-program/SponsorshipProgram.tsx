@@ -11,6 +11,7 @@ import ProgramOverviewSection from "../ambassador-program/components/ProgramOver
 import { ambassadorProgramOverview, sponsorshipProgramOverview } from "../ambassador-program/data/programData";
 import ClubSponsorshipValueSystem from "./components/ClubSponsorshipValueSystem";
 import EquipYourAcademySection from "./components/EquipYourAcademySection";
+import HeroTrustBadges from "@/features/home/components/HeroTrustBadges";
 
 
 export default function SponsorshipProgram() {
@@ -35,6 +36,7 @@ export default function SponsorshipProgram() {
         >
           <HeroSection {...pageData.hero} />
 
+<HeroTrustBadges />
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -43,6 +45,7 @@ export default function SponsorshipProgram() {
      <ProgramOverviewSection
            data={sponsorshipProgramOverview}
          />
+         
          <ClubSponsorshipValueSystem />
          <EquipYourAcademySection />
             <HowWeWorkSection />

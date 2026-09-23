@@ -72,7 +72,7 @@ export default function HeroSection({
   return (
     <section
       ref={heroRef}
-      className={`relative overflow-hidden pb-8 lg:pb-0 ${background?.sectionClassName ?? ""}`}
+      className={`relative overflow-hidden pb-8 lg:pb-9 ${background?.sectionClassName ?? ""}`}
       style={{
         backgroundColor: sectionBgColor,
         ...(sectionHeightPx ? { minHeight: undefined } : {}),

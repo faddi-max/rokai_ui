@@ -13,6 +13,7 @@ import ScalingBrands from "../../home/components/ScalingBrandsSection";
 import AffiliateLoginSection from "./components/AffiliateLoginSection";
 import StepSection from "./components/StepSection";
 import BenefitsSection from "./components/BenefitsSection";
+import HeroTrustBadges from "@/features/home/components/HeroTrustBadges";
 
 export default function AffiliatePage() {
   const { data, loading, error, refetch } = useAsyncData(() =>
@@ -35,6 +36,7 @@ export default function AffiliatePage() {
           className="relative w-full"
         >
           <HeroSection {...pageData.hero} />
+          <HeroTrustBadges />
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}

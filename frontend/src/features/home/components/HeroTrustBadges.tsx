@@ -50,7 +50,7 @@ export default function HeroTrustBadges({
   return (
     <section
       aria-label="Why brands work with ROKAI"
-      className="relative z-10 -mt-10 px-5 sm:-mt-12 sm:px-8 lg:-mt-16 lg:px-0"
+      className="relative z-10 -mt-10 px-5 sm:-mt-12 sm:px-8 lg:-mt-10 lg:px-0"
     >
       <motion.ul
         variants={containerVariants}

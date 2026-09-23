@@ -12,6 +12,7 @@ import ClientFeedbackSection from "@/features/categories/componnets/ClientFeedba
 import HowWeWorkSection from "@/features/categories/data/HowWeWorkSection";
 import FAQSection from "../../home/components/FAQSection";
 import { ambassadorProgramOverview } from "./data/programData";
+import HeroTrustBadges from "@/features/home/components/HeroTrustBadges";
 export default function AmbassadorProgramPage() {
   const { data, loading, error, refetch } = useAsyncData(() =>
     categoriesService.getAmbassadorPageData()
@@ -33,7 +34,7 @@ export default function AmbassadorProgramPage() {
           className="relative w-full"
         >
           <HeroSection {...pageData.hero} />
-
+<HeroTrustBadges />
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -42,7 +43,7 @@ export default function AmbassadorProgramPage() {
           <ProgramOverviewSection
         data={ambassadorProgramOverview}
       />
-           {/* <PartnershipSection /> */}
+           <PartnershipSection />
            <WhoIsForSection />
            <BenefitsSection />
            {/* <ExpectationsSection /> */}

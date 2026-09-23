@@ -347,13 +347,7 @@ export default function Navbar() {
                                     {hoveredCategory.label}
                                   </span>
 
-                                  <Link
-                                    to={hoveredCategory.href}
-                                    onClick={() => setActiveDropdown(null)}
-                                    className="font-space-grotesk text-[11px] font-bold text-white/55 transition-colors hover:text-[#E51B24]"
-                                  >
-                                    View Category
-                                  </Link>
+                              
                                 </div>
 
                                 <div className="flex flex-col gap-[26px]">
