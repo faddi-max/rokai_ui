@@ -30,11 +30,15 @@ export interface ApiBlogPost {
   title: string;
   slug: string;
   excerpt?: string | null;
+  content?: string | null;   
   image?: string | null;
+  image_alt?: string | null; 
   author?: string | null;
   status?: string;
   read_time?: number | null;
   published_at?: string | null;
+  views_count?: number;      
+  url?: string;             
   category?: {
     id: number | string;
     title: string;
@@ -43,7 +47,6 @@ export interface ApiBlogPost {
     image?: string | null;
   } | null;
 }
-
 
 const API_HOST = (() => {
   try {
@@ -111,6 +114,7 @@ function mapApiPost(post: ApiBlogPost, fallbackSlug = ""): BlogPost {
     excerpt: cleanExcerpt,
     date,
     readTime: readTimeLabel,
+    content: post.content || "",
   };
 }
 
@@ -158,7 +162,7 @@ export const blogsService = {
 
   async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
     try {
-      const raw = await apiClient.get<ApiBlogPost>(`/blogs/posts/${slug}`);
+      const raw = await apiClient.get<ApiBlogPost>(`/blogs/${slug}`);
       if (raw) return mapApiPost(raw);
     } catch (err) {
       console.warn(`Could not fetch post '${slug}', using fallback:`, err);

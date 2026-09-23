@@ -75,7 +75,7 @@ export default function BlogCategoryPage() {
             highlightTitle={post.highlightTitle}
             bodyTitle={post.bodyTitle}
             description={post.description}
-            onReadMore={() => navigate(`/blogs/post/${post.slug}`)}
+            onReadMore={() => navigate(`/blogs/${post.slug}`)}
           />
         ))}
       </div>

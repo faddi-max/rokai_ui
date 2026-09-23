@@ -59,7 +59,7 @@ export default function SectionHeaderblog({
       }`}
     >
       <div>
-        <div className="mb-3 flex items-center gap-3">
+        <div className="mb-3 flex items-center gap-6">
           <motion.span
             initial={{ opacity: 0, x: -10 }}
             whileInView={{ opacity: 1, x: 0 }}

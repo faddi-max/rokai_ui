@@ -1,0 +1,190 @@
+import type { BlogPost } from "@/shared/types/blogs";
+
+interface BlogHeroDetailMeta {
+  primaryTopic?: string;
+  suitableFor?: string;
+  contentType?: string;
+  lastReviewed?: string;
+  expertReviewed?: boolean;
+  readsCount?: number;
+  /** Pass a second real photo if you have one — otherwise the single
+   *  post.image is shown as one full-width banner instead of being
+   *  duplicated into two identical panels. */
+  secondaryImage?: string;
+}
+
+interface BlogHeroDetailProps {
+  post: BlogPost;
+  meta?: BlogHeroDetailMeta;
+}
+
+function formatDate(dateStr?: string) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
+
+function splitTitle(title: string) {
+  const words = title.trim().split(/\s+/);
+  if (words.length <= 4) return { lead: title, accent: "" };
+  const mid = Math.ceil(words.length / 2);
+  return { lead: words.slice(0, mid).join(" "), accent: words.slice(mid).join(" ") };
+}
+
+export default function BlogHeroDetail({ post, meta = {} }: BlogHeroDetailProps) {
+  const {
+    primaryTopic = post.badgeLabel || "—",
+    suitableFor = "Athletes & academies",
+    contentType = "Long-form guide",
+    lastReviewed = formatDate(post.date),
+    expertReviewed = true,
+    readsCount,
+    secondaryImage,
+  } = meta;
+
+  const { lead, accent } = splitTitle(post.title);
+  console.log(post.title)
+  const dateLabel = formatDate(post.date);
+
+  // Build the meta-row items first so we only ever render a Dot BETWEEN
+  // two real items — never before an empty one and never trailing.
+  const metaItems = [
+    <span key="author">
+      By <span className="text-white/85">{post.author}</span>
+    </span>,
+    dateLabel && <span key="date">{dateLabel}</span>,
+    post.readTime && <span key="read">{post.readTime}</span>,
+    expertReviewed && (
+      <span key="reviewed" className="flex items-center gap-1 text-emerald-400">
+        <CheckIcon /> Expert reviewed
+      </span>
+    ),
+    !!readsCount && (
+      <span key="reads" className="flex items-center gap-1">
+        <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
+        {readsCount >= 1000 ? `${(readsCount / 1000).toFixed(1)}k` : readsCount} reads
+      </span>
+    ),
+  ].filter(Boolean);
+
+  return (
+    <section className="bg-[#0a0a0a] text-white font-space-grotesk px-6 py-16 md:px-12 lg:px-20">
+      <div className="mx-auto max-w-[1200px]">
+        <div className="mb-6 flex items-center gap-2">
+          <span className="h-[2px] w-6 bg-[#E63946]" />
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">
+            {post.badgeLabel || "Article"}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_260px]">
+          <div>
+            <h1 className="text-[34px] font-extrabold uppercase leading-[1.08] tracking-tight md:text-[46px]">
+              <span className="block text-white">{lead}</span>
+              {accent && (
+                <span className="relative block text-[#E63946]">
+                  {accent}
+                  <span className="absolute -bottom-1 left-0 h-[3px] w-16 bg-[#E63946]" />
+                </span>
+              )}
+            </h1>
+
+            <p className="mt-6 max-w-[520px] text-[15px] leading-relaxed text-white/60">
+              {post.excerpt}
+            </p>
+
+            <div className="mt-8 h-px w-full max-w-[560px] bg-white/10" />
+
+            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-white/60">
+              {metaItems.map((item, i) => (
+                <span key={i} className="flex items-center gap-5">
+                  {i > 0 && <Dot />}
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-5 lg:pt-1">
+            <Fact label="Primary topic" value={primaryTopic} />
+            <Fact label="Suitable for" value={suitableFor} />
+            <Fact label="Content type" value={contentType} />
+            <Fact label="Last reviewed" value={lastReviewed} />
+          </div>
+        </div>
+
+        {secondaryImage ? (
+          <div className="relative mt-10 grid grid-cols-2 overflow-hidden rounded-2xl border border-white/10">
+            <BannerPhoto src={post.image} />
+            <BannerPhoto src={secondaryImage} dark />
+            <CenterBadge />
+          </div>
+        ) : (
+          <div className="relative mt-10 overflow-hidden rounded-2xl border border-white/10">
+            <BannerPhoto src={post.image} tall />
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function Fact({ label, value }: { label: string; value?: string }) {
+  if (!value) return null;
+  return (
+    <div>
+      <div className="text-[11px] uppercase tracking-wide text-white/40">{label}</div>
+      <div className="mt-1 text-[13px] font-semibold text-white">{value}</div>
+    </div>
+  );
+}
+
+function BannerPhoto({ src, dark, tall }: { src?: string; dark?: boolean; tall?: boolean }) {
+  return (
+    <div
+      className={`relative bg-cover bg-center ${tall ? "h-[380px]" : "h-[320px]"} ${
+        dark ? "bg-black" : "bg-white/5"
+      }`}
+      style={src ? { backgroundImage: `url(${src})` } : undefined}
+    >
+      <span className="absolute bottom-3 left-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#E63946] text-[10px] font-bold">
+        R
+      </span>
+    </div>
+  );
+}
+
+function CenterBadge() {
+  return (
+    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+      <div className="flex items-center gap-2">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#E63946] text-sm font-bold">
+          R
+        </span>
+        <span className="text-lg font-bold tracking-wide">ROKAI</span>
+      </div>
+      <span className="mt-1 text-[10px] uppercase tracking-[0.25em] text-white/50">
+        Built to become
+      </span>
+    </div>
+  );
+}
+
+function Dot() {
+  return <span className="h-1 w-1 rounded-full bg-white/30" />;
+}
+
+function CheckIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <path
+        d="M2.5 6.2 5 8.7 9.5 3.5"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
