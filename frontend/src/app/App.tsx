@@ -13,7 +13,8 @@ import SponsorshipProgram from "@/features/programs/sponsorship-program/Sponsors
 
 import ClubPartnershipProgram from "@/features/programs/club-partnership/ClubPartnershipProgram";
 import SinglePageBlog from "@/features/blogs/SingleBlogPage";
-// Code-split route pages with lazy loading
+import ProgramApplyPage from "@/features/programs/ProgramForm/ProgramApplyPage";
+
 const HomePage = lazy(() => import("@/features/home/HomePage"));
 const CategoriesPage = lazy(() => import("@/features/categories/CategoriesPage"));
 const BlogsPage = lazy(() => import("@/features/blogs/BlogsPage"));
@@ -126,6 +127,11 @@ export default function App() {
   path="/programs/partnership"
   element={<ClubPartnershipProgram />}
 />
+<Route
+  path="/programs/partnership"
+  element={<ClubPartnershipProgram />}
+/>
+<Route path="/programs/apply/:programId" element={<ProgramApplyPage />} />
           </Route>
         </Routes>
       </Suspense>

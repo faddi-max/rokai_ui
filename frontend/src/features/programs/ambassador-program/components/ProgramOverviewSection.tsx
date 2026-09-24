@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import SectionHeaderblog from "@/shared/components/sections/SectionHeaderblog";
 import SectionGlow from "@/shared/components/layout/SectionGlow";
 import type { ProgramOverviewData } from "../data/programData";
@@ -93,14 +94,18 @@ export default function ProgramOverviewSection({
 
             {/* BUTTONS */}
             <div className="mt-9 flex flex-wrap items-center gap-6">
-              <a
-                href={data.primaryCtaHref}
+              <Link
+                to={
+                  data.primaryCtaHref.startsWith("/programs/")
+                    ? data.primaryCtaHref
+                    : `/programs/apply/${(data.watermark || "ambassador").toLowerCase()}`
+                }
                 className="flex h-[37px] items-center gap-[25px] rounded-[6px] bg-[#e63946] px-[13px] font-space-grotesk text-[13px] font-medium uppercase tracking-[1.08px] text-white transition hover:opacity-90"
               >
                 {data.primaryCta}
 
                 <ArrowUpRight size={16} />
-              </a>
+              </Link>
 
               <a
                 href={data.secondaryCtaHref}

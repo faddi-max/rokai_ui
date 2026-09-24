@@ -314,8 +314,7 @@ export default function BlogContentSection({ post, categories = [] }: BlogConten
 
   if (!post.content) return null;
 
-  // Smooth-scroll to a section instead of the browser's hard anchor jump.
-  // h2 already has scroll-margin-top set, so the sticky header is respected.
+
   const handleTocClick = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     event.preventDefault();
     const target = document.getElementById(id);
