@@ -4,8 +4,16 @@ import SectionGlow from "@/shared/components/layout/SectionGlow";
 import { discussionService } from "@/shared/api/services/discussionService";
 import { useDiscussionComments } from "@/shared/hooks/useDiscussionCommnet";
 import type { DiscussionComment } from "@/shared/types/discussion";
+import { InstagramIcon, FacebookIcon, LinkedinIcon, YoutubeIcon } from "../../../../src/shared/icons/socialmediaicons";
 
 const COMMENT_MAX_LENGTH = 500;
+
+const socialLinks = [
+  { icon: InstagramIcon, href: "#", label: "Instagram" },
+  { icon: FacebookIcon, href: "#", label: "Facebook" },
+  { icon: LinkedinIcon, href: "#", label: "LinkedIn" },
+  { icon: YoutubeIcon, href: "#", label: "YouTube" },
+];
 
 function StarRating({
   rating,
@@ -272,8 +280,31 @@ export default function CommunityDiscussionSection({ postId }: { postId: string 
   return (
     <SectionGlow>
       <div className="mx-5 py-10 font-space-grotesk lg:mx-50">
+        {/* Social bar + community CTA */}
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {socialLinks.map(({ icon: Icon, href, label }) => (
+              <a
+                key={label}
+                href={href}
+                aria-label={label}
+                className="flex h-9 w-9 items-center justify-center rounded-md bg-white text-black transition hover:bg-white/80"
+              >
+                <Icon size={16} />
+              </a>
+            ))}
+          </div>
+          
+          <a  href="#join-community"
+            className="flex items-center gap-1 rounded-md bg-[#E63946] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#c92f3b]"
+          >
+            Join Our Community
+            <ArrowUpRight size={14} />
+          </a>
+        </div>
+
         {/* Header */}
-        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+        <div className="flex flex-col py-10 justify-between gap-6 lg:flex-row lg:items-end">
           <div>
             <div className="mb-2 flex items-center gap-3">
               <span className="text-xs font-semibold uppercase tracking-widest text-white/50">
@@ -287,7 +318,7 @@ export default function CommunityDiscussionSection({ postId }: { postId: string 
               <span className="text-[#E63946]">Conversation</span>
             </h2>
           </div>
-          <p className="max-w-sm text-sm leading-relaxed text-white/60">
+          <p className="max-w-sm text-sm leading-relaxed border-l-2 border-red-400 p-2 text-white/60">
             Share Your Experience, Ask A Question, Or Help Another Athlete. Every
             Comment And Reply Stays Connected, So The Complete Discussion Is Easy To
             Follow.
@@ -295,7 +326,7 @@ export default function CommunityDiscussionSection({ postId }: { postId: string 
         </div>
 
         {/* Leave a comment */}
-        <div className="mt-8 rounded-xl border border-white/10 bg-white/[0.02] p-5 sm:p-6">
+        <div className="mt-10 rounded-xl border border-white/10 bg-white/[0.02] p-5 sm:p-6">
           <h3 className="text-lg font-bold uppercase text-white">Leave A Comment</h3>
           <p className="mt-1 text-sm text-white/50">
             Share Your Thoughts, Ask A Question Or Leave A Review!

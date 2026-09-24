@@ -324,18 +324,12 @@ export default function BlogContentSection({ post, categories = [] }: BlogConten
     window.history.replaceState(null, "", `#${id}`);
   };
 
-  // NOTE: the Figma "Author" block (avatar initials, name, bio) needs a bio
-  // string that today's BlogPost/API sample only partially provides (just a
-  // plain `author` name, e.g. "Rokai"). If you want the full two-line bio
-  // shown in the design, add `author_bio` (and optionally `author_avatar`)
-  // to the BlogPost type/API response — the fields below read them
-  // defensively so nothing breaks if they're still missing.
   const authorName = post.author;
   const authorBio = (post as unknown as { author_bio?: string }).author_bio;
 
   return (
-    <section className="overflow-x-hidden bg-[#0a0a0a] px-6 py-16 md:px-12 lg:px-20">
-      <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-12 lg:grid-cols-[220px_minmax(0,1fr)]">
+    <section className="overflow-x-hidden bg-[#0a0a0a] px-6 py-16 md:px-10 lg:px-6">
+      <div className=" grid grid-cols-1 gap-10 lg:grid-cols-[220px_minmax(0,1fr)] mx-5 lg:mx-20">
         <aside className="lg:sticky lg:top-24 lg:h-fit">
           {toc.length > 0 && (
             <div className="mb-10">
@@ -402,7 +396,7 @@ export default function BlogContentSection({ post, categories = [] }: BlogConten
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.45, ease: "easeOut" }}
-          className="mx-auto mt-12 max-w-[1200px] border-t border-white/10 pt-10 lg:pl-[calc(220px+3rem)]"
+          className="mx-auto mt-12 border-t border-white/10 pt-10 lg:pl-[calc(220px+2.5rem)]"
         >
           <div className={`${EYEBROW_CLASS} mb-4`}>Author</div>
           <div className="flex items-start gap-4">
@@ -422,12 +416,6 @@ export default function BlogContentSection({ post, categories = [] }: BlogConten
           </div>
         </motion.div>
       )}
-
-      <div className="mx-auto mt-12 max-w-[1200px] border-t border-white/10 pt-6 lg:pl-[calc(220px+3rem)]">
-        <Link to="/blogs" className="text-sm font-semibold underline text-accent">
-          ← Back to all posts
-        </Link>
-      </div>
 
       <style>{`
         .text-accent { color: ${ACCENT}; }

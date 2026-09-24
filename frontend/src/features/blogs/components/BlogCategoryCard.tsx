@@ -156,12 +156,18 @@ export default function BlogCard({
           </div>
 
           <h3 className="mt-3 text-[16px] font-bold uppercase leading-[1.3] sm:text-[18px] md:text-[20px] md:leading-[1.25]">
-            {highlightTitle && (
-              <span style={GRADIENT_TEXT} className="bg-clip-text">
-                {highlightTitle}{" "}
-              </span>
-            )}
-            {bodyTitle && <span className="text-white">{bodyTitle}</span>}
+            <button
+              type="button"
+              onClick={onReadMore}
+              className="text-left transition-opacity duration-200 hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E63946] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111111]"
+            >
+              {highlightTitle && (
+                <span style={GRADIENT_TEXT} className="bg-clip-text">
+                  {highlightTitle}{" "}
+                </span>
+              )}
+              {bodyTitle && <span className="text-white">{bodyTitle}</span>}
+            </button>
           </h3>
 
           {description && (

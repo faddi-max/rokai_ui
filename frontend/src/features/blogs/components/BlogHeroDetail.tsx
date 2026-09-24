@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import type { BlogPost } from "@/shared/types/blogs";
 import { blogcatagory } from "@/assets";
 
@@ -30,34 +32,63 @@ function splitTitle(title: string) {
   return { lead: words.slice(0, mid).join(" "), accent: words.slice(mid).join(" ") };
 }
 
+
+function getReviewCacheKey(post: BlogPost) {
+  const fingerprint = (post as unknown as { updatedAt?: string }).updatedAt || post.publishedAt || post.date || "";
+  return `blog-last-reviewed:${post.slug}:${fingerprint}`;
+}
+
+function readOrSetCachedReviewDate(post: BlogPost): string {
+  if (typeof window === "undefined") return new Date().toISOString().slice(0, 10);
+  const key = getReviewCacheKey(post);
+  try {
+    const cached = window.localStorage.getItem(key);
+    if (cached) return cached;
+    const today = new Date().toISOString().slice(0, 10);
+    window.localStorage.setItem(key, today);
+    return today;
+  } catch {
+    return new Date().toISOString().slice(0, 10);
+  }
+}
+
 export default function BlogHeroDetail({ post, meta = {} }: BlogHeroDetailProps) {
   const {
     primaryTopic = post.badgeLabel || "—",
     suitableFor = "Athletes & academies",
     contentType = "Long-form guide",
-    lastReviewed = formatDate(post.date),
+    lastReviewed,
     expertReviewed = true,
     readsCount,
     secondaryImage,
   } = meta;
 
   const { lead, accent } = splitTitle(post.title);
-  console.log(post.title)
   const dateLabel = formatDate(post.date);
 
-  // Build the meta-row items first so we only ever render a Dot BETWEEN
-  // two real items — never before an empty one and never trailing.
+  // If the caller passes an explicit `lastReviewed`, that wins. Otherwise
+  // fall back to the cached/auto-generated review date for this post.
+  const [cachedReviewDate, setCachedReviewDate] = useState<string>("");
+
+  useEffect(() => {
+    if (lastReviewed) return;
+    setCachedReviewDate(readOrSetCachedReviewDate(post));
+  }, [post.slug, (post as unknown as { updatedAt?: string }).updatedAt, post.publishedAt, post.date, lastReviewed]);
+
+  const lastReviewedLabel = lastReviewed || formatDate(cachedReviewDate);
+
+  // Order matters here: Expert reviewed now comes before read time.
   const metaItems = [
     <span key="author">
       By <span className="text-white/85">{post.author}</span>
     </span>,
     dateLabel && <span key="date">{dateLabel}</span>,
-    post.readTime && <span key="read">{post.readTime}</span>,
     expertReviewed && (
       <span key="reviewed" className="flex items-center gap-1 text-emerald-400">
         <CheckIcon /> Expert reviewed
       </span>
     ),
+    post.readTime && <span key="read">{post.readTime}</span>,
     !!readsCount && (
       <span key="reads" className="flex items-center gap-1">
         <span className="h-1.5 w-1.5 rounded-full bg-white/50" />
@@ -67,13 +98,16 @@ export default function BlogHeroDetail({ post, meta = {} }: BlogHeroDetailProps)
   ].filter(Boolean);
 
   return (
-    <section className="bg-[#0a0a0a] text-white font-space-grotesk px-6 py-16 md:px-12 lg:px-20">
-      <div className="mx-auto max-w-[1200px]">
+    <section className="bg-[#0a0a0a] text-white font-space-grotesk px-6 py-16 md:px-10 lg:px-6 ">
+      <div className=" mx-20">
         <div className="mb-6 flex items-center gap-2">
           <span className="h-[2px] w-6 bg-[#E63946]" />
-          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">
+          <Link
+            to={`/blogs/category/${post.categorySlug}`}
+            className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70 transition-colors hover:text-[#E63946]"
+          >
             {post.badgeLabel || "Article"}
-          </span>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_260px]">
@@ -108,7 +142,7 @@ export default function BlogHeroDetail({ post, meta = {} }: BlogHeroDetailProps)
             <Fact label="Primary topic" value={primaryTopic} />
             <Fact label="Suitable for" value={suitableFor} />
             <Fact label="Content type" value={contentType} />
-            <Fact label="Last reviewed" value={lastReviewed} />
+            <Fact label="Last reviewed" value={lastReviewedLabel} />
           </div>
         </div>
 

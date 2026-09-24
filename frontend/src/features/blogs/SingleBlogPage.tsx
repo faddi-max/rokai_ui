@@ -43,11 +43,11 @@ export default function SinglePageBlog() {
       {({ post, categories }) => (
         <div>
           <BlogHeroDetail post={post} />
-          <SectionGlow>
+        
           <BlogContentSection post={post} categories={categories} />
           <TrendingBlogsSection />
           <CommunityDiscussionSection />
-          </SectionGlow>
+       
           {/* <FAQSection /> */}
         </div>
       )}
