@@ -48,7 +48,7 @@ export interface ApiBlogPost {
   } | null;
 }
 
-const API_HOST = (() => {
+export const PUBLIC_HOST = (() => {
   try {
     return new URL(API_BASE_URL).host;
   } catch {
@@ -56,25 +56,60 @@ const API_HOST = (() => {
   }
 })();
 
-function sanitizeImageUrl(url: string | null | undefined): string {
+export const SERVER_BASE_URL = (() => {
+  try {
+    return new URL(API_BASE_URL).origin;
+  } catch {
+    return "";
+  }
+})();
+
+export function sanitizeImageUrl(url: string | null | undefined): string {
   if (!url || typeof url !== "string" || !url.trim() || url === "null" || url === "undefined") {
     return blogcatagory;
   }
 
   const cleanUrl = url.trim();
 
-
-  if (API_HOST && cleanUrl.includes(API_HOST)) {
-    const storageMatch = cleanUrl.match(/\/storage\/.*/);
-    if (storageMatch) return storageMatch[0];
-    return cleanUrl.replace(/^http:\/\//i, "https://");
+  // 1. If it's already a full valid public URL (not localhost/127.0.0.1), keep the EXACT URL from API
+  if (/^https?:\/\//i.test(cleanUrl) && !/127\.0\.0\.1|localhost/i.test(cleanUrl)) {
+    return cleanUrl;
   }
 
-  if (cleanUrl.startsWith("http://")) {
-    return cleanUrl.replace(/^http:\/\//i, "https://");
+  // 2. If it points to local dev server (127.0.0.1 or localhost), replace with PUBLIC_HOST using http://
+  if (/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?/i.test(cleanUrl)) {
+    if (PUBLIC_HOST) {
+      return cleanUrl.replace(/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?/i, `http://${PUBLIC_HOST}`);
+    }
+  }
+
+  // 3. Prepend http://${PUBLIC_HOST} for relative /storage paths
+  if (cleanUrl.startsWith("/storage/") && PUBLIC_HOST) {
+    return `http://${PUBLIC_HOST}${cleanUrl}`;
   }
 
   return cleanUrl;
+}
+
+export function sanitizeContentHtml(html: string | null | undefined): string {
+  if (!html) return "";
+  let clean = html;
+
+  if (PUBLIC_HOST) {
+    // Replace 127.0.0.1 or localhost in img src with http://${PUBLIC_HOST}
+    clean = clean.replace(
+      /src=["']http:\/\/(127\.0\.0\.1|localhost)(:\d+)?([^"']+)["']/gi,
+      `src="http://${PUBLIC_HOST}$3"`
+    );
+
+    // Fix relative /storage/ paths in img src
+    clean = clean.replace(
+      /src=["']\/storage\/([^"']+)["']/gi,
+      `src="http://${PUBLIC_HOST}/storage/$1"`
+    );
+  }
+
+  return clean;
 }
 
 function mapApiCategory(cat: ApiBlogCategory): BlogCategory {
@@ -114,7 +149,7 @@ function mapApiPost(post: ApiBlogPost, fallbackSlug = ""): BlogPost {
     excerpt: cleanExcerpt,
     date,
     readTime: readTimeLabel,
-    content: post.content || "",
+    content: sanitizeContentHtml(post.content),
   };
 }
 

@@ -1,12 +1,37 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import DOMPurify from "dompurify";
 import type { BlogPost, BlogCategory } from "@/shared/types/blogs";
+import { sanitizeImageUrl } from "@/shared/api/services/blogsService";
+import { blogcatagory } from "@/assets";
+// Reusing the *actual* homepage FAQ item for pixel-perfect parity instead of
+// re-styling h4/p pairs. Adjust this path if FAQItem lives elsewhere.
+import FAQItem from "@/features/home/components/FAQItem";
 
 interface TocItem {
   id: string;
   label: string;
 }
+
+interface FaqEntry {
+  question: string;
+  answer: string;
+}
+
+// Brand accent — Figma dev mode, node 768-5997 ("In This Article" text style).
+const ACCENT = "#E63946";
+
+// Figma "Eyebrow / Label" type spec (same node): Space Grotesk, 700, 12px,
+// line-height 18px, letter-spacing 2px, uppercase, accent red. Used for
+// "In This Article", "Explore Categories", "Author", and the h2 section
+// markers (e.g. "03 — DRYING") so they all stay pixel-identical.
+const EYEBROW_CLASS =
+  "font-space-grotesk text-[12px] font-bold uppercase leading-[18px] tracking-[2px] text-accent";
+
+// DOM id used to mount the FAQ accordion inside the raw article HTML via a portal.
+const FAQ_MOUNT_ID = "blog-content-faq-mount";
 
 function slugify(text: string) {
   return text
@@ -16,16 +41,31 @@ function slugify(text: string) {
     .replace(/\s+/g, "-");
 }
 
+function getInitials(name: string) {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() || "")
+    .join("");
+}
+
+// Strips stray "(H2)" / "(H3)" / "(H4)" labels that sometimes leak into
+// heading text from the source content — not a styling issue, a data one.
+function stripHeadingTag(text: string) {
+  return text.replace(/\(H[1-6]\)\s*$/i, "").trim();
+}
+
 function highlightLastWords(el: Element, count = 2) {
   const text = el.textContent?.trim() || "";
   const words = text.split(/\s+/);
   if (words.length <= count) return;
   const lead = words.slice(0, words.length - count).join(" ");
   const accent = words.slice(words.length - count).join(" ");
-  el.innerHTML = `${lead} <span class="text-[#E63946]">${accent}</span>`;
+  el.innerHTML = `${lead} <span class="text-accent">${accent}</span>`;
 }
 
-// Splits a stat/feature <li> into a short bold "label" + a muted "description".
+// Splits a stat/feature <li> into a short bold red "label" + a muted "description".
 // Priority: leading <strong>/<b> node → text before first colon → fallback: whole text as label only.
 function splitStatItem(doc: Document, li: Element) {
   const firstEl = li.firstElementChild;
@@ -35,10 +75,7 @@ function splitStatItem(doc: Document, li: Element) {
     const rest = (li.textContent || "").replace(label, "").trim();
     li.innerHTML = "";
     const labelEl = doc.createElement("div");
-    labelEl.setAttribute(
-      "class",
-      "mb-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#E63946]"
-    );
+    labelEl.setAttribute("class", "mb-1 text-[11px] font-bold uppercase tracking-[0.12em] text-accent");
     labelEl.textContent = label;
     li.appendChild(labelEl);
     if (rest) {
@@ -57,10 +94,7 @@ function splitStatItem(doc: Document, li: Element) {
     const rest = raw.slice(colonIndex + 1).trim();
     li.innerHTML = "";
     const labelEl = doc.createElement("div");
-    labelEl.setAttribute(
-      "class",
-      "mb-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#E63946]"
-    );
+    labelEl.setAttribute("class", "mb-1 text-[11px] font-bold uppercase tracking-[0.12em] text-accent");
     labelEl.textContent = label;
     li.appendChild(labelEl);
     const descEl = doc.createElement("div");
@@ -76,6 +110,7 @@ function splitStatItem(doc: Document, li: Element) {
 
 // Turns a single-<i> callout paragraph into a two-tier box: bold headline + muted subtext,
 // when the source text has more than one sentence. Falls back to one bold line otherwise.
+// Matches the solid white "quote" box style (e.g. "Your Gi works hard...").
 function styleCallout(doc: Document, p: Element, italicEl: Element) {
   const text = italicEl.textContent?.trim() || "";
   const sentenceMatch = text.match(/^(.*?[.!?])\s*(.*)$/s);
@@ -97,10 +132,84 @@ function styleCallout(doc: Document, p: Element, italicEl: Element) {
   p.setAttribute("class", `${p.getAttribute("class") || ""} callout-box`.trim());
 }
 
-function styleContent(html: string): { html: string; toc: TocItem[] } {
+// Different posts label their FAQ section differently ("FAQ", "FAQs",
+// "Frequently Asked Questions", "Common Questions", "Q&A"...) — match all of them.
+const FAQ_HEADING_RE =
+  /\b(faqs?|frequently\s+asked\s+questions?|common\s+questions?|questions?\s*(&|and)\s*answers?|q\s*&\s*a)\b/i;
+
+// A question can be marked up as a real heading (h3/h4) OR as a plain
+// paragraph that just starts with a number, e.g. "1. What does gi mean?" —
+// content sources are inconsistent about this, so both are treated the same.
+function isFaqQuestionNode(el: Element): boolean {
+  if (el.tagName === "H3" || el.tagName === "H4") return true;
+  if (el.tagName === "P") {
+    const text = (el.textContent || "").trim();
+    return /^\(?\d{1,2}[.)]\s+.+\?$/.test(text);
+  }
+  return false;
+}
+
+// Detects an FAQ section and pulls its question/answer pairs out of the flow
+// into a data array, leaving a mount point behind so the real FAQItem
+// accordion can be portaled in. Answers are normalized regardless of source
+// formatting: a plain paragraph, multiple paragraphs, or a bullet list
+// (flattened to "• point" lines) are all collected the same way, so every
+// post ends up rendering through the identical accordion.
+function extractFaqSection(doc: Document, h2: Element): FaqEntry[] {
+  const items: FaqEntry[] = [];
+  const toRemove: Element[] = [];
+  let node = h2.nextElementSibling;
+
+  while (node && node.tagName !== "H2") {
+    if (isFaqQuestionNode(node)) {
+      const question = stripHeadingTag(node.textContent || "");
+      toRemove.push(node);
+
+      const answerParts: string[] = [];
+      let answerNode = node.nextElementSibling;
+      while (answerNode && answerNode.tagName !== "H2" && !isFaqQuestionNode(answerNode)) {
+        if (answerNode.tagName === "P") {
+          const text = (answerNode.textContent || "").trim();
+          if (text) answerParts.push(text);
+        } else if (answerNode.tagName === "UL" || answerNode.tagName === "OL") {
+          const points = Array.from(answerNode.querySelectorAll(":scope > li"))
+            .map((li) => (li.textContent || "").trim())
+            .filter(Boolean);
+          if (points.length) answerParts.push(points.map((pt) => `• ${pt}`).join("\n"));
+        }
+        toRemove.push(answerNode);
+        answerNode = answerNode.nextElementSibling;
+      }
+
+      if (question) items.push({ question, answer: answerParts.join("\n\n") });
+      node = answerNode;
+      continue;
+    }
+    node = node.nextElementSibling;
+  }
+
+  if (items.length) {
+    toRemove.forEach((el) => el.remove());
+    const mount = doc.createElement("div");
+    mount.id = FAQ_MOUNT_ID;
+    mount.setAttribute("class", "not-prose mt-6");
+    h2.parentNode?.insertBefore(mount, h2.nextSibling);
+  }
+
+  return items;
+}
+
+function styleContent(html: string): { html: string; toc: TocItem[]; faqItems: FaqEntry[] } {
   const doc = new DOMParser().parseFromString(html, "text/html");
   const toc: TocItem[] = [];
   const seen = new Map<string, number>();
+  let faqItems: FaqEntry[] = [];
+
+  // Strip stray "(H2)/(H3)/(H4)" artifacts from all heading text up front.
+  doc.querySelectorAll("h2, h3, h4").forEach((el) => {
+    const cleaned = stripHeadingTag(el.textContent || "");
+    if (cleaned !== (el.textContent || "").trim()) el.textContent = cleaned;
+  });
 
   // Wrap tables so a wide table scrolls inside itself instead of pushing the page wider.
   doc.querySelectorAll("table").forEach((table) => {
@@ -110,19 +219,16 @@ function styleContent(html: string): { html: string; toc: TocItem[] } {
     wrapper.appendChild(table);
   });
 
-  // Guard every image so a broken/unreachable src shows a visible placeholder
-  // instead of silently disappearing (helps spot bad URLs during dev).
+  // Guard every image: normalize the src, and fall back to the local
+  // category placeholder asset if it fails to load.
   doc.querySelectorAll("img").forEach((img) => {
     img.setAttribute("loading", "lazy");
-    const alt = img.getAttribute("alt") || "Image unavailable";
-    img.setAttribute(
-      "onerror",
-      `this.onerror=null;this.src='data:image/svg+xml;utf8,` +
-        `<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22450%22>` +
-        `<rect width=%22100%25%22 height=%22100%25%22 fill=%22%23161616%22/>` +
-        `<text x=%2250%25%22 y=%2250%25%22 fill=%22%23666%22 font-family=%22sans-serif%22 font-size=%2218%22 text-anchor=%22middle%22>Image unavailable</text>` +
-        `</svg>';this.style.border='1px dashed rgba(255,255,255,0.15)';`
-    );
+    const rawSrc = img.getAttribute("src");
+    if (rawSrc) {
+      img.setAttribute("src", sanitizeImageUrl(rawSrc));
+    }
+    const alt = img.getAttribute("alt") || "Blog post image";
+    img.setAttribute("onerror", `this.onerror=null;this.src='${blogcatagory}';`);
     img.setAttribute("alt", alt);
   });
 
@@ -139,17 +245,23 @@ function styleContent(html: string): { html: string; toc: TocItem[] } {
     h2.setAttribute("style", "scroll-margin-top: 6rem");
     toc.push({ id, label });
 
+    // "03 — DRYING" style eyebrow, matching the reference pages' section markers.
     const eyebrow = doc.createElement("div");
     eyebrow.setAttribute(
       "class",
-      "not-prose mb-3 mt-14 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E63946]"
+      `not-prose mb-3 mt-14 flex items-center gap-2 ${EYEBROW_CLASS}`
     );
-    eyebrow.innerHTML = `<span class="inline-block h-[2px] w-5 bg-[#E63946]"></span>${String(
+    eyebrow.innerHTML = `<span class="inline-block h-[2px] w-5" style="background:${ACCENT}"></span>${String(
       index + 1
     ).padStart(2, "0")}`;
     h2.parentNode?.insertBefore(eyebrow, h2);
 
     highlightLastWords(h2, 2);
+
+    // Only the first FAQ-labeled h2 is extracted — most posts have one.
+    if (!faqItems.length && FAQ_HEADING_RE.test(label)) {
+      faqItems = extractFaqSection(doc, h2);
+    }
   });
 
   doc.querySelectorAll("ol").forEach((ol) => {
@@ -175,7 +287,7 @@ function styleContent(html: string): { html: string; toc: TocItem[] } {
     }
   });
 
-  return { html: doc.body.innerHTML, toc };
+  return { html: doc.body.innerHTML, toc, faqItems };
 }
 
 interface BlogContentSectionProps {
@@ -184,12 +296,42 @@ interface BlogContentSectionProps {
 }
 
 export default function BlogContentSection({ post, categories = [] }: BlogContentSectionProps) {
-  const { html: safeHtml, toc } = useMemo(() => {
-    if (!post.content) return { html: "", toc: [] as TocItem[] };
+  const { html: safeHtml, toc, faqItems } = useMemo(() => {
+    if (!post.content) return { html: "", toc: [] as TocItem[], faqItems: [] as FaqEntry[] };
     return styleContent(DOMPurify.sanitize(post.content));
   }, [post.content]);
 
+  // The FAQ mount div only exists in the DOM after dangerouslySetInnerHTML
+  // has actually rendered, so grab it post-mount and portal the real
+  // FAQItem accordion into it.
+  const [faqMountEl, setFaqMountEl] = useState<HTMLElement | null>(null);
+  const [activeFaq, setActiveFaq] = useState(0);
+
+  useEffect(() => {
+    setFaqMountEl(faqItems.length ? document.getElementById(FAQ_MOUNT_ID) : null);
+    setActiveFaq(0);
+  }, [safeHtml, faqItems.length]);
+
   if (!post.content) return null;
+
+  // Smooth-scroll to a section instead of the browser's hard anchor jump.
+  // h2 already has scroll-margin-top set, so the sticky header is respected.
+  const handleTocClick = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    event.preventDefault();
+    const target = document.getElementById(id);
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.history.replaceState(null, "", `#${id}`);
+  };
+
+  // NOTE: the Figma "Author" block (avatar initials, name, bio) needs a bio
+  // string that today's BlogPost/API sample only partially provides (just a
+  // plain `author` name, e.g. "Rokai"). If you want the full two-line bio
+  // shown in the design, add `author_bio` (and optionally `author_avatar`)
+  // to the BlogPost type/API response — the fields below read them
+  // defensively so nothing breaks if they're still missing.
+  const authorName = post.author;
+  const authorBio = (post as unknown as { author_bio?: string }).author_bio;
 
   return (
     <section className="overflow-x-hidden bg-[#0a0a0a] px-6 py-16 md:px-12 lg:px-20">
@@ -197,15 +339,14 @@ export default function BlogContentSection({ post, categories = [] }: BlogConten
         <aside className="lg:sticky lg:top-24 lg:h-fit">
           {toc.length > 0 && (
             <div className="mb-10">
-              <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
-                In this article
-              </div>
+              <div className={`${EYEBROW_CLASS} mb-3`}>In this article</div>
               <nav className="flex flex-col gap-2 border-l border-white/10 pl-3">
                 {toc.map((item) => (
                   <a
                     key={item.id}
                     href={`#${item.id}`}
-                    className="text-[13px] leading-snug text-white/55 transition-colors hover:text-[#E63946]"
+                    onClick={(e) => handleTocClick(e, item.id)}
+                    className="text-[13px] leading-snug text-white/55 transition-colors duration-300 hover:text-accent"
                   >
                     {item.label}
                   </a>
@@ -216,15 +357,13 @@ export default function BlogContentSection({ post, categories = [] }: BlogConten
 
           {categories.length > 0 && (
             <div>
-              <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
-                Explore categories
-              </div>
+              <div className={`${EYEBROW_CLASS} mb-3`}>Explore categories</div>
               <nav className="flex flex-col gap-2">
                 {categories.map((c) => (
                   <Link
                     key={c.slug}
                     to={`/blogs/category/${c.slug}`}
-                    className="text-[13px] text-white/55 transition-colors hover:text-[#E63946]"
+                    className="text-[13px] text-white/55 transition-colors hover:text-accent"
                   >
                     {c.title}
                   </Link>
@@ -240,13 +379,59 @@ export default function BlogContentSection({ post, categories = [] }: BlogConten
         />
       </div>
 
+      {faqMountEl &&
+        faqItems.length > 0 &&
+        createPortal(
+          <div className="flex flex-col divide-y divide-white/10 border-t border-white/10">
+            {faqItems.map((faq, i) => (
+              <FAQItem
+                key={`${faq.question}-${i}`}
+                faq={faq}
+                index={i}
+                isOpen={activeFaq === i}
+                onToggle={() => setActiveFaq(activeFaq === i ? -1 : i)}
+              />
+            ))}
+          </div>,
+          faqMountEl
+        )}
+
+      {authorName && (
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="mx-auto mt-12 max-w-[1200px] border-t border-white/10 pt-10 lg:pl-[calc(220px+3rem)]"
+        >
+          <div className={`${EYEBROW_CLASS} mb-4`}>Author</div>
+          <div className="flex items-start gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-black font-space-grotesk text-[15px] font-bold text-accent">
+              {getInitials(authorName)}
+            </div>
+            <div>
+              <div className="font-space-grotesk text-[17px] font-bold text-white">
+                {authorName}
+              </div>
+              {authorBio && (
+                <p className="mt-1 max-w-[560px] text-[13px] leading-relaxed text-white/55">
+                  {authorBio}
+                </p>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       <div className="mx-auto mt-12 max-w-[1200px] border-t border-white/10 pt-6 lg:pl-[calc(220px+3rem)]">
-        <Link to="/blogs" className="text-sm font-semibold text-[#E63946] underline">
+        <Link to="/blogs" className="text-sm font-semibold underline text-accent">
           ← Back to all posts
         </Link>
       </div>
 
       <style>{`
+        .text-accent { color: ${ACCENT}; }
+
         .blog-article {
           font-family: inherit;
           color: rgba(255,255,255,0.6);
@@ -289,7 +474,7 @@ export default function BlogContentSection({ post, categories = [] }: BlogConten
           color: rgba(255,255,255,0.6);
         }
         .blog-article a {
-          color: #E63946;
+          color: ${ACCENT};
           text-decoration: none;
         }
         .blog-article a:hover {
@@ -306,26 +491,49 @@ export default function BlogContentSection({ post, categories = [] }: BlogConten
           margin: 1.5rem 0;
           border-radius: 0.75rem;
         }
+
+        /* Comparison table — dark surface, bold uppercase header row with a
+           red underline, hairline row dividers (matches the Apex/Kessho/Pro
+           Protocol comparison block). */
         .blog-article .table-wrap {
-          margin: 1.5rem 0;
+          margin: 2rem 0;
           overflow-x: auto;
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 0.5rem;
         }
         .blog-article table {
           width: 100%;
           border-collapse: collapse;
           font-size: 0.85rem;
+          background: #111111;
         }
         .blog-article table td,
         .blog-article table th {
-          border: 1px solid rgba(255,255,255,0.1);
-          padding: 0.65rem 0.9rem;
-          color: rgba(255,255,255,0.6);
+          padding: 0.85rem 1.1rem;
           text-align: left;
+          border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .blog-article table tr:last-child td {
+          border-bottom: none;
         }
         .blog-article table tr:first-child td {
           color: #ffffff;
+          font-family: "Space Grotesk", sans-serif;
           font-weight: 700;
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          border-bottom: 2px solid ${ACCENT};
         }
+        .blog-article table tr:not(:first-child) td:first-child {
+          color: #ffffff;
+          font-weight: 600;
+        }
+        .blog-article table tr:not(:first-child) td {
+          color: rgba(255,255,255,0.55);
+        }
+
+        /* Numbered step list — large red counters (01, 02, 03…). */
         .blog-article .step-list {
           list-style: none;
           margin: 1.5rem 0;
@@ -344,10 +552,14 @@ export default function BlogContentSection({ post, categories = [] }: BlogConten
           position: absolute;
           left: 0;
           top: -0.1rem;
+          font-family: "Space Grotesk", sans-serif;
           font-weight: 800;
           font-size: 1.05rem;
-          color: #E63946;
+          color: ${ACCENT};
         }
+
+        /* Stat row — 2-4 short items split into a red micro-label + muted line,
+           separated by hairline rules (matches FIT / FABRIC / HYGIENE). */
         .blog-article .stat-grid {
           list-style: none;
           display: grid;
@@ -381,6 +593,8 @@ export default function BlogContentSection({ post, categories = [] }: BlogConten
             padding-left: 0;
           }
         }
+
+        /* Solid quote box — white bg, bold black text (e.g. "Your Gi works hard..."). */
         .blog-article .callout-box {
           background: #ffffff;
           color: #0a0a0a;

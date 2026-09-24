@@ -54,7 +54,7 @@ export default function SectionHeaderblog({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className={`flex lg:m-25 m-5 flex-col gap-6 mb-10 ${
+      className={`flex lg:m-25 m-5  flex-col gap-6 mb-10 ${
         description ? "md:flex-row md:items-start md:justify-between" : ""
       }`}
     >

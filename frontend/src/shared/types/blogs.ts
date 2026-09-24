@@ -19,6 +19,7 @@ export interface BlogPost {
   slug: string;
   categorySlug: string;
   image: string;
+  
   badgeLabel: string;
   author: string;
   tags: BlogCardTag[];
@@ -31,6 +32,7 @@ export interface BlogPost {
   excerpt?: string;
   date?: string;
   readTime?: string;
+ 
 }
 
 export interface BlogsPageData {

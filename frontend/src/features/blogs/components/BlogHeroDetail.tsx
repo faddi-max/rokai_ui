@@ -1,4 +1,5 @@
 import type { BlogPost } from "@/shared/types/blogs";
+import { blogcatagory } from "@/assets";
 
 interface BlogHeroDetailMeta {
   primaryTopic?: string;
@@ -7,9 +8,6 @@ interface BlogHeroDetailMeta {
   lastReviewed?: string;
   expertReviewed?: boolean;
   readsCount?: number;
-  /** Pass a second real photo if you have one — otherwise the single
-   *  post.image is shown as one full-width banner instead of being
-   *  duplicated into two identical panels. */
   secondaryImage?: string;
 }
 
@@ -143,12 +141,19 @@ function Fact({ label, value }: { label: string; value?: string }) {
 function BannerPhoto({ src, dark, tall }: { src?: string; dark?: boolean; tall?: boolean }) {
   return (
     <div
-      className={`relative bg-cover bg-center ${tall ? "h-[380px]" : "h-[320px]"} ${
+      className={`relative overflow-hidden ${tall ? "h-[380px]" : "h-[320px]"} ${
         dark ? "bg-black" : "bg-white/5"
       }`}
-      style={src ? { backgroundImage: `url(${src})` } : undefined}
     >
-      <span className="absolute bottom-3 left-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#E63946] text-[10px] font-bold">
+      <img
+        src={src || blogcatagory}
+        alt="Blog banner"
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).src = blogcatagory;
+        }}
+        className="h-full w-full object-cover"
+      />
+      <span className="absolute bottom-3 left-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#E63946] text-[10px] font-bold text-white">
         R
       </span>
     </div>
