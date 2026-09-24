@@ -175,7 +175,7 @@ function Fact({ label, value }: { label: string; value?: string }) {
 function BannerPhoto({ src, dark, tall }: { src?: string; dark?: boolean; tall?: boolean }) {
   return (
     <div
-      className={`relative overflow-hidden ${tall ? "h-[380px]" : "h-[320px]"} ${
+      className={`relative overflow-hidden ${tall ? "h-full" : "h-[320px]"} ${
         dark ? "bg-black" : "bg-white/5"
       }`}
     >

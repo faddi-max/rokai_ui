@@ -5,8 +5,7 @@ import { DataLoader, PageLoader } from "@/shared/components/feedback";
 import BlogHeroDetail from "./components/BlogHeroDetail";
 import BlogContentSection from "./components/BlogContentSection";
 
-import FAQSection from "../home/components/FAQSection";
-import SectionGlow from "@/shared/components/layout/SectionGlow";
+
 import TrendingBlogsSection from "./components/TrendingBlogsSection";
 import CommunityDiscussionSection from "./components/CommunityDiscussionSection";
 
@@ -46,7 +45,7 @@ export default function SinglePageBlog() {
         
           <BlogContentSection post={post} categories={categories} />
           <TrendingBlogsSection />
-          <CommunityDiscussionSection />
+          <CommunityDiscussionSection postId=""/>
        
           {/* <FAQSection /> */}
         </div>

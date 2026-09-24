@@ -328,7 +328,7 @@ export default function BlogContentSection({ post, categories = [] }: BlogConten
   const authorBio = (post as unknown as { author_bio?: string }).author_bio;
 
   return (
-    <section className="overflow-x-hidden bg-[#0a0a0a] px-6 py-16 md:px-10 lg:px-6">
+   <section className="bg-[#0a0a0a] px-6 py-16 md:px-10 lg:px-6">
       <div className=" grid grid-cols-1 gap-10 lg:grid-cols-[220px_minmax(0,1fr)] mx-5 lg:mx-20">
         <aside className="lg:sticky lg:top-24 lg:h-fit">
           {toc.length > 0 && (
