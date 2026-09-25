@@ -5,9 +5,10 @@ import { categoriesService } from "@/shared/api/services/categoriesService";
 import { DataLoader, PageLoader } from "@/shared/components/feedback";
 
 import HowWeWorkSection from "@/features/categories/data/HowWeWorkSection";
-import ClientFeedbackSection from "@/features/categories/componnets/ClientFeedbackSection";
+
 import FAQSection from "@/features/home/components/FAQSection";
 import PrivateLabelProcessSection from "./components/PrivateLabelProcessSection";
+import LabelProcessSection from "./components/LabelProcessSection";
 import WhatWeManufactureGridSection from "./components/WhatWeManufactureGridSection";
 import BuiltAroundBrandSection from "./components/BuiltAroundBrandSection";
 import BrandSystemSection from "./components/BrandSystemSection";
@@ -63,6 +64,7 @@ export default function PrivateLabelManufacturingPage() {
             <ProductionFitSection />
             <PreviousWorkSection />
             <WhoWeManufactureForSection />
+            <LabelProcessSection />
             <DefineBrandPresenceSection />
  
             <FAQSection />

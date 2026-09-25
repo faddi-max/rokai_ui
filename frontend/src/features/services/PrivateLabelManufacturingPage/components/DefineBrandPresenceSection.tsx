@@ -162,17 +162,17 @@ export default function DefineBrandPresenceSection({
         description={description}
       />
 
-      <div className="relative z-10  w-full max-w-[1578px] py-20  px-5 pb-16 sm:px-8 lg:px-[30px] mx-auto  ">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_708px]">
+      <div className="relative z-10  w-full max-w-[1578px] py-20    px-5 pb-16 sm:px-8 lg:px-[30px] mx-auto  ">
+        <div className="grid grid-cols-1   gap-10 lg:grid-cols-[1fr_708px]">
           {/* LEFT — intro + contact details */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.25 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col gap-9"
+            className="flex flex-col gap-20 pl-7 border-l border-[#3B3B3B]"
           >
-            <p className="max-w-[360px] font-space-grotesk text-[14px] font-light leading-[22px] text-white/70">
+            <p className="max-w-[560px] mt-10 font-space-grotesk text-[18px] font-light leading-[22px] text-white/70">
               {leftIntro}
             </p>
 
