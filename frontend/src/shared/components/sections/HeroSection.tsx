@@ -5,6 +5,7 @@ import Button from "@/shared/components/ui/Button";
 import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
 import { usePrefersReducedMotion } from "@/shared/hooks/usePrefersReducedMotion";
 import type { HeroContent, HeroGlow } from "@/shared/types/hero";
+import SectionGlow from "../layout/SectionGlow";
 
 const DEFAULT_GLOWS: HeroGlow[] = [
   { width: 601, height: 901, top: 9, left: 783, color: "#E51B24C4", blur: 500 },
@@ -12,7 +13,7 @@ const DEFAULT_GLOWS: HeroGlow[] = [
 ];
 
 export default function HeroSection({
-  eyebrow, // SEO CHANGE: new prop
+  eyebrow,
   headingLines,
   description,
   primaryCta,
@@ -21,6 +22,8 @@ export default function HeroSection({
   visual,
   background,
   subscribe,
+  featureTags,
+  brandCard,
 }: HeroContent) {
   const heroRef = useRef<HTMLElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -58,6 +61,7 @@ export default function HeroSection({
         .fromTo("[data-hero-heading]", revealLeft(), revealVisible)
         .fromTo("[data-hero-divider], [data-hero-description]", revealLeft(), { ...revealVisible, stagger: motion.stagger }, "-=0.2")
         .fromTo("[data-hero-ctas]", revealLeft(), revealVisible, "-=0.15");
+      if (document.querySelector("[data-hero-tags]")) tl.fromTo("[data-hero-tags]", revealLeft(), revealVisible, "-=0.15");
       if (document.querySelector("[data-hero-proof]")) tl.fromTo("[data-hero-proof]", revealLeft(), revealVisible, "-=0.15");
       if (document.querySelector("[data-hero-visual]")) {
         tl.fromTo("[data-hero-visual]", revealUp(32), revealVisible, "-=0.2");
@@ -65,11 +69,15 @@ export default function HeroSection({
       if (document.querySelector("[data-hero-product-card], [data-hero-caption]")) {
         tl.fromTo("[data-hero-product-card], [data-hero-caption]", revealRight(), { ...revealVisible, stagger: motion.stagger }, "-=0.25");
       }
+      if (document.querySelector("[data-hero-brand-card]")) {
+        tl.fromTo("[data-hero-brand-card]", revealUp(20), revealVisible, "-=0.2");
+      }
     },
     { scope: heroRef, dependencies: [prefersReducedMotion], revertOnUpdate: true }
   );
 
   return (
+    <SectionGlow>
     <section
       ref={heroRef}
       className={`relative overflow-hidden pb-8 lg:pb-9 ${background?.sectionClassName ?? ""}`}
@@ -80,7 +88,7 @@ export default function HeroSection({
     >
       <div className="pointer-events-none absolute inset-0">
         <div
-          className="relative  hidden max-w-[1512px] lg:block"
+          className="relative hidden max-w-[1512px] lg:block"
           style={sectionHeightPx ? { height: sectionHeightPx } : { height: "100%" }}
         >
           {glows.map((glow, index) => (
@@ -120,6 +128,32 @@ export default function HeroSection({
               />
             </div>
           )}
+
+          {/* Floating accent card (e.g. "YOUR BRAND.") — positioned against the same
+              1512px frame as the glows/background image, per the Figma spec. */}
+          {brandCard && (
+            <div
+              data-hero-brand-card
+              className="pointer-events-auto z-100 absolute z-10 flex flex-col justify-center  px-5"
+              style={{
+                width: brandCard.position.width,
+                height: brandCard.position.height,
+                top: brandCard.position.top,
+                left: brandCard.position.left,
+                transform: brandCard.position.angle ? `rotate(${brandCard.position.angle}deg)` : undefined,
+                opacity: brandCard.position.opacity ?? 1,
+                borderRadius: brandCard.position.borderRadius ?? 10,
+                backgroundColor: brandCard.bgColor ?? "#E51B24",
+              }}
+            >
+              <p className="font-space-grotesk text-[25px] font-bold uppercase leading-[18px] text-white">
+                {brandCard.title}
+              </p>
+              <p className="mt-1 font-space-grotesk text-[12px] py-2 font-normal uppercase leading-[12px] tracking-wide text-white/80">
+                {brandCard.subtitle}
+              </p>
+            </div>
+          )}
         </div>
 
         <div
@@ -133,7 +167,6 @@ export default function HeroSection({
         style={sectionHeightPx ? { minHeight: undefined } : undefined}
       >
         <div className={`relative z-10 flex min-w-0 flex-col gap-6 ${isBackgroundVisual ? "max-w-2xl" : ""}`}>
-          {/* SEO CHANGE: eyebrow text above the H1 */}
           {eyebrow && (
             <p className="font-space-grotesk text-xs font-medium uppercase tracking-[0.2em] text-white/70">
               {eyebrow}
@@ -150,7 +183,6 @@ export default function HeroSection({
                     : undefined
                 }
               >
-                {/* SEO CHANGE: add a space before <br /> so text reads correctly */}
                 {line.text}
                 {index < headingLines.length - 1 && (
                   <>
@@ -209,6 +241,20 @@ export default function HeroSection({
             )}
           </div>
 
+          {/* NEW — small uppercase feature-tag row under the CTAs */}
+          {featureTags && featureTags.length > 0 && (
+            <div  className="flex flex-wrap items-center gap-y-2 pt-1">
+              {featureTags.map((tag, i) => (
+                <span key={tag} className="flex items-center ">
+                  {i > 0 && <span aria-hidden className="mx-3 h-3 w-px bg-white/20" />}
+                  <span className="whitespace-nowrap  border-1 border-[#FFFFFF1A] p-2 font-space-grotesk text-[11px] font-medium uppercase  text-white/50">
+                    {tag}
+                  </span>
+                </span>
+              ))}
+            </div>
+          )}
+
           {secondaryRow && (
             <div data-hero-proof>
               {secondaryRow.type === "join" ? (
@@ -218,7 +264,7 @@ export default function HeroSection({
                       <img
                         key={`${avatar}-${index}`}
                         src={avatar}
-                        alt="" // SEO CHANGE: decorative avatars get empty alt
+                        alt=""
                         className="h-10 w-10 rounded-full border-2 border-black object-cover"
                       />
                     ))}
@@ -244,16 +290,15 @@ export default function HeroSection({
         {!isBackgroundVisual && (
           <div className="relative flex w-full items-end justify-center gap-8 lg:gap-15">
             <div className={`relative z-10 w-full max-w-[320px] sm:max-w-[420px] lg:max-w-[480px] ${isModelVisual ? "lg:-translate-x-10" : ""}`}>
-              {/* SEO CHANGE: width, height and priority so the main image loads fast */}
               <img
                 data-hero-visual
                 src={visual.image}
                 alt={visual.imageAlt}
                 width={480}
-                height={640}
+                height={670}
                 decoding="async"
                 fetchPriority="high"
-                className="h-auto w-full object-contain"
+                className="h-auto w-full object-contain rounded-xl"
               />
 
               {visual.floatingBadges?.map((badge, index) => (
@@ -315,8 +360,26 @@ export default function HeroSection({
                 "linear-gradient(180deg, rgba(17,17,17,0.15) 0%, rgba(17,17,17,0) 30%, rgba(17,17,17,0.85) 100%)",
             }}
           />
+          {/* Mobile version of the brand card, stacked instead of absolutely positioned */}
+          {brandCard && (
+            <div
+              className="absolute bottom-4 left-4 flex max-w-[180px] flex-col justify-center px-4 py-3"
+              style={{
+                borderRadius: brandCard.position.borderRadius ?? 10,
+                backgroundColor: brandCard.bgColor ?? "#E51B24",
+              }}
+            >
+              <p className="font-space-grotesk text-[13px] font-bold uppercase leading-[16px] text-white">
+                {brandCard.title}
+              </p>
+              <p className="mt-1 font-space-grotesk text-[8px] font-medium uppercase leading-[11px] tracking-wide text-white/80">
+                {brandCard.subtitle}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </section>
+    </SectionGlow>
   );
 }

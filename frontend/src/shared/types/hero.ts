@@ -135,3 +135,40 @@ export interface HeroImageVisual {
   imageAlt: string;
   floatingBadges?: HeroFloatingBadge[];
 }
+/** Small uppercase tag row under the CTA buttons, e.g. "Custom Branding | Low MOQ Options". */
+export type HeroFeatureTags = string[];
+
+/** Floating accent card overlaid on the hero image (e.g. "YOUR BRAND."). */
+export interface HeroBrandCardPosition {
+  width: number;
+  height: number;
+  top: number;
+  left: number;
+  angle?: number;
+  opacity?: number;
+  borderRadius?: number;
+}
+
+export interface HeroBrandCard {
+  title: string;
+  subtitle: string;
+  bgColor?: string;
+  position: HeroBrandCardPosition;
+}
+
+// Add these two optional fields to HeroContent:
+export interface HeroContent {
+  eyebrow?: string;
+  headingLines: HeroHeadingLine[];
+  description: string;
+  primaryCta?: HeroCta;
+  secondaryCta?: HeroCta;
+  secondaryRow?: HeroSecondaryRow;
+  visual: HeroVisual;
+  background?: HeroBackground;
+  subscribe?: HeroSubscribeCta;
+  /** NEW — small tag row below the CTA buttons */
+  featureTags?: HeroFeatureTags;
+  /** NEW — floating accent card over the visual (background/image type) */
+  brandCard?: HeroBrandCard;
+}

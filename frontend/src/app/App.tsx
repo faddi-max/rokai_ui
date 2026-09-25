@@ -16,6 +16,11 @@ import SinglePageBlog from "@/features/blogs/SingleBlogPage";
 import ProgramApplyPage from "@/features/programs/ProgramForm/ProgramApplyPage";
 import ResourcesPage from "@/features/resources/ResourcesPage";
 
+import { OemManufacturingPage } from "@/features/services/OemManufacturingPage/OemManufacturingPage";
+import { CustomLabelsPackagingPage } from "@/features/services/CustomLabelsPackagingPage/CustomLabelsPackagingPage";
+import { ShippingLogisticsPage } from "@/features/services/ShippingLogisticsPage/ShippingLogisticsPage";
+import PrivateLabelManufacturingPage from "@/features/services/PrivateLabelManufacturingPage/PrivateLabelManufacturingPage";
+
 
 const HomePage = lazy(() => import("@/features/home/HomePage"));
 const CategoriesPage = lazy(() => import("@/features/categories/CategoriesPage"));
@@ -109,6 +114,10 @@ export default function App() {
             <Route path="/blogs/:slug" element={<SinglePageBlog />} />
             <Route path="*" element={<NotFoundPage />} />
             <Route path="/programs" element={<ProgramsPage />} />
+            <Route path="/services/private-label-manufacturing" element={<PrivateLabelManufacturingPage />} />
+<Route path="/services/oem-manufacturing" element={<OemManufacturingPage />} />
+<Route path="/services/custom-labels-packaging" element={<CustomLabelsPackagingPage />} />
+<Route path="/services/shipping-logistics" element={<ShippingLogisticsPage />} />
 
 <Route
   path="/programs/affiliate"

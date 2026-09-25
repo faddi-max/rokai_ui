@@ -51,9 +51,11 @@ import whyrokai from './whyrokai.png'
 import sponserhero from './sponserhero.png'
 import sponser from './sponser.jpg'
 import resourcetool from './resourcestools.png'
+import servicemanufacturehero from './ServiesPrivate Label Manufacturinghero.png'
 
 import clubpartnershipoverview from './clubpartnership.jpg'
 export {
+  servicemanufacturehero,
   resourcetool,
   clubpartnershipoverview,
   sponser,

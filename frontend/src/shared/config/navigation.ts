@@ -205,40 +205,37 @@ export const navLinks: NavLink[] = [
     ],
   },
 
-  {
-    label: "Services",
-    href: "/services",
-    hasDropdown: false,
-    dropdownItems: [
-      {
-        label: "Full OEM / ODM Manufacturing",
-        href: "/services#capabilities",
-        description:
-          "Turnkey custom cut & sew production from 50 to 50,000 units",
-        image: "",
-      },
-      {
-        label: "AI Pattern Grading & Sizing",
-        href: "/services#capabilities",
-        description:
-          "Proprietary algorithm for zero-variance shrinkage control",
-        image: "",
-      },
-      {
-        label: "Tajima Embroidery & Sublimation",
-        href: "/services#capabilities",
-        description: "Industrial high-density stitching and Italian inks",
-        image: "",
-      },
-      {
-        label: "Private Label Packaging",
-        href: "/services#capabilities",
-        description:
-          "Custom damask neck tags, hang tags, and branded pouches",
-        image: "",
-      },
-    ],
-  },
+{
+  label: "Services",
+  href: "/services",
+  hasDropdown: true,
+  dropdownItems: [
+    {
+      label: "Private Label Manufacturing",
+      href: "/services/private-label-manufacturing",
+      description: "",
+      image: "",
+    },
+    {
+      label: "OEM Manufacturing",
+      href: "/services/oem-manufacturing",
+      description: "",
+      image: "",
+    },
+    {
+      label: "Custom Labels & Packaging",
+      href: "/services/custom-labels-packaging",
+      description: "",
+      image: "",
+    },
+    {
+      label: "Shipping & Logistics",
+      href: "/services/shipping-logistics",
+      description: "",
+      image: "",
+    },
+  ],
+},
 
   {
     label: "Programs",

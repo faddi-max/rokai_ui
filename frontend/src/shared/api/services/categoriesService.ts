@@ -10,6 +10,7 @@ import { ambassadorHeroContent } from "@/features/programs/ambassador-program/da
 import { ambassadorHero} from "@/features/programs/sponsorship-program/data/ambassadorHero";
 import { clubpartnershipHero } from "@/features/programs/club-partnership/data/clubpartnershiphero";
 import { ResourcesHero } from "@/features/resources/data/resourseHero";
+import { Privateservicehero } from "@/features/services/PrivateLabelManufacturingPage/data/PrivateServiceHero";
 
 export interface PageData {
   hero: HeroContent;
@@ -104,6 +105,15 @@ export const categoriesService = {
     async clubPartnershipPageData(): Promise<PageData> {
     const fallback: PageData = {
       hero: clubpartnershipHero,
+      categoryHeroContent: categoryHeroContent,
+      blogCategories: blogCategories || [],
+    }
+    
+    return apiClient.fetchWithFallback<PageData>("/programs/page", fallback);
+  },
+      async ServicesPrivateLabelManufacture(): Promise<PageData> {
+    const fallback: PageData = {
+      hero: Privateservicehero,
       categoryHeroContent: categoryHeroContent,
       blogCategories: blogCategories || [],
     }
