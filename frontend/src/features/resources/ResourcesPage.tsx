@@ -8,6 +8,8 @@ import HowWeWorkSection from "@/features/categories/data/HowWeWorkSection";
 import ClientFeedbackSection from "@/features/categories/componnets/ClientFeedbackSection";
 import FAQSection from "@/features/home/components/FAQSection";
 import TrendingBlogsSection from "../blogs/components/TrendingBlogsSection";
+import ResourceCategoriesSection from "./components/ResourceCategoriesSection";
+import InteractiveToolsSection from "./components/InteractiveToolsSection";
 
 
 export default function ResourcesPage() {
@@ -40,7 +42,8 @@ export default function ResourcesPage() {
           >
     
          
-        
+        <ResourceCategoriesSection />
+        <InteractiveToolsSection />
          <TrendingBlogsSection />  
   <FAQSection  />
            
