@@ -9,6 +9,7 @@ import type { Category } from "@/features/home/data/categories";
 import { ambassadorHeroContent } from "@/features/programs/ambassador-program/data/ambassadorHero";
 import { ambassadorHero} from "@/features/programs/sponsorship-program/data/ambassadorHero";
 import { clubpartnershipHero } from "@/features/programs/club-partnership/data/clubpartnershiphero";
+import { ResourcesHero } from "@/features/resources/data/resourseHero";
 
 export interface PageData {
   hero: HeroContent;
@@ -85,6 +86,15 @@ export const categoriesService = {
    async getsponsershipPageData(): Promise<PageData> {
     const fallback: PageData = {
       hero: ambassadorHero,
+      categoryHeroContent: categoryHeroContent,
+      blogCategories: blogCategories || [],
+    }
+    
+    return apiClient.fetchWithFallback<PageData>("/programs/page", fallback);
+  },
+     async getresourcesPageData(): Promise<PageData> {
+    const fallback: PageData = {
+      hero: ResourcesHero,
       categoryHeroContent: categoryHeroContent,
       blogCategories: blogCategories || [],
     }

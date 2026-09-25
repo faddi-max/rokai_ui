@@ -14,6 +14,8 @@ import SponsorshipProgram from "@/features/programs/sponsorship-program/Sponsors
 import ClubPartnershipProgram from "@/features/programs/club-partnership/ClubPartnershipProgram";
 import SinglePageBlog from "@/features/blogs/SingleBlogPage";
 import ProgramApplyPage from "@/features/programs/ProgramForm/ProgramApplyPage";
+import ResourcesPage from "@/features/resources/ResourcesPage";
+
 
 const HomePage = lazy(() => import("@/features/home/HomePage"));
 const CategoriesPage = lazy(() => import("@/features/categories/CategoriesPage"));
@@ -102,7 +104,7 @@ export default function App() {
             {/* <Route path="/programs" element={<AmbassadorProgramPage />} /> */}
             <Route path="/contact" element={<NotFoundPage />} />
             <Route path="/blogs" element={<BlogsPage />} />
-            <Route path="/resources" element={<NotFoundPage />} />
+            <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/blogs/category/:slug" element={<BlogCategoryPage />} />
             <Route path="/blogs/:slug" element={<SinglePageBlog />} />
             <Route path="*" element={<NotFoundPage />} />

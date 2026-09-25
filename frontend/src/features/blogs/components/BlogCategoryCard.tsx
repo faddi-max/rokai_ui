@@ -133,7 +133,10 @@ export default function BlogCard({
               }}
             />
             {badgeLabel && (
-              <span className="absolute bottom-2 left-3 text-[11px] font-semibold uppercase tracking-wide text-white sm:bottom-3 sm:left-4 sm:text-xs">
+              <span
+                style={FONT_STACK}
+                className="absolute left-2 top-2 z-10 inline-flex items-center whitespace-nowrap rounded-[4px] border border-white/25 bg-black/40 px-2 py-1 text-[8px] font-semibold uppercase tracking-wide text-white backdrop-blur-[2px] sm:left-3 sm:top-3 sm:px-2.5 sm:text-[9px]"
+              >
                 {badgeLabel}
               </span>
             )}

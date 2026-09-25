@@ -11,7 +11,7 @@ export interface ProgramsPageData {
 }
 
 export interface ProgramApplicationPayload {
-  program_id: string; // e.g. "ambassador" | "affiliate" | "sponsorship" | "partnership"
+  program_id: string; 
   program_name?: string;
   full_name: string;
   email: string;
