@@ -4,6 +4,8 @@ import SectionGlow from "../layout/SectionGlow";
 interface SectionHeaderProps {
   eyebrow: string;
   title: string;
+  /** Optional second white title line, forced onto its own line above the highlight. */
+  titleLine2?: string;
   highlight: string;
   afterHighlight?: string;
   /** White text rendered inline right before the highlight, on the same line (e.g. "BUILD YOUR " + "BRAND."). */
@@ -21,6 +23,7 @@ interface SectionHeaderProps {
 export default function SectionHeaderblog({
   eyebrow,
   title,
+  titleLine2,
   highlight,
   afterHighlight,
   highlightPrefix,
@@ -88,6 +91,17 @@ export default function SectionHeaderblog({
           >
             {title}
           </motion.span>
+          {titleLine2 && (
+            <motion.span
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.25 }}
+              className="block text-white"
+            >
+              {titleLine2}
+            </motion.span>
+          )}
           {highlightPosition === "start" ? (
             <motion.span
               initial={{ opacity: 0, y: 14 }}

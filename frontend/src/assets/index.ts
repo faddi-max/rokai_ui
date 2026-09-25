@@ -52,9 +52,47 @@ import sponserhero from './sponserhero.png'
 import sponser from './sponser.jpg'
 import resourcetool from './resourcestools.png'
 import servicemanufacturehero from './ServiesPrivate Label Manufacturinghero.png'
-
+import labelmanufacture1 from './manufacture1.png'
+import labelmanufacture2 from './manufacture2.png'
+import labelmanufacture3 from './manufacture3.png'
+import labelmanufacture4 from './manufacture4.png'
+import manufacturebrand1 from './manufacturebrand1.jpg'
+import manufacturebrand2 from './manufacturebrand2.jpg'
+import manufacturebrand3 from './manufacturebrand3.jpg'
+import manufacturebrand4 from './manufacturebrand4.jpg'
+import manufacturebrand5 from './manufacturebrand5.jpg'
 import clubpartnershipoverview from './clubpartnership.jpg'
+import brandmanufacture from './brandmanufacture.jpg'
+import manufactureProduct from './manufactureProduct.png'
+import servicePerformance from './servicePerformance.jpg'
+import branddetails from './branddetals.png'
+import brandimage from './brandimage.png'
+import brandhero from './BRANDHERO.png'
+import brand1 from './BRAND1.png'
+import brand2 from './brand2.png'
+import brand3 from './brand3.png'
+import brand4 from './brand4.png'
+
 export {
+  brandhero,
+  brand1,
+  brand2,
+  brand3,
+  brand4,
+  branddetails,
+  brandimage,
+  servicePerformance,
+  manufactureProduct,
+  brandmanufacture,
+  manufacturebrand1,
+  manufacturebrand2,
+  manufacturebrand3,
+  manufacturebrand4,
+  manufacturebrand5,
+  labelmanufacture1,
+  labelmanufacture2,
+  labelmanufacture3,
+  labelmanufacture4,
   servicemanufacturehero,
   resourcetool,
   clubpartnershipoverview,

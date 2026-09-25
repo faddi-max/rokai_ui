@@ -7,6 +7,18 @@ import { DataLoader, PageLoader } from "@/shared/components/feedback";
 import HowWeWorkSection from "@/features/categories/data/HowWeWorkSection";
 import ClientFeedbackSection from "@/features/categories/componnets/ClientFeedbackSection";
 import FAQSection from "@/features/home/components/FAQSection";
+import PrivateLabelProcessSection from "./components/PrivateLabelProcessSection";
+import WhatWeManufactureGridSection from "./components/WhatWeManufactureGridSection";
+import BuiltAroundBrandSection from "./components/BuiltAroundBrandSection";
+import BrandSystemSection from "./components/BrandSystemSection";
+import DesignToProductSection from "./components/DesignToProductSection";
+import MaterialsQualitySection from "./components/MaterialsQualitySection";
+import BrandingPackagingSection from "./components/BrandingPackagingSection";
+import ProductionFitSection from "./components/ProductionFitSection";
+import PreviousWorkSection from "./components/PreviousWorkSection";
+import WhoWeManufactureForSection from "./components/WhoWeManufactureForSection";
+import MapSection from "./components/MapSection";
+import DefineBrandPresenceSection from "./components/DefineBrandPresenceSection";
 
 
 
@@ -32,6 +44,11 @@ export default function PrivateLabelManufacturingPage() {
           className="relative w-full"
         >
           <HeroSection {...pageData.hero} />
+          <PrivateLabelProcessSection />
+          <WhatWeManufactureGridSection />
+          <BuiltAroundBrandSection />
+          <BrandSystemSection />
+          <DesignToProductSection />
 
 
           <motion.div
@@ -41,8 +58,15 @@ export default function PrivateLabelManufacturingPage() {
           >
     
             <HowWeWorkSection />
-  <ClientFeedbackSection />
-  <FAQSection  />
+            <MaterialsQualitySection />
+            <BrandingPackagingSection />
+            <ProductionFitSection />
+            <PreviousWorkSection />
+            <WhoWeManufactureForSection />
+            <DefineBrandPresenceSection />
+ 
+            <FAQSection />
+            <MapSection />
            
           </motion.div>
         </motion.div>
