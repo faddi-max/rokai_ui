@@ -75,7 +75,13 @@ import brand4 from './brand4.png'
 import oemhero from './OemHero.png'
 import oemindustry from './oemindustrial.png'
 import customlabel from './customlabelhero.png'
+import labeloverview from './labeloverview.png'
+import labelprotocol from './labelprotocol.png'
+import labelproperty from './labelproperty.png'
 export {
+  labelproperty,
+  labelprotocol,
+  labeloverview,
   customlabel,
   oemindustry,
   oemhero,

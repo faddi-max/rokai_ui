@@ -10,6 +10,7 @@ import FAQSection from "@/features/home/components/FAQSection";
 import TrendingBlogsSection from "../blogs/components/TrendingBlogsSection";
 import ResourceCategoriesSection from "./components/ResourceCategoriesSection";
 import InteractiveToolsSection from "./components/InteractiveToolsSection";
+import ResourceSearchBar from "@/shared/components/sections/SearchBar";
 
 
 export default function ResourcesPage() {
@@ -33,6 +34,7 @@ export default function ResourcesPage() {
           className="relative w-full"
         >
           <HeroSection {...pageData.hero} />
+          <ResourceSearchBar />
 
 
           <motion.div

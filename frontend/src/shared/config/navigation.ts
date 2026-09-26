@@ -44,6 +44,7 @@ import {
   work2,
   work3,
   work4,
+  customlabel,
 } from "@/assets";
 
 export const navLinks: NavLink[] = [
@@ -228,7 +229,7 @@ export const navLinks: NavLink[] = [
       label: "Custom Labels & Packaging",
       href: "/services/custom-labels-packaging",
       description: "",
-      image: labelmanufacture1,
+      image: customlabel,
     },
     {
       label: "Shipping & Logistics",

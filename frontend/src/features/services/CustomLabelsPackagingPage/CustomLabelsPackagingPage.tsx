@@ -1,9 +1,32 @@
-export const CustomLabelsPackagingPage = () => {
-  return (
-    <div className="min-h-screen bg-black text-white">
-      <h1 className="px-6 py-16 font-space-grotesk text-2xl font-bold uppercase">
-        Custom Labels & Packaging
-      </h1>
-    </div>
-  );
-};
+import HeroSection from "@/shared/components/sections/HeroSection";
+
+import HowWeWorkSection from "@/features/categories/data/HowWeWorkSection";
+
+import DefineBrandPresenceSection from "../PrivateLabelManufacturingPage/components/DefineBrandPresenceSection";
+import FAQSection from "@/features/home/components/FAQSection";
+import MapSection from "../PrivateLabelManufacturingPage/components/MapSection";
+import { customelabelhero } from "./data/customlabelHero";
+import LabelOverviewSection from "./components/LabelOverviewSection";
+import { labeloverview, labelproperty, labelprotocol } from "@/assets";
+import LabelProcessSection from "../PrivateLabelManufacturingPage/components/LabelProcessSection";
+import LabelProtocolSection from "./components/LabelProtocolSection";
+import WhatWeManufactureGridSection from "../PrivateLabelManufacturingPage/components/WhatWeManufactureGridSection";
+import LabelProprietaryCapabilities from "./components/LabelProprietaryCapabilities";
+
+
+
+export const CustomLabelPackagingPage = () => (
+  <>
+    <HeroSection {...customelabelhero} />
+    <LabelOverviewSection image={labeloverview} />
+   <LabelProtocolSection image={labelprotocol}/>
+   <WhatWeManufactureGridSection />
+   <LabelProprietaryCapabilities image={labelproperty} />
+     <HowWeWorkSection />
+     <DefineBrandPresenceSection />
+   
+ 
+            <FAQSection />
+            <MapSection />
+  </>
+);

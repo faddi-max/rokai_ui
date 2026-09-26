@@ -1,7 +1,7 @@
 import { customlabel, oemhero } from "@/assets";
 import type { HeroContent } from "@/shared/types/hero";
 
-export const oemHero: HeroContent = {
+export const customelabelhero: HeroContent = {
   headingLines: [
     { text: "YOUR BRAND." },
     { text: "YOUR IDENTITY." },
