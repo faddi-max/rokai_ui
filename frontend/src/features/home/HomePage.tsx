@@ -12,11 +12,20 @@ import TestimonialsSection from "./components/TestimonialsSection";
 import ToolsResourcesSection from "./components/ToolsResourcesSection";
 import TrustBadges from "./components/TrustBadges";
 import WhatWeManufactureSection from "./components/WhatWeManufactureSection";
-import { categories } from "./data/categories";
+import { categories as fallbackCategories } from "./data/categories";
 import CapabilitiesSection from "./components/CapabilitiesSection";
 import WhyRokaiSection from "@/shared/components/sections/WhyRokaiSection";
-
+import { useAsyncData } from "@/shared/hooks/useAsyncData";
+import { categoriesService } from "@/shared/api/services/categoriesService";
+const fetchhomedata = () => categoriesService.getParentCategories();
 export default function HomePage() {
+  const { data: parentCategories } = useAsyncData(fetchhomedata);
+
+  const categoriesToDisplay =
+    parentCategories && parentCategories.length > 0
+      ? parentCategories
+      : fallbackCategories;
+
   return (
     <>
       <SeoHead {...homeSeo} jsonLd={homeJsonLd} />
@@ -28,7 +37,7 @@ export default function HomePage() {
           headingLine1="Fightwear developed for"
           headingLine2="your sport and brand."
           description="From training essentials to competition-ready fightwear, ROKAI develops apparel systems around the demands of each combat sport."
-          categories={categories}
+          categories={categoriesToDisplay}
         />
         <ScalingBrandsSection />
         <TestimonialsSection />

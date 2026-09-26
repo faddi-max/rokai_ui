@@ -105,6 +105,8 @@ export default function App() {
           <Route element={<RootLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/categories" element={<CategoriesPage />} />
+            <Route path="/categories/:slug" element={<CategoriesPage />} />
+            <Route path="/categories/:parentSlug/:slug" element={<CategoriesPage />} />
             <Route path="/services" element={<NotFoundPage />} />
             {/* <Route path="/programs" element={<AmbassadorProgramPage />} /> */}
             <Route path="/contact" element={<NotFoundPage />} />

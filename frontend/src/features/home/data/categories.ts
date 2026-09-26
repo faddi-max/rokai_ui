@@ -6,6 +6,10 @@ export type Category = {
   buttonLabel: string;
   buttonHref: string;
   imageAlt: string;
+  slug?: string;
+  parent_id?: number | string | null;
+  level?: number;
+  children?: Category[];
 };
 
 import {

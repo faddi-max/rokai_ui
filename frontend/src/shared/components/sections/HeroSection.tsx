@@ -6,6 +6,7 @@ import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
 import { usePrefersReducedMotion } from "@/shared/hooks/usePrefersReducedMotion";
 import type { HeroContent, HeroGlow } from "@/shared/types/hero";
 import SectionGlow from "../layout/SectionGlow";
+import { herocatagory } from "@/assets";
 
 const DEFAULT_GLOWS: HeroGlow[] = [
   { width: 601, height: 901, top: 9, left: 783, color: "#E51B24C4", blur: 500 },
@@ -292,13 +293,16 @@ export default function HeroSection({
             <div className={`relative z-10 w-full max-w-[320px] sm:max-w-[420px] lg:max-w-[480px] ${isModelVisual ? "lg:-translate-x-10" : ""}`}>
               <img
                 data-hero-visual
-                src={visual.image}
+                src={visual.image || herocatagory}
                 alt={visual.imageAlt}
                 width={480}
                 height={670}
                 decoding="async"
                 fetchPriority="high"
                 className="h-auto w-full object-contain rounded-xl"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = herocatagory;
+                }}
               />
 
               {visual.floatingBadges?.map((badge, index) => (

@@ -15,6 +15,8 @@ import {
 } from "@/shared/config/navigation";
 import Button from "@/shared/components/ui/Button";
 import { logo } from "@/assets";
+import { useAsyncData } from "@/shared/hooks/useAsyncData";
+import { categoriesService } from "@/shared/api/services/categoriesService";
 
 export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState<boolean>(false);
@@ -30,6 +32,11 @@ export default function Navbar() {
     useState<CategoryLink | null>(null);
 
   const navRef = useRef<HTMLDivElement>(null);
+
+  const { data: dynamicNavCategories } = useAsyncData(
+    () => categoriesService.getNavCategories(),
+    []
+  );
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -55,6 +62,11 @@ export default function Navbar() {
   const categoriesLink = navLinks.find(
     (link) => link.label === "Categories"
   );
+
+  const activeCategories =
+    dynamicNavCategories && dynamicNavCategories.length > 0
+      ? dynamicNavCategories
+      : categoriesLink?.categories;
 
   return (
     <header
@@ -239,7 +251,7 @@ export default function Navbar() {
                   {/* CATEGORIES MEGA MENU — nothing shown until hover; image + submenu animate in */}
                   {isCategories &&
                     isDropdownOpen &&
-                    categoriesLink?.categories && (
+                    activeCategories && (
                       <div className="absolute left-0 top-full z-50 pt-[24px]">
                         <div
                           className={`flex overflow-hidden rounded-[14px] border border-white/[0.04] bg-[#130E0F] shadow-[0_20px_60px_rgba(0,0,0,0.45)] transition-[width] duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
@@ -277,7 +289,7 @@ export default function Navbar() {
                             </div>
 
                             <div>
-                              {categoriesLink.categories.map((category) => {
+                              {activeCategories.map((category) => {
                                 const isHovered =
                                   hoveredCategory?.label === category.label;
 
@@ -591,7 +603,7 @@ export default function Navbar() {
                     <div className="mb-4 mt-2">
                       <div className="rounded-[10px] bg-[#130E0F] p-[10px]">
                         <div className="mb-[8px] flex flex-wrap gap-[6px]">
-                          {link.categories?.map((category) => {
+                          {activeCategories?.map((category) => {
                             const isActive =
                               mobileActiveCategory?.label ===
                               category.label;

@@ -27,12 +27,14 @@ export class ApiError extends Error {
 
 export interface RequestOptions {
   headers?: HeadersInit;
- 
+
   cache?: boolean;
- 
+
   ttlMs?: number;
 
   forceRefresh?: boolean;
+
+  timeoutMs?: number;
 }
 
 interface CacheEntry<T> {
@@ -75,6 +77,7 @@ export const apiClient = {
       cache = true,
       ttlMs = DEFAULT_TTL_MS,
       forceRefresh = false,
+      timeoutMs = 8000,
     } = options;
 
     const url = buildUrl(endpoint);
@@ -88,16 +91,21 @@ export const apiClient = {
       }
     }
 
-    // 2. Perform fresh network request
+    // 2. Perform fresh network request with timeout
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
     try {
       const response = await fetch(url, {
         method: "GET",
+        signal: controller.signal,
         headers: {
           "Content-Type": "application/json",
           "ngrok-skip-browser-warning": "true",
           ...headers,
         },
       });
+      clearTimeout(timer);
 
       if (!response.ok) {
         throw new ApiError(
@@ -124,7 +132,11 @@ export const apiClient = {
 
       return result;
     } catch (error) {
+      clearTimeout(timer);
       if (error instanceof ApiError) throw error;
+      if ((error as Error)?.name === "AbortError") {
+        throw new ApiError(408, `GET ${endpoint} timed out after ${timeoutMs}ms`);
+      }
       throw new ApiError(500, (error as Error).message || "Network Error");
     }
   },

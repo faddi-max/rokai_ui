@@ -13,7 +13,7 @@ type CategoriesSectionProps = {
 };
 
 const arrowButtonClass =
-  "flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white text-black transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+  "flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-black transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:h-14 sm:w-14";
 
 export default function CategoriesSection({
   eyebrow,
@@ -39,26 +39,26 @@ export default function CategoriesSection({
   return (
     <section
       aria-labelledby={headingId}
-      className="relative bg-black overflow-hidden py-20 lg:py-28"
+      className="relative overflow-hidden bg-black py-14 sm:py-20 lg:py-28"
     >
       <div
         aria-hidden="true"
         className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(150,15,20,0.3),transparent_60%)]"
       />
 
-      <div className="relative max-w-[1512px] mx-auto px-6 md:px-10 lg:px-16">
-        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-10 mb-16">
+      <div className="relative mx-auto max-w-[1512px] px-4 sm:px-6 md:px-10 lg:px-16">
+        <div className="mb-10 flex flex-col justify-between gap-8 sm:mb-16 sm:gap-10 lg:flex-row lg:items-start">
           <div>
-            <div className="flex items-center gap-3 mb-4">
-              <p className="font-space-grotesk text-[17px] font-light leading-[30px] uppercase tracking-[0.15em] text-white">
+            <div className="mb-4 flex items-center gap-3">
+              <p className="font-space-grotesk text-xs font-light leading-5 uppercase tracking-[0.15em] text-white sm:text-[17px] sm:leading-[30px]">
                 {eyebrow}
               </p>
-              <span aria-hidden="true" className="h-px w-16 bg-[#E51B24]" />
+              <span aria-hidden="true" className="h-px w-8 shrink-0 bg-[#E51B24] sm:w-16" />
             </div>
 
             <h2
               id={headingId}
-              className="font-space-grotesk text-[clamp(2rem,5vw,3.5rem)] font-bold leading-[1.05] uppercase"
+              className="font-space-grotesk text-3xl font-bold leading-[1.05] uppercase sm:text-4xl lg:text-5xl"
             >
               <span className="block text-white">{headingLine1}</span>
               <span
@@ -70,9 +70,9 @@ export default function CategoriesSection({
             </h2>
           </div>
 
-          <div className="flex items-start gap-4 max-w-sm lg:pt-2">
-            <span aria-hidden="true" className=" h-8 w-[2px] shrink-0 bg-[#E51B24]" />
-            <p className="font-space-grotesk text-[17px] font-light leading-[30px] tracking-[0%] text-white/80">
+          <div className="flex max-w-sm items-start gap-3 sm:gap-4 lg:pt-2">
+            <span aria-hidden="true" className="h-8 w-[2px] shrink-0 bg-[#E51B24]" />
+            <p className="font-space-grotesk text-sm font-light leading-6 text-white/80 sm:text-[17px] sm:leading-[30px]">
               {description}
             </p>
           </div>
@@ -82,12 +82,12 @@ export default function CategoriesSection({
         <ul
           ref={trackRef}
           role="list"
-          className="flex w-full snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-2 [-ms-overflow-style:none] [scrollbar-width:none] lg:gap-8 [&::-webkit-scrollbar]:hidden"
+          className="flex w-full snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-6 lg:gap-8 [&::-webkit-scrollbar]:hidden"
         >
           {categories.map((category, index) => (
             <li
               key={category.id}
-              className="h-full w-[85vw] shrink-0 snap-start sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-2rem)/2)]"
+              className="h-full w-[88vw] shrink-0 snap-start sm:w-[78vw] lg:w-[70vw] xl:w-[calc((100%-2rem)/2)]"
             >
               <CategoryCard category={category} index={index} />
             </li>
@@ -96,7 +96,7 @@ export default function CategoriesSection({
 
         {
       showNav && categories.length > 2 && (
-  <div className="mt-14 flex items-center justify-center gap-4">
+  <div className="mt-8 flex items-center justify-center gap-4 sm:mt-14">
     <button
       type="button"
       aria-label="Previous category"

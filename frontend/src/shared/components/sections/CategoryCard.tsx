@@ -2,6 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import type { Category } from "@/features/home/data/categories";
 import { gsap, motion } from "@/shared/animations";
 import Button from "@/shared/components/ui/Button";
+import { catagoriespage1 } from "@/assets";
 
 type CategoryCardProps = {
   category: Category;
@@ -18,14 +19,17 @@ export default function CategoryCard({ category, index }: CategoryCardProps) {
   };
 
   return (
-    <article className="flex h-full flex-col gap-6 rounded-2xl border border-white/5 bg-[#0d0808] p-6 sm:flex-row sm:items-center sm:gap-8 sm:p-8">
-      <div className="mx-auto h-[280px] w-full max-w-[200px] shrink-0 sm:mx-0 sm:h-[320px] sm:w-[200px]">
+    <article className="flex h-full flex-col gap-4 rounded-2xl border border-white/5 bg-[#0d0808] p-5 sm:gap-6 sm:p-6 lg:flex-row lg:items-center lg:gap-8 xl:p-8">
+      <div className="mx-auto h-56 w-full max-w-[180px] shrink-0 sm:h-64 sm:max-w-[200px] lg:mx-0 lg:h-[300px] lg:w-[200px]">
         <img
-          src={category.image}
+          src={category.image || catagoriespage1}
           alt={category.imageAlt}
           loading="lazy"
           decoding="async"
           className="h-full w-full object-contain"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = catagoriespage1;
+          }}
           onMouseEnter={(event) => animateModel(event.currentTarget, 1.04)}
           onMouseLeave={(event) => animateModel(event.currentTarget, 1)}
         />
@@ -40,13 +44,13 @@ export default function CategoryCard({ category, index }: CategoryCardProps) {
         </span>
 
         <h3
-          className="bg-clip-text font-space-grotesk text-[40px] font-medium leading-[51px] tracking-[0%] text-transparent"
+          className="bg-clip-text font-space-grotesk text-3xl font-medium leading-tight text-transparent sm:text-4xl"
           style={{ backgroundImage: "linear-gradient(90deg, #E51B24 0%, #690106 100%)" }}
         >
           {category.title}
         </h3>
 
-        <p className="max-w-md font-space-grotesk text-[15px] font-light leading-[26px] text-white/60">
+        <p className="max-w-md font-space-grotesk text-sm font-light leading-6 text-white/60 sm:text-[15px] sm:leading-[26px]">
           {category.description}
         </p>
 
