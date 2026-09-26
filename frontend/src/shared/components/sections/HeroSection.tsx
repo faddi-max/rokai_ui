@@ -128,7 +128,7 @@ export default function HeroSection({
                 data-hero-visual
                 src={visual.image}
                 alt={visual.imageAlt}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover rounded-2xl"
               />
               <div
                 className="absolute inset-0"
@@ -137,12 +137,11 @@ export default function HeroSection({
             </div>
           )}
 
-          {/* Floating accent card (e.g. "YOUR BRAND.") — positioned against the same
-              1512px frame as the glows/background image, per the Figma spec. */}
+       
           {brandCard && (
             <div
               data-hero-brand-card
-              className="pointer-events-auto z-100 absolute z-10 flex flex-col justify-center  px-5"
+              className="pointer-events-auto z-20 absolute  flex flex-col justify-center  px-5"
               style={{
                 width: brandCard.position.width,
                 height: brandCard.position.height,
@@ -182,7 +181,7 @@ export default function HeroSection({
           className={`relative z-10 flex min-w-0 flex-col gap-6 ${
             isBackgroundVisual
               ? isSideBackgroundVisual
-                ? "max-w-[52%]"
+                ? "lg:max-w-[52%]"
                 : "max-w-2xl"
               : ""
           }`}
@@ -193,7 +192,7 @@ export default function HeroSection({
             </p>
           )}
 
-          <h1 data-hero-heading className="font-space-grotesk text-[clamp(2rem,9vw,3.5rem)] font-bold uppercase leading-[1.02] text-white lg:text-[clamp(3rem,5vw,4.375rem)] lg:leading-[0.98]">
+          <h1 data-hero-heading className="font-space-grotesk text-[clamp(2rem,8.5vw,2.75rem)] font-bold uppercase leading-[1.02] text-white sm:text-[clamp(2.5rem,6vw,3.5rem)] lg:text-[clamp(3rem,5vw,4.375rem)] lg:leading-[0.98]">
             {headingLines.map((line, index) => (
               <span
                 key={`${line.text}-${index}`}
@@ -219,7 +218,7 @@ export default function HeroSection({
             <span className="h-[3px] w-3 bg-white" />
           </div>
 
-          <p data-hero-description className="max-w-md font-space-grotesk text-base text-white/80">{description}</p>
+          <p data-hero-description className="max-w-md font-space-grotesk text-sm leading-6 text-white/80 sm:text-base sm:leading-7">{description}</p>
 
           <div data-hero-ctas className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
             {subscribe ? (

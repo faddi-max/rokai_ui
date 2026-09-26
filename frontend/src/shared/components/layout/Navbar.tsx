@@ -54,10 +54,6 @@ export default function Navbar() {
     };
   }, []);
 
-  const programsLink = navLinks.find(
-    (link) => link.label === "Programs"
-  );
-
   const categoriesLink = navLinks.find(
     (link) => link.label === "Categories"
   );
@@ -100,6 +96,7 @@ export default function Navbar() {
               const isDropdownOpen = activeDropdown === link.label;
 
               const isPrograms = link.label === "Programs";
+              const isServices = link.label === "Services";
               const isCategories = link.label === "Categories";
 
               return (
@@ -158,9 +155,9 @@ export default function Navbar() {
                   </div>
 
                   {/* PROGRAMS SPECIAL DROPDOWN */}
-                  {isPrograms &&
+                  {(isPrograms || isServices) &&
                     isDropdownOpen &&
-                    programsLink && (
+                    link.dropdownItems?.length && (
                       <div className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-[24px]">
                         <div className="w-[292px] rounded-[14px] border border-white/[0.04] bg-[#130E0F] p-[13px] shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
                           {/* IMAGE PREVIEW — only visible while hovering a specific link */}
@@ -196,7 +193,7 @@ export default function Navbar() {
 
                           {/* PROGRAM LIST */}
                           <div>
-                            {programsLink.dropdownItems?.map(
+                            {link.dropdownItems.map(
                               (program) => {
                                 const isHovered =
                                   hoveredProgram?.label ===
@@ -244,15 +241,17 @@ export default function Navbar() {
                           </div>
 
                           {/* EXPLORE ALL */}
-                          <Link
-                            to="/programs"
-                            onClick={() =>
-                              setActiveDropdown(null)
-                            }
-                            className="mt-[4px] block px-[14px] pb-[4px] pt-[11px] font-space-grotesk text-[15px] font-bold text-[#EF3340] transition-colors hover:text-[#ff5964]"
-                          >
-                            Explore all Programs
-                          </Link>
+                          {isPrograms && (
+                            <Link
+                              to="/programs"
+                              onClick={() =>
+                                setActiveDropdown(null)
+                              }
+                              className="mt-[4px] block px-[14px] pb-[4px] pt-[11px] font-space-grotesk text-[15px] font-bold text-[#EF3340] transition-colors hover:text-[#ff5964]"
+                            >
+                              Explore all Programs
+                            </Link>
+                          )}
                         </div>
                       </div>
                     )}
@@ -427,6 +426,7 @@ export default function Navbar() {
                   {/* NORMAL DESKTOP DROPDOWN */}
                   {hasDropdown &&
                     !isPrograms &&
+                    !isServices &&
                     !isCategories &&
                     isDropdownOpen && (
                       <div className="absolute left-0 top-full w-[340px] pt-2">
@@ -513,6 +513,7 @@ export default function Navbar() {
               const isExpanded = mobileExpanded === link.label;
 
               const isPrograms = link.label === "Programs";
+              const isServices = link.label === "Services";
               const isCategories = link.label === "Categories";
 
               return (
@@ -580,7 +581,7 @@ export default function Navbar() {
                   </div>
 
                   {/* PROGRAMS MOBILE MENU — no hover on touch, so each item shows its own image inline */}
-                  {isPrograms && isExpanded && (
+                  {(isPrograms || isServices) && isExpanded && (
                     <div className="mb-4 mt-2">
                       <div className="rounded-[10px] bg-[#130E0F] p-[10px]">
                         {link.dropdownItems?.map((program) => (
@@ -607,15 +608,17 @@ export default function Navbar() {
                         ))}
 
                         {/* EXPLORE */}
-                        <Link
-                          to="/programs"
-                          onClick={() =>
-                            setIsMobileOpen(false)
-                          }
-                          className="block px-[4px] pb-[5px] pt-[10px] font-space-grotesk text-[15px] font-bold text-[#EF3340]"
-                        >
-                          Explore all Programs
-                        </Link>
+                        {isPrograms && (
+                          <Link
+                            to="/programs"
+                            onClick={() =>
+                              setIsMobileOpen(false)
+                            }
+                            className="block px-[4px] pb-[5px] pt-[10px] font-space-grotesk text-[15px] font-bold text-[#EF3340]"
+                          >
+                            Explore all Programs
+                          </Link>
+                        )}
                       </div>
                     </div>
                   )}
@@ -728,6 +731,7 @@ export default function Navbar() {
                   {/* NORMAL MOBILE SUBMENU */}
                   {hasDropdown &&
                     !isPrograms &&
+                    !isServices &&
                     !isCategories &&
                     isExpanded && (
                       <div className="mb-2 ml-3 flex flex-col gap-1.5 border-l-2 border-[#E51B24]/40 pl-3 pt-1">

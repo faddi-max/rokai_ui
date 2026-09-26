@@ -1,19 +1,19 @@
-import { oemhero } from "@/assets";
+import { customlabel, oemhero } from "@/assets";
 import type { HeroContent } from "@/shared/types/hero";
 
 export const oemHero: HeroContent = {
   headingLines: [
-    { text: "BUILT FOR" },
-    { text: "YOUR" },
-    { text: "BRAND", highlight: true },
+    { text: "YOUR BRAND." },
+    { text: "YOUR IDENTITY." },
+    { text: "OUR PRESENTATION.", highlight: true },
   ],
   description:
-    "From product concept to production, Rokai OEM Manufacturing gives brands the infrastructure, engineering and quality control to build combat sports gear around their exact requirements.",
+    "Custom labeling and packaging helps your products create a consistent brand experience from production to presentation.",
   primaryCta: { label: "Start Your Project", href: "#apply" },
   secondaryCta: { label: "Request a Quote", href: "#quote" },
   visual: {
     type: "background",
-    image: oemhero,
+    image: customlabel,
     imageAlt: "OEM manufacturing specialist working with production equipment",
     position: { width: 482, height: 450, top: 20, left: 935, opacity: 1 },
   },

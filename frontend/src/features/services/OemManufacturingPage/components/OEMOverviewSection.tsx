@@ -2,7 +2,6 @@ import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 import SectionGlow from "@/shared/components/layout/SectionGlow";
 import SectionHeaderblog from "@/shared/components/sections/SectionHeaderblog";
-import { oemhero } from "@/assets";
 
 export interface OEMOverviewSectionProps {
   eyebrow?: string;
@@ -34,7 +33,7 @@ const DEFAULT_INFRASTRUCTURE_ITEMS = [
 function ChecklistRow({ label }: { label: string }) {
   return (
     <li className="flex items-start gap-2">
-      <Check size={13} strokeWidth={3} className="mt-[3px] shrink-0 text-[#2FB574]" aria-hidden />
+      <Check size={13} strokeWidth={3} className="mt-[3px] shrink-0 text-[#E51B24]" aria-hidden />
       <span className="font-space-grotesk text-[13px] leading-[19px] text-white/80">{label}</span>
     </li>
   );
@@ -45,7 +44,7 @@ export default function OEMOverviewSection({
   title = "MANUFACTURING BUILT",
   highlight = "AROUND YOUR BRAND.",
   headerDescription = "OEM (Original Equipment Manufacturing) at Rokai is the solution for businesses seeking high quality, custom combat sports gear tailored to their brand.",
-  image = oemhero,
+  image,
   imageAlt = "Rokai OEM manufacturing — worker on the production floor",
   imageLabel = "Built through discipline",
   imageNumber = "ROKAI / OEM",
@@ -65,13 +64,13 @@ export default function OEMOverviewSection({
         accentColor="#E51B24"
       />
 
-      <div className="relative mx-auto max-w-[1440px] px-5 pb-20 sm:px-8 md:px-10 lg:px-[49px]">
+      <div className="relative mx-auto max-w-[1180px] px-5 pb-20 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.15 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="relative z-10 flex flex-col gap-10 lg:flex-row lg:items-stretch lg:gap-16"
+          className="relative z-10 flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-16"
         >
           <div className="relative w-full shrink-0 overflow-hidden rounded-[12px] border border-[#363636] bg-[#111] lg:w-[478px]">
             <img
@@ -88,7 +87,7 @@ export default function OEMOverviewSection({
               }}
             />
 
-            <div className="absolute bottom-[21px] left-[23px] right-[23px] flex items-center justify-between border-t border-white/35 pt-2">
+            <div className="absolute bottom-[21px] left-[23px] right-[23px] flex items-center justify-between border-t border-white/35 pt-10">
               <span className="font-space-grotesk text-[10px] font-semibold uppercase tracking-[1.5px] text-[#f7f7f5]">
                 {imageLabel}
               </span>
@@ -98,19 +97,17 @@ export default function OEMOverviewSection({
             </div>
           </div>
 
-          <div className="flex w-full flex-col justify-center lg:max-w-[636px]">
-            <div className="flex flex-col gap-5">
-              {paragraphs.map((paragraph, i) => (
-                <p
-                  key={i}
-                  className="font-space-grotesk text-[18px] font-normal leading-[27px] tracking-[0%] text-white"
-                >
-                  {paragraph}
-                </p>
-              ))}
-            </div>
+          <div className="flex w-full flex-col justify-center items-center mt-20 gap-[10px] border-l border-[#3B3B3B] p-[10px] lg:w-[636px]">
+            {paragraphs.map((paragraph, i) => (
+              <p
+                key={i}
+                className="font-space-grotesk text-[18px] px-2 font-normal leading-[27px] tracking-[0%] text-white/70"
+              >
+                {paragraph}
+              </p>
+            ))}
 
-            <div className="mt-9">
+            <div className="mt-[10px]">
               <h3 className="font-space-grotesk text-[15px] font-bold uppercase tracking-[0.04em] text-white">
                 {infrastructureLabel}
               </h3>
