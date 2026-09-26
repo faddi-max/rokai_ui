@@ -32,6 +32,8 @@ export const oemHero: HeroContent = {
   background: {
     bgColor: "",
     heightPx: 560,
+    imageOverlay:
+      "linear-gradient(148.35deg, rgba(230, 57, 70, 0.12) 0%, rgba(0, 0, 0, 0.1) 100%)",
     glows: [
       { width: 460, height: 460, top: 0, left: 580, color: "#E51B243D", blur: 260 },
     ],

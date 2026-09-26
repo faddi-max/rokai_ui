@@ -80,6 +80,8 @@ export interface HeroBackground {
   bgColor?: string;  
   heightPx?: number;   
   glows?: HeroGlow[];
+  /** Optional gradient or color overlay rendered over a background hero image. */
+  imageOverlay?: string;
 }
 export interface HeroSubscribeCta {
   placeholder: string;

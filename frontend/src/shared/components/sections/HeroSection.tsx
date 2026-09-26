@@ -134,6 +134,12 @@ export default function HeroSection({
                 className="absolute inset-0"
                 style={{ backgroundColor: sectionBgColor, opacity: 1 - photoOpacity }}
               />
+              {background?.imageOverlay && (
+                <div
+                  className="pointer-events-none absolute inset-0"
+                  style={{ background: background.imageOverlay }}
+                />
+              )}
             </div>
           )}
 
