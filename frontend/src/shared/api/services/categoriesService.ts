@@ -158,14 +158,20 @@ export function mapCategoriesToNavLinks(apiCategories: Category[]): CategoryLink
     });
 }
 
-let categoriesCachePromise: Promise<Category[]> | null = null;
+const CATEGORIES_TTL_MS = 5 * 60 * 1000;
+
+let categoriesCache: { data: Category[]; timestamp: number } | null = null;
+let categoriesRequest: Promise<Category[]> | null = null;
+let categoriesRequestToken: symbol | null = null;
 
 export const categoriesService = {
   /**
    * Clears in-memory categories cache
    */
   clearCache(): void {
-    categoriesCachePromise = null;
+    categoriesCache = null;
+    categoriesRequest = null;
+    categoriesRequestToken = null;
     apiClient.clearCache("/categories");
   },
 
@@ -173,25 +179,48 @@ export const categoriesService = {
    * Fetches product categories list from backend API with in-memory caching
    */
   async getCategories(forceRefresh = false): Promise<Category[]> {
-    if (forceRefresh) {
-      categoriesCachePromise = null;
+    const cachedCategories = categoriesCache;
+    const cacheIsFresh =
+      cachedCategories && Date.now() - cachedCategories.timestamp < CATEGORIES_TTL_MS;
+
+    if (!forceRefresh && cacheIsFresh) {
+      return cachedCategories.data;
     }
 
-    if (!categoriesCachePromise) {
-      categoriesCachePromise = (async () => {
-        try {
-          const raw = await apiClient.get<ApiCategory[]>("/categories", { forceRefresh });
-          if (Array.isArray(raw) && raw.length > 0) {
-            return raw.map((cat) => mapApiCategoryToCategory(cat));
-          }
-        } catch (err) {
-          console.warn("Could not fetch /categories, using fallback:", err);
-        }
+    if (!forceRefresh && categoriesRequest) {
+      return categoriesRequest;
+    }
+
+    const requestToken = Symbol("categories");
+    const request = (async () => {
+      // Allow the shared request reference to be registered before the API call.
+      await Promise.resolve();
+      try {
+        const raw = await apiClient.get<ApiCategory[]>("/categories", { forceRefresh });
+        const mappedCategories = Array.isArray(raw) && raw.length > 0
+          ? raw.map((cat) => mapApiCategoryToCategory(cat))
+          : localCategories;
+
+        categoriesCache = { data: mappedCategories, timestamp: Date.now() };
+        return mappedCategories;
+      } catch (err) {
+        // Do not cache a fallback: a later navigation can retry the API.
+        console.warn("Could not fetch /categories, using fallback:", err);
         return localCategories;
-      })();
+      } finally {
+        if (categoriesRequestToken === requestToken) {
+          categoriesRequest = null;
+          categoriesRequestToken = null;
+        }
+      }
+    })();
+
+    if (!forceRefresh) {
+      categoriesRequest = request;
+      categoriesRequestToken = requestToken;
     }
 
-    return categoriesCachePromise;
+    return request;
   },
 
   /**

@@ -33,9 +33,8 @@ export default function Navbar() {
 
   const navRef = useRef<HTMLDivElement>(null);
 
-  const { data: dynamicNavCategories } = useAsyncData(
-    () => categoriesService.getNavCategories(),
-    []
+  const { data: dynamicNavCategories } = useAsyncData(() =>
+    categoriesService.getNavCategories()
   );
 
   useEffect(() => {

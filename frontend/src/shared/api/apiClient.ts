@@ -44,6 +44,8 @@ interface CacheEntry<T> {
 
 const DEFAULT_TTL_MS = 5 * 60 * 1000; 
 const apiCache = new Map<string, CacheEntry<unknown>>();
+const inFlightGetRequests = new Map<string, Promise<unknown>>();
+const inFlightGetRequestTokens = new Map<string, symbol>();
 
 const getEnvBaseUrl = (): string => {
   const env = (import.meta as unknown as { env?: Record<string, string> }).env || {};
@@ -91,54 +93,75 @@ export const apiClient = {
       }
     }
 
-    // 2. Perform fresh network request with timeout
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-
-    try {
-      const response = await fetch(url, {
-        method: "GET",
-        signal: controller.signal,
-        headers: {
-          "Content-Type": "application/json",
-          "ngrok-skip-browser-warning": "true",
-          ...headers,
-        },
-      });
-      clearTimeout(timer);
-
-      if (!response.ok) {
-        throw new ApiError(
-          response.status,
-          `GET ${endpoint} failed with status ${response.status}`
-        );
-      }
-
-      const resJson = await response.json();
-
-      // Unwrap API response envelope ({ success: true, data: T })
-      const result: T =
-        resJson && typeof resJson === "object" && "data" in resJson
-          ? (resJson as { data: T }).data
-          : (resJson as T);
-
-      // 3. Save result to cache
-      if (cache) {
-        apiCache.set(url, {
-          data: result,
-          timestamp: Date.now(),
-        });
-      }
-
-      return result;
-    } catch (error) {
-      clearTimeout(timer);
-      if (error instanceof ApiError) throw error;
-      if ((error as Error)?.name === "AbortError") {
-        throw new ApiError(408, `GET ${endpoint} timed out after ${timeoutMs}ms`);
-      }
-      throw new ApiError(500, (error as Error).message || "Network Error");
+    // 2. Reuse a request that is already fetching this endpoint. This matters when
+    // the Navbar and page mount together and both request the same data.
+    if (cache && !forceRefresh) {
+      const inFlightRequest = inFlightGetRequests.get(url);
+      if (inFlightRequest) return inFlightRequest as Promise<T>;
     }
+
+    const requestToken = Symbol(url);
+    const request = (async (): Promise<T> => {
+      // Allow the in-flight entry to be registered before any synchronous failure.
+      await Promise.resolve();
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          signal: controller.signal,
+          headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
+            ...headers,
+          },
+        });
+
+        if (!response.ok) {
+          throw new ApiError(
+            response.status,
+            `GET ${endpoint} failed with status ${response.status}`
+          );
+        }
+
+        const resJson = await response.json();
+
+        // Unwrap API response envelope ({ success: true, data: T })
+        const result: T =
+          resJson && typeof resJson === "object" && "data" in resJson
+            ? (resJson as { data: T }).data
+            : (resJson as T);
+
+        if (cache) {
+          apiCache.set(url, {
+            data: result,
+            timestamp: Date.now(),
+          });
+        }
+
+        return result;
+      } catch (error) {
+        if (error instanceof ApiError) throw error;
+        if ((error as Error)?.name === "AbortError") {
+          throw new ApiError(408, `GET ${endpoint} timed out after ${timeoutMs}ms`);
+        }
+        throw new ApiError(500, (error as Error).message || "Network Error");
+      } finally {
+        clearTimeout(timer);
+        if (inFlightGetRequestTokens.get(url) === requestToken) {
+          inFlightGetRequests.delete(url);
+          inFlightGetRequestTokens.delete(url);
+        }
+      }
+    })();
+
+    if (cache && !forceRefresh) {
+      inFlightGetRequests.set(url, request);
+      inFlightGetRequestTokens.set(url, requestToken);
+    }
+
+    return request;
   },
 
 
@@ -208,8 +231,12 @@ export const apiClient = {
     if (endpoint) {
       const url = buildUrl(endpoint);
       apiCache.delete(url);
+      inFlightGetRequests.delete(url);
+      inFlightGetRequestTokens.delete(url);
     } else {
       apiCache.clear();
+      inFlightGetRequests.clear();
+      inFlightGetRequestTokens.clear();
     }
   },
 
