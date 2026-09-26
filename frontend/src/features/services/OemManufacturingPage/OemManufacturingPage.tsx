@@ -1,9 +1,11 @@
-export const OemManufacturingPage = () => {
-  return (
-    <div className="min-h-screen bg-black text-white">
-      <h1 className="px-6 py-16 font-space-grotesk text-2xl font-bold uppercase">
-        OEM Manufacturing
-      </h1>
-    </div>
-  );
-};
+import HeroSection from "@/shared/components/sections/HeroSection";
+import OEMOverviewSection from "./components/OEMOverviewSection";
+import { oemHero } from "./data/oemHero";
+import { oemhero } from "@/assets";
+
+export const OemManufacturingPage = () => (
+  <>
+    <HeroSection {...oemHero} />
+    <OEMOverviewSection image={oemhero}/>
+  </>
+);

@@ -32,6 +32,7 @@ export default function CategoriesPage() {
       onRetry={refetch}
     >
       {(pageData) => {
+        const isTerminalCategory = pageData.category?.level === 3;
         const displayCategories =
           pageData.categories && pageData.categories.length > 0
             ? pageData.categories
@@ -40,21 +41,23 @@ export default function CategoriesPage() {
         return (
           <div className="">
             <HeroSection {...pageData.hero} />
-            <CategoriesSection
-              eyebrow={
-                pageData.category
-                  ? `${pageData.category.title} Sub-Categories`
-                  : "Premium Quality"
-              }
-              headingLine1={pageData.category ? pageData.category.title : "for Every Level of"}
-              headingLine2="Collection & Products"
-              description={
-                pageData.category?.description ||
-                "Choose the right gear for your needs."
-              }
-              categories={displayCategories}
-              showNav={true}
-            />
+            {!isTerminalCategory && (
+              <CategoriesSection
+                eyebrow={
+                  pageData.category
+                    ? `${pageData.category.title} Sub-Categories`
+                    : "Premium Quality"
+                }
+                headingLine1={pageData.category ? pageData.category.title : "for Every Level of"}
+                headingLine2="Collection & Products"
+                description={
+                  pageData.category?.description ||
+                  "Choose the right gear for your needs."
+                }
+                categories={displayCategories}
+                showNav={true}
+              />
+            )}
             <WhyRokaiSection />
             <ProblemSolversSection />
             <GiEngineeringSection />

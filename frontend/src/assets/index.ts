@@ -72,8 +72,9 @@ import brand1 from './BRAND1.png'
 import brand2 from './brand2.png'
 import brand3 from './brand3.png'
 import brand4 from './brand4.png'
-
+import oemhero from './OemHero.png'
 export {
+  oemhero,
   brandhero,
   brand1,
   brand2,

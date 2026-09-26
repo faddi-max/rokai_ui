@@ -122,19 +122,16 @@ export default function Navbar() {
                   }}
                 >
                   <div className="flex items-center">
-                    <NavLink
-                      to={link.href}
-                      className={({ isActive }) =>
-                        `flex items-center gap-1 py-2 font-space-grotesk text-[13px] font-bold tracking-wide transition-colors ${
-                          isActive
-                            ? "text-[#E51B24]"
-                            : "text-white hover:text-[#E51B24]"
-                        }`
-                      }
-                    >
-                      {link.label}
-
-                      {hasDropdown && (
+                    {hasDropdown ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setActiveDropdown(isDropdownOpen ? null : link.label)
+                        }
+                        aria-expanded={isDropdownOpen}
+                        className="flex items-center gap-1 py-2 font-space-grotesk text-[13px] font-bold tracking-wide text-white transition-colors hover:text-[#E51B24]"
+                      >
+                        {link.label}
                         <ChevronDown
                           size={14}
                           className={`opacity-70 transition-transform duration-200 ${
@@ -143,8 +140,21 @@ export default function Navbar() {
                               : ""
                           }`}
                         />
-                      )}
-                    </NavLink>
+                      </button>
+                    ) : (
+                      <NavLink
+                        to={link.href}
+                        className={({ isActive }) =>
+                          `flex items-center gap-1 py-2 font-space-grotesk text-[13px] font-bold tracking-wide transition-colors ${
+                            isActive
+                              ? "text-[#E51B24]"
+                              : "text-white hover:text-[#E51B24]"
+                          }`
+                        }
+                      >
+                        {link.label}
+                      </NavLink>
+                    )}
                   </div>
 
                   {/* PROGRAMS SPECIAL DROPDOWN */}
@@ -511,23 +521,36 @@ export default function Navbar() {
                   className="border-b border-white/5 pb-1"
                 >
                   <div className="flex items-center justify-between">
-                    <NavLink
-                      to={link.href}
-                      onClick={() => {
-                        if (!hasDropdown) {
-                          setIsMobileOpen(false);
+                    {hasDropdown ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = isExpanded ? null : link.label;
+                          setMobileExpanded(next);
+                          if (isCategories && !next) {
+                            setMobileActiveCategory(null);
+                          }
+                        }}
+                        aria-expanded={isExpanded}
+                        className="py-2 font-space-grotesk text-[15px] font-bold text-white transition-colors hover:text-[#E51B24]"
+                      >
+                        {link.label}
+                      </button>
+                    ) : (
+                      <NavLink
+                        to={link.href}
+                        onClick={() => setIsMobileOpen(false)}
+                        className={({ isActive }) =>
+                          `py-2 font-space-grotesk text-[15px] font-bold transition-colors ${
+                            isActive
+                              ? "text-[#E51B24]"
+                              : "text-white hover:text-[#E51B24]"
+                          }`
                         }
-                      }}
-                      className={({ isActive }) =>
-                        `py-2 font-space-grotesk text-[15px] font-bold transition-colors ${
-                          isActive
-                            ? "text-[#E51B24]"
-                            : "text-white hover:text-[#E51B24]"
-                        }`
-                      }
-                    >
-                      {link.label}
-                    </NavLink>
+                      >
+                        {link.label}
+                      </NavLink>
+                    )}
 
                     {hasDropdown && (
                       <button

@@ -269,13 +269,14 @@ export const categoriesService = {
       selectedCategory = allCategories[0] || localCategories[0];
     }
 
+    const isTerminalCategory = selectedCategory?.level === 3;
     let childCategories: Category[] = [];
-    if (selectedCategory && selectedCategory.children && selectedCategory.children.length > 0) {
+    if (!isTerminalCategory && selectedCategory?.children?.length) {
       childCategories = selectedCategory.children;
-    } else if (selectedCategory) {
+    } else if (!isTerminalCategory && selectedCategory) {
       childCategories = allCategories.filter((c) => c.id !== selectedCategory?.id);
     }
-    if (childCategories.length === 0) {
+    if (!isTerminalCategory && childCategories.length === 0) {
       childCategories = localCategories;
     }
 

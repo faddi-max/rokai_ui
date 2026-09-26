@@ -30,6 +30,8 @@ export default function HeroSection({
   const prefersReducedMotion = usePrefersReducedMotion();
   const isModelVisual = visual.type === "model";
   const isBackgroundVisual = visual.type === "background";
+  const isSideBackgroundVisual =
+    isBackgroundVisual && visual.position.left > 0;
   const glows = background?.glows ?? DEFAULT_GLOWS;
   const [email, setEmail] = useState("");
 
@@ -84,7 +86,7 @@ export default function HeroSection({
       className={`relative overflow-hidden pb-8 lg:pb-9 ${background?.sectionClassName ?? ""}`}
       style={{
         backgroundColor: sectionBgColor,
-        ...(sectionHeightPx ? { minHeight: undefined } : {}),
+        ...(sectionHeightPx ? { minHeight: sectionHeightPx } : {}),
       }}
     >
       <div className="pointer-events-none absolute inset-0">
@@ -110,10 +112,15 @@ export default function HeroSection({
             <div
               className="absolute overflow-hidden"
               style={{
-                width: visual.position.width,
-                height: visual.position.height,
+                width: isSideBackgroundVisual
+                  ? `min(${visual.position.width}px, 52vw)`
+                  : visual.position.width,
+                height: isSideBackgroundVisual
+                  ? `min(${visual.position.height}px, 100%)`
+                  : visual.position.height,
                 top: visual.position.top,
-                left: visual.position.left,
+                left: isSideBackgroundVisual ? undefined : visual.position.left,
+                right: isSideBackgroundVisual ? 0 : undefined,
                 transform: visual.position.angle ? `rotate(${visual.position.angle}deg)` : undefined,
               }}
             >
@@ -139,8 +146,12 @@ export default function HeroSection({
               style={{
                 width: brandCard.position.width,
                 height: brandCard.position.height,
-                top: brandCard.position.top,
-                left: brandCard.position.left,
+                top: isSideBackgroundVisual
+                  ? `min(${brandCard.position.top}px, calc(100% - ${brandCard.position.height}px - 2rem))`
+                  : brandCard.position.top,
+                left: isSideBackgroundVisual
+                  ? `calc(100% - min(${visual.position.width}px, 52vw) - 3.5rem)`
+                  : brandCard.position.left,
                 transform: brandCard.position.angle ? `rotate(${brandCard.position.angle}deg)` : undefined,
                 opacity: brandCard.position.opacity ?? 1,
                 borderRadius: brandCard.position.borderRadius ?? 10,
@@ -167,20 +178,28 @@ export default function HeroSection({
         className={`relative mx-auto grid max-w-[1512px] items-center gap-8 px-5 py-10 sm:px-8 md:px-10 ${isBackgroundVisual ? "" : "lg:grid-cols-2 lg:gap-5"} lg:px-16`}
         style={sectionHeightPx ? { minHeight: undefined } : undefined}
       >
-        <div className={`relative z-10 flex min-w-0 flex-col gap-6 ${isBackgroundVisual ? "max-w-2xl" : ""}`}>
+        <div
+          className={`relative z-10 flex min-w-0 flex-col gap-6 ${
+            isBackgroundVisual
+              ? isSideBackgroundVisual
+                ? "max-w-[52%]"
+                : "max-w-2xl"
+              : ""
+          }`}
+        >
           {eyebrow && (
             <p className="font-space-grotesk text-xs font-medium uppercase tracking-[0.2em] text-white/70">
               {eyebrow}
             </p>
           )}
 
-          <h1 data-hero-heading className="font-space-grotesk text-[clamp(2rem,9vw,3.5rem)] font-bold uppercase leading-[1.02] text-white lg:text-[70px] lg:leading-[68px]">
+          <h1 data-hero-heading className="font-space-grotesk text-[clamp(2rem,9vw,3.5rem)] font-bold uppercase leading-[1.02] text-white lg:text-[clamp(3rem,5vw,4.375rem)] lg:leading-[0.98]">
             {headingLines.map((line, index) => (
               <span
                 key={`${line.text}-${index}`}
                 className={
                   line.highlight
-                    ? "bg-[linear-gradient(90deg,#E51B24_0%,#690106_100%)] bg-clip-text text-transparent lg:whitespace-nowrap lg:text-[63px] lg:leading-[76px]"
+                    ? "bg-[linear-gradient(90deg,#E51B24_0%,#690106_100%)] bg-clip-text text-transparent lg:whitespace-nowrap lg:text-[clamp(3rem,4.6vw,3.9375rem)] lg:leading-[1.05]"
                     : undefined
                 }
               >

@@ -19,7 +19,7 @@ export const Privateservicehero: HeroContent = {
     "Global Shipping",
   ],
   visual: {
-    
+    type: "background",
     image: servicemanufacturehero,
     imageAlt: "Rokai BJJ athlete training at sunset",
     position: { width: 1712, height: 600, top: 0, left: 0, opacity: 1 },
