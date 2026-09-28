@@ -81,7 +81,19 @@ import labelproperty from './labelproperty.png'
 import shippingoverview from './shippingoverview.png'
 import shippingprotocol from './shippingprotocol.png'
 import shippingproperty from './shippingproperty.png'
+import abouthero from  './abouthero.png'
+import aboutsell from './aboutsell.png'
+import aboutprocess from './aboutprocess.png'
+import aboutenquiry from './aboutenquiry.png'
+import aboutpartner from './aboutPartner.png'
+import storybehind from './storybehind.jpg'
 export {
+  storybehind,
+  aboutpartner,
+  aboutenquiry,
+  aboutprocess,
+  aboutsell,
+  abouthero,
   shippingoverview,
   shippingprotocol,
   shippingproperty,

@@ -1,144 +1,97 @@
-import { ArrowUpRight } from "lucide-react";
-import SectionEyebrow from "./SectionEyebrow";
+import { motion } from "framer-motion";
+import SectionGlow from "@/shared/components/layout/SectionGlow";
+import SectionHeaderblog from "@/shared/components/sections/SectionHeaderblog";
 import { sustainabilityGoals } from "@/features/home/data/sustainabilityGoals";
-import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
 
 const SustainabilityGoalsSection = () => {
-  const {
-    eyebrow,
-    titleTop,
-    titleBottom,
-    description,
-    goals,
-    ctaText,
-    ctaHref,
-    image,
-    caption,
-  } = sustainabilityGoals;
+  const { eyebrow, titleTop, titleBottom, description, goals, image, caption } =
+    sustainabilityGoals;
 
   return (
-    <section className="relative w-full overflow-hidden bg-black px-6 py-16 sm:px-10 lg:px-20 lg:py-24">
-      {/* Ambient red glow, bottom-left — matches design's subtle vignette */}
-      <div
-        className="pointer-events-none absolute -bottom-1/4 -left-1/4 h-[60%] w-[50%]"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, rgba(165,20,24,0.18) 0%, transparent 70%)",
-        }}
+    <SectionGlow className="relative overflow-hidden">
+      <SectionHeaderblog
+        bare
+        eyebrow={eyebrow}
+        title={titleTop}
+        highlight={titleBottom}
+        highlightGradient="linear-gradient(90deg, #E51B24 0%, #690106 100%)"
+        accentColor="#E51B24"
+        description={description}
       />
 
-      <div className="relative mx-auto grid w-full max-w-[1512px] grid-cols-1 gap-14 lg:grid-cols-2 lg:gap-16">
-        {/* Left column */}
-        <div className="flex flex-col gap-8 lg:gap-10">
-          <SectionEyebrow
-            label={eyebrow}
-            textClassName="text-white/50"
-            lineClassName="border-[#7A1017]"
-          />
+      <div className="relative z-10 mx-auto w-full max-w-[1280px] px-5 pb-20 sm:px-8 lg:px-[30px]">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
+          {/* LEFT — goals, aligned to the bottom of the image column */}
+          <div className="flex items-end">
+            <div className="grid w-full grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-5 lg:pb-[70px]">
+              {goals.map((goal, i) => (
+                <motion.div
+                  key={goal.number}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{
+                    duration: 0.45,
+                    delay: i * 0.08,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  className="flex flex-col"
+                >
+                  <span
+                    className="font-space-grotesk font-light leading-none text-white/45"
+                    style={{ fontSize: "clamp(30px, 1.4vw + 18px, 40px)" }}
+                  >
+                    {goal.number}
+                  </span>
 
-          <h2 className="font-space-grotesk uppercase">
-            <span
-              className="block font-bold text-white"
-              style={{
-                fontSize: "clamp(28px, 2.6vw + 12px, 52px)",
-                lineHeight: "clamp(30px, 2.6vw + 12px, 56px)",
-                letterSpacing: "0%",
-              }}
-            >
-              {titleTop}
-            </span>
-            <span
-              className="block bg-clip-text font-bold text-transparent"
-              style={{
-                fontSize: "clamp(28px, 2.6vw + 12px, 52px)",
-                lineHeight: "clamp(30px, 2.6vw + 12px, 56px)",
-                letterSpacing: "0%",
-                backgroundImage:
-                  "linear-gradient(90deg, #E51B24 0%, #690106 100%)",
-              }}
-            >
-              {titleBottom}
-            </span>
-          </h2>
+                  <span
+                    aria-hidden
+                    className="mt-2 block h-px w-full bg-gradient-to-r from-[#E51B24] to-[#E51B24]/30"
+                  />
 
-          <div className="grid grid-cols-3 gap-4 sm:gap-8">
-            {goals.map((goal) => (
-              <div key={goal.number} className="flex flex-col gap-3">
-                <span
-                  className="font-space-grotesk font-light leading-none text-white/40"
-                  style={{ fontSize: "clamp(28px, 1.6vw + 16px, 40px)" }}
-                >
-                  {goal.number}
-                </span>
-                <div className="h-[2px] w-full bg-gradient-to-r from-[#E51B24] to-transparent" />
-                <p
-                  className="font-space-grotesk font-bold uppercase text-white"
-                  style={{ fontSize: "13px", lineHeight: "17px" }}
-                >
-                  {goal.title}
-                </p>
-                <p
-                  className="font-space-grotesk font-light text-white/45"
-                  style={{ fontSize: "12px", lineHeight: "17px" }}
-                >
-                  {goal.description}
-                </p>
-              </div>
-            ))}
+                  <h3 className="mt-3 max-w-[150px] py-3 font-space-grotesk text-[18px] font-bold uppercase leading-[25px] text-white">
+                    {goal.title}
+                  </h3>
+
+                  <p className="mt-2 max-w-[125px] font-space-grotesk text-[15px] font-light leading-[20px] text-white/50">
+                    {goal.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
           </div>
 
-          <a
-            href={ctaHref}
-            className="inline-flex w-fit items-center gap-2 rounded-[4px] bg-[#E63946] px-6 py-3.5 text-white transition-colors hover:bg-[#c92e3a]"
+          {/* RIGHT — image + caption strip */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="w-full overflow-hidden rounded-[10px] border border-white/10 bg-[#151515]"
           >
-            <span className="font-space-grotesk text-[14px] font-semibold leading-[18px]">
-              {ctaText}
-            </span>
-            <AnimatedArrow icon={ArrowUpRight} className="h-4 w-4 shrink-0" />
-          </a>
-        </div>
-
-        {/* Right column */}
-        <div className="flex flex-col gap-10 lg:pt-3">
-          <div className="border-l-2 border-[#E51B24] pl-5">
-            <p
-              className="font-space-grotesk font-light text-white/60"
-              style={{
-                fontSize: "clamp(14px, 0.3vw + 13px, 16px)",
-                lineHeight: "1.6",
-              }}
-            >
-              {description}
-            </p>
-          </div>
-
-          <div className="w-full">
-            <div className="relative aspect-[312/219] w-full overflow-hidden">
+            <div className="relative aspect-[313/220] w-full overflow-hidden">
               <img
                 src={image}
                 alt="Trees in a sunlit forest"
+                loading="lazy"
                 className="absolute inset-0 h-full w-full object-cover"
               />
             </div>
+
             <div className="bg-[#151515] px-6 py-5">
               {caption.map((line) => (
                 <p
                   key={line}
-                  className="font-space-grotesk uppercase text-white/45"
-                  style={{
-                    fontSize: "11px",
-                    lineHeight: "1.9",
-                    letterSpacing: "0.15em",
-                  }}
+                  className="font-space-grotesk text-[8px] font-medium uppercase leading-[12px] tracking-[0.25em] text-white/50"
                 >
                   {line}
                 </p>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </section>
+    </SectionGlow>
   );
 };
 

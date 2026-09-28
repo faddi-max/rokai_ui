@@ -21,6 +21,7 @@ import { CustomLabelPackagingPage } from "@/features/services/CustomLabelsPackag
 
 import PrivateLabelManufacturingPage from "@/features/services/PrivateLabelManufacturingPage/PrivateLabelManufacturingPage";
 import ShippingLogisticsPage from "@/features/services/ShippingLogisticsPage/ShippingLogisticsPage";
+import AboutUs from "@/features/AboutUs/AboutUs";
 
 
 const HomePage = lazy(() => import("@/features/home/HomePage"));
@@ -105,6 +106,7 @@ export default function App() {
         <Routes>
           <Route element={<RootLayout />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutUs />} />
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/categories/:slug" element={<CategoriesPage />} />
             <Route path="/categories/:parentSlug/:slug" element={<CategoriesPage />} />
@@ -126,6 +128,7 @@ export default function App() {
   path="/programs/affiliate"
   element={<AffiliatePage />}
 />
+
 
 <Route
   path="/programs/ambassador"

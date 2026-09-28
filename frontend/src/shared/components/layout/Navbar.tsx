@@ -179,7 +179,7 @@ export default function Navbar() {
                                 <img
                                   src={hoveredProgram.image}
                                   alt={hoveredProgram.label}
-                                  className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+                                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                                 />
 
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
@@ -597,7 +597,7 @@ export default function Navbar() {
                               <img
                                 src={program.image}
                                 alt={program.label}
-                                className="h-full w-full object-contain"
+                                className="h-full w-full object-cover"
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                               <span className="absolute bottom-[10px] left-[12px] font-space-grotesk text-[13px] font-bold uppercase text-white">
@@ -663,7 +663,7 @@ export default function Navbar() {
                               <img
                                 src={mobileActiveCategory.image}
                                 alt={mobileActiveCategory.label}
-                                className="h-full w-full object-contain"
+                                className="h-full w-full object-cover"
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                               <span className="absolute bottom-[10px] left-[12px] font-space-grotesk text-[12px] font-bold uppercase text-white">
