@@ -25,13 +25,14 @@ export default function HeroSection({
   subscribe,
   featureTags,
   brandCard,
-}: HeroContent) {
+  fullWidthBackground = false,
+}: HeroContent & { fullWidthBackground?: boolean }) {
   const heroRef = useRef<HTMLElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
   const isModelVisual = visual.type === "model";
   const isBackgroundVisual = visual.type === "background";
   const isSideBackgroundVisual =
-    isBackgroundVisual && visual.position.left > 0;
+    isBackgroundVisual && visual.position.left > 0 && !fullWidthBackground;
   const glows = background?.glows ?? DEFAULT_GLOWS;
   const [email, setEmail] = useState("");
 
@@ -91,7 +92,7 @@ export default function HeroSection({
     >
       <div className="pointer-events-none absolute inset-0">
         <div
-          className="relative hidden max-w-[1512px] lg:block"
+          className={fullWidthBackground ? "absolute inset-0" : "relative hidden max-w-[1512px] lg:block"}
           style={sectionHeightPx ? { height: sectionHeightPx } : { height: "100%" }}
         >
           {glows.map((glow, index) => (
@@ -111,24 +112,24 @@ export default function HeroSection({
           {isBackgroundVisual && (
             <div
               className="absolute overflow-hidden"
-              style={{
-                width: isSideBackgroundVisual
-                  ? `min(${visual.position.width}px, 52vw)`
-                  : visual.position.width,
-                height: isSideBackgroundVisual
-                  ? `min(${visual.position.height}px, 100%)`
-                  : visual.position.height,
-                top: visual.position.top,
-                left: isSideBackgroundVisual ? undefined : visual.position.left,
-                right: isSideBackgroundVisual ? 0 : undefined,
-                transform: visual.position.angle ? `rotate(${visual.position.angle}deg)` : undefined,
-              }}
+              style={fullWidthBackground ? { inset: 0 } : {
+                  width: isSideBackgroundVisual
+                    ? `min(${visual.position.width}px, 52vw)`
+                    : visual.position.width,
+                  height: isSideBackgroundVisual
+                    ? `min(${visual.position.height}px, 100%)`
+                    : visual.position.height,
+                  top: visual.position.top,
+                  left: isSideBackgroundVisual ? undefined : visual.position.left,
+                  right: isSideBackgroundVisual ? 0 : undefined,
+                  transform: visual.position.angle ? `rotate(${visual.position.angle}deg)` : undefined,
+                }}
             >
               <img
                 data-hero-visual
                 src={visual.image}
                 alt={visual.imageAlt}
-                className="h-full w-full object-cover rounded-2xl"
+                className={`h-full w-full object-cover ${fullWidthBackground ? "" : "rounded-2xl"}`}
               />
               <div
                 className="absolute inset-0"

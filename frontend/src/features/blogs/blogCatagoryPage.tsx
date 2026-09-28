@@ -45,7 +45,7 @@ export default function BlogCategoryPage() {
     >
       {({ pageData, category, posts }) => (
         <div>
-          <HeroSection {...pageData.hero} />
+          <HeroSection {...pageData.hero} fullWidthBackground />
 {category && (
                 <SectionHeaderblog
                   eyebrow={category.title}

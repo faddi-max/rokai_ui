@@ -98,8 +98,19 @@ export default function BlogHeroDetail({ post, meta = {} }: BlogHeroDetailProps)
   ].filter(Boolean);
 
   return (
-    <section className="bg-[#0a0a0a] text-white font-space-grotesk px-6 py-16 md:px-10 lg:px-6 ">
-      <div className=" mx-20">
+    <section className="relative isolate min-h-140 overflow-hidden bg-[#0a0a0a] px-6 py-16 font-space-grotesk text-white md:px-10 lg:px-6">
+      <div className="absolute inset-0 z-0">
+        <img
+          src={post.image || blogcatagory}
+          alt=""
+          className="h-full w-full object-cover"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = blogcatagory;
+          }}
+        />
+        <div className="absolute inset-0 bg-black/70" />
+      </div>
+      <div className="relative z-10 mx-auto w-full max-w-378">
         <div className="mb-6 flex items-center gap-2">
           <span className="h-[2px] w-6 bg-[#E63946]" />
           <Link
@@ -146,15 +157,11 @@ export default function BlogHeroDetail({ post, meta = {} }: BlogHeroDetailProps)
           </div>
         </div>
 
-        {secondaryImage ? (
+        {secondaryImage && (
           <div className="relative mt-10 grid grid-cols-2 overflow-hidden rounded-2xl border border-white/10">
             <BannerPhoto src={post.image} />
             <BannerPhoto src={secondaryImage} dark />
             <CenterBadge />
-          </div>
-        ) : (
-          <div className="relative mt-10 overflow-hidden rounded-2xl border border-white/10">
-            <BannerPhoto src={post.image} tall />
           </div>
         )}
       </div>

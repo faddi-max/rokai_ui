@@ -18,8 +18,9 @@ import ResourcesPage from "@/features/resources/ResourcesPage";
 
 import { OemManufacturingPage } from "@/features/services/OemManufacturingPage/OemManufacturingPage";
 import { CustomLabelPackagingPage } from "@/features/services/CustomLabelsPackagingPage/CustomLabelsPackagingPage";
-import { ShippingLogisticsPage } from "@/features/services/ShippingLogisticsPage/ShippingLogisticsPage";
+
 import PrivateLabelManufacturingPage from "@/features/services/PrivateLabelManufacturingPage/PrivateLabelManufacturingPage";
+import ShippingLogisticsPage from "@/features/services/ShippingLogisticsPage/ShippingLogisticsPage";
 
 
 const HomePage = lazy(() => import("@/features/home/HomePage"));

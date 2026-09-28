@@ -22,7 +22,7 @@ export default function BlogsPage() {
     >
       {(pageData) => (
         <div>
-          <HeroSection {...pageData.hero} />
+          <HeroSection {...pageData.hero} fullWidthBackground />
           <BlogCategoriesSection categories={pageData.blogCategories} />
           <ManufacturingProcessSection />
           <FAQSection />

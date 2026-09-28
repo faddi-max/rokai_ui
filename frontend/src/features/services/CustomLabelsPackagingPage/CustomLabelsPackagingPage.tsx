@@ -8,7 +8,7 @@ import MapSection from "../PrivateLabelManufacturingPage/components/MapSection";
 import { customelabelhero } from "./data/customlabelHero";
 import LabelOverviewSection from "./components/LabelOverviewSection";
 import { labeloverview, labelproperty, labelprotocol } from "@/assets";
-import LabelProcessSection from "../PrivateLabelManufacturingPage/components/LabelProcessSection";
+
 import LabelProtocolSection from "./components/LabelProtocolSection";
 import WhatWeManufactureGridSection from "../PrivateLabelManufacturingPage/components/WhatWeManufactureGridSection";
 import LabelProprietaryCapabilities from "./components/LabelProprietaryCapabilities";

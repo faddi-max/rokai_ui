@@ -78,7 +78,13 @@ import customlabel from './customlabelhero.png'
 import labeloverview from './labeloverview.png'
 import labelprotocol from './labelprotocol.png'
 import labelproperty from './labelproperty.png'
+import shippingoverview from './shippingoverview.png'
+import shippingprotocol from './shippingprotocol.png'
+import shippingproperty from './shippingproperty.png'
 export {
+  shippingoverview,
+  shippingprotocol,
+  shippingproperty,
   labelproperty,
   labelprotocol,
   labeloverview,
