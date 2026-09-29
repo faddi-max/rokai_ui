@@ -273,7 +273,9 @@ export const navLinks: NavLink[] = [
   },
 
   { label: "About Us", href: "/about" },
-  { label: "Contact", href: "/contact" },
+
   { label: "Blogs", href: "/blogs" },
   { label: "Resources", href: "/resources" },
+    { label: "Contact", href: "/contact" },
+  { label: "Privacy", href: "/legal" },
 ];

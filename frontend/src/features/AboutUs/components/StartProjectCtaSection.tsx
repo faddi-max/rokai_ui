@@ -7,13 +7,18 @@ import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
 /*  Types — API-ready                                                         */
 /* -------------------------------------------------------------------------- */
 
+export interface StartProjectCta {
+  label: string;
+  href: string;
+}
+
 export interface StartProjectCtaSectionProps {
   eyebrow?: string;
   title?: string;
   highlight?: string;
   description?: string;
-  ctaLabel?: string;
-  ctaHref?: string;
+  primaryCta?: StartProjectCta;
+  secondaryCta?: StartProjectCta;
   watermark?: string;
 }
 
@@ -26,8 +31,8 @@ export default function StartProjectCtaSection({
   title = "TELL US WHAT YOU WANT",
   highlight = "MADE.",
   description = "Have a product idea, specification or existing range? Start the conversation with ROKAI and map the right manufacturing route.",
-  ctaLabel = "Request a quote",
-  ctaHref = "/contact",
+  primaryCta = { label: "Request a quote", href: "/contact" },
+  secondaryCta,
   watermark = "ROKAI",
 }: StartProjectCtaSectionProps) {
   return (
@@ -69,13 +74,25 @@ export default function StartProjectCtaSection({
           {description}
         </p>
 
-        <a
-          href={ctaHref}
-          className="mt-8 inline-flex h-[37px] w-fit items-center gap-[10px] rounded-[6px] bg-[#E63946] px-[13px] font-space-grotesk text-[12px] font-medium text-white transition-colors hover:bg-[#c92e3a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-        >
-          {ctaLabel}
-          <AnimatedArrow icon={ArrowUpRight} className="h-3.5 w-3.5 shrink-0" />
-        </a>
+        <div className="mt-8 flex flex-wrap items-center gap-4">
+          {secondaryCta && (
+            <a
+              href={secondaryCta.href}
+              className="inline-flex h-[37px] w-fit items-center gap-[10px] rounded-[6px] border border-white/15 bg-white px-[13px] font-space-grotesk text-[12px] font-medium text-black transition-colors hover:bg-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              {secondaryCta.label}
+              <AnimatedArrow icon={ArrowUpRight} className="h-3.5 w-3.5 shrink-0" />
+            </a>
+          )}
+
+          <a
+            href={primaryCta.href}
+            className="inline-flex h-[37px] w-fit items-center gap-[10px] rounded-[6px] bg-[#E63946] px-[13px] font-space-grotesk text-[12px] font-medium text-white transition-colors hover:bg-[#c92e3a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          >
+            {primaryCta.label}
+            <AnimatedArrow icon={ArrowUpRight} className="h-3.5 w-3.5 shrink-0" />
+          </a>
+        </div>
       </motion.div>
     </div>
   );

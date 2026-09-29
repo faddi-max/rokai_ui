@@ -208,7 +208,7 @@ const Footer = () => {
         <div className="mt-8 flex flex-col gap-4 border-t border-[#222] pt-6 font-space-grotesk text-[14px] font-light leading-[18px] text-white sm:flex-row sm:items-center sm:justify-between">
           <p>2026 ROKAI CORP. All Rights Reserved.</p>
           <nav aria-label="Legal" className="flex flex-wrap gap-4">
-            <Link to="/contact" className="transition-colors hover:text-[#E51B24]">
+            <Link to="/legal" className="transition-colors hover:text-[#E51B24]">
               Privacy
             </Link>
             <Link to="/contact" className="transition-colors hover:text-[#E51B24]">
