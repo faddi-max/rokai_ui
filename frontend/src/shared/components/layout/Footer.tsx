@@ -77,9 +77,17 @@ const footerColumns: FooterColumn[] = [
       { label: "Our Manufacturing", href: "/services#capabilities" },
       { label: "Sustainability", href: "/services" },
       { label: "Blogs", href: "/blogs" },
-      { label: "About Us", href: "/programs" },
+      { label: "About Us", href: "/about" },
       { label: "News", href: "/blogs" },
       { label: "Contact Us", href: "/contact" },
+    ],
+  },
+  {
+    title: "Support",
+    links: [
+      { label: "Privacy Policy", href: "/legal/privacy-policy" },
+      { label: "Shipping Policy", href: "/legal/shipping-policy" },
+      { label: "Terms & Conditions", href: "/legal/terms-conditions" },
     ],
   },
 ];
@@ -138,7 +146,7 @@ const Footer = () => {
   return (
     <footer className="bg-black text-white">
       <div className="mx-auto w-full max-w-[1250px] px-5 pb-8 pt-12 sm:px-8 md:pt-14 lg:px-0 lg:pt-16">
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.35fr_repeat(4,1fr)] lg:gap-0">
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.35fr_repeat(5,1fr)] lg:gap-0">
           <div className="lg:pr-12">
             <Link to="/" className="inline-block">
               <img src={logo} alt="Rokai" className="h-auto w-[150px]" />
@@ -207,17 +215,6 @@ const Footer = () => {
 
         <div className="mt-8 flex flex-col gap-4 border-t border-[#222] pt-6 font-space-grotesk text-[14px] font-light leading-[18px] text-white sm:flex-row sm:items-center sm:justify-between">
           <p>2026 ROKAI CORP. All Rights Reserved.</p>
-          <nav aria-label="Legal" className="flex flex-wrap gap-4">
-            <Link to="/legal" className="transition-colors hover:text-[#E51B24]">
-              Privacy
-            </Link>
-            <Link to="/contact" className="transition-colors hover:text-[#E51B24]">
-              Terms
-            </Link>
-            <Link to="/contact" className="transition-colors hover:text-[#E51B24]">
-              Cookies
-            </Link>
-          </nav>
         </div>
       </div>
     </footer>
