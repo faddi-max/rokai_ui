@@ -88,7 +88,13 @@ import aboutenquiry from './aboutenquiry.png'
 import aboutpartner from './aboutPartner.png'
 import storybehind from './storybehind.jpg'
 import bespokehero from './bespokehero.png'
+import customizationShort from './customizationShort.png'
+import customizationGi from './customizationGi.png'
+import customizationRushguard from './customizationRushguard.png'
 export {
+  customizationShort,
+  customizationGi,
+  customizationRushguard,
   bespokehero,
   storybehind,
   aboutpartner,
