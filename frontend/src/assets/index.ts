@@ -87,7 +87,9 @@ import aboutprocess from './aboutprocess.png'
 import aboutenquiry from './aboutenquiry.png'
 import aboutpartner from './aboutPartner.png'
 import storybehind from './storybehind.jpg'
+import bespokehero from './bespokehero.png'
 export {
+  bespokehero,
   storybehind,
   aboutpartner,
   aboutenquiry,

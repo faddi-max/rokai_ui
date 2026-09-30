@@ -1,3 +1,4 @@
+import SectionGlow from "@/shared/components/layout/SectionGlow";
 import { motion } from "framer-motion";
 import { Star, Quote } from "lucide-react";
 
@@ -40,7 +41,7 @@ const StarRow = () => (
 
 const ClientFeedbackSection = () => {
   return (
-    <section className="w-full bg-black">
+    <SectionGlow className="w-full bg-black">
       <div className="mx-auto w-full max-w-[1250px] px-5 py-16 sm:px-8 md:py-20 lg:px-0 lg:py-28">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <motion.div
@@ -175,7 +176,7 @@ const ClientFeedbackSection = () => {
           </div>
         </div>
       </div>
-    </section>
+    </SectionGlow>
   );
 };
 
