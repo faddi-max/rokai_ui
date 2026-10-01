@@ -58,16 +58,18 @@ export function sanitizeImageUrl(url: string | null | undefined): string {
     return cleanUrl;
   }
 
-  // 2. If it points to local dev server (127.0.0.1 or localhost), replace with PUBLIC_HOST using http://
+  // 2. If it points to local dev server (127.0.0.1 or localhost), replace with PUBLIC_HOST
   if (/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?/i.test(cleanUrl)) {
     if (PUBLIC_HOST) {
-      return cleanUrl.replace(/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?/i, `http://${PUBLIC_HOST}`);
+      const protocol = API_BASE_URL.startsWith("https") ? "https" : "http";
+      return cleanUrl.replace(/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?/i, `${protocol}://${PUBLIC_HOST}`);
     }
   }
 
-  // 3. Prepend http://${PUBLIC_HOST} for relative /storage paths
+  // 3. Prepend protocol://${PUBLIC_HOST} for relative /storage paths
   if (cleanUrl.startsWith("/storage/") && PUBLIC_HOST) {
-    return `http://${PUBLIC_HOST}${cleanUrl}`;
+    const protocol = API_BASE_URL.startsWith("https") ? "https" : "http";
+    return `${protocol}://${PUBLIC_HOST}${cleanUrl}`;
   }
 
   return cleanUrl;

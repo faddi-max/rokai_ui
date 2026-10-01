@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import HeroSection from "@/shared/components/sections/HeroSection";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
-import { categoriesService } from "@/shared/api/services/categoriesService";
+import { servicesService } from "@/shared/api/services/servicesService";
 import { DataLoader, PageLoader } from "@/shared/components/feedback";
 
 import HowWeWorkSection from "@/features/categories/data/HowWeWorkSection";
@@ -21,12 +21,9 @@ import WhoWeManufactureForSection from "./components/WhoWeManufactureForSection"
 import MapSection from "./components/MapSection";
 import DefineBrandPresenceSection from "./components/DefineBrandPresenceSection";
 
-
-
-
 export default function PrivateLabelManufacturingPage() {
   const { data, loading, error, refetch } = useAsyncData(() =>
-    categoriesService.ServicesPrivateLabelManufacture()
+    servicesService.getServicesPageData("private-label-manufacturing")
   );
 
   return (

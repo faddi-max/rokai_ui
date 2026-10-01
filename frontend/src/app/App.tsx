@@ -33,6 +33,7 @@ const HomePage = lazy(() => import("@/features/home/HomePage"));
 const CategoriesPage = lazy(() => import("@/features/categories/CategoriesPage"));
 const BlogsPage = lazy(() => import("@/features/blogs/BlogsPage"));
 const ProgramsPage = lazy(() => import("@/features/programs/affiliate-program/Affiliate-page"));
+const ServicesPage = lazy(() => import("@/features/services/ServicesPage"));
 
 
 const NotFoundPage = () => {
@@ -114,9 +115,8 @@ export default function App() {
             <Route path="/about" element={<AboutUs />} />
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/categories/:slug" element={<CategoriesPage />} />
-            <Route path="/categories/:parentSlug/:slug" element={<CategoriesPage />} />
-            <Route path="/services" element={<NotFoundPage />} />
-            {/* <Route path="/programs" element={<AmbassadorProgramPage />} /> */}
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/services/:slug" element={<ServicesPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/legal/:slug" element={<PrivacyPolicy />} />
                <Route path="/legal" element={<PrivacyPolicy />} />

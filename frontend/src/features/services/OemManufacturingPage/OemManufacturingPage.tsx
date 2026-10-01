@@ -9,10 +9,19 @@ import DefineBrandPresenceSection from "../PrivateLabelManufacturingPage/compone
 import FAQSection from "@/features/home/components/FAQSection";
 import MapSection from "../PrivateLabelManufacturingPage/components/MapSection";
 import ProprietaryCapabilitiesSection from "./components/ProprietaryCapabilitiesSection";
+import { useAsyncData } from "@/shared/hooks/useAsyncData";
+import { servicesService } from "@/shared/api/services/servicesService";
 
-export const OemManufacturingPage = () => (
-  <>
-    <HeroSection {...oemHero} />
+export const OemManufacturingPage = () => {
+  const { data } = useAsyncData(() =>
+    servicesService.getServicesPageData("oem-manufacturing")
+  );
+  const hero = data?.hero || oemHero;
+  console.log("OEM Manufacturing Page Data:", data); // Debugging line to check the fetched data
+
+  return (
+    <>
+      <HeroSection {...hero} />
     <OEMOverviewSection image={oemhero}/>
      <IndustrialProtocolSection image={oemindustry} />
     <WhatWeManufactureGridSection />
@@ -26,4 +35,6 @@ export const OemManufacturingPage = () => (
             <FAQSection />
             <MapSection />
   </>
-);
+  );
+};
+

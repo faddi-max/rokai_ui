@@ -17,6 +17,7 @@ import Button from "@/shared/components/ui/Button";
 import { logo } from "@/assets";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
 import { categoriesService } from "@/shared/api/services/categoriesService";
+import { servicesService } from "@/shared/api/services/servicesService";
 
 export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState<boolean>(false);
@@ -35,6 +36,10 @@ export default function Navbar() {
 
   const { data: dynamicNavCategories } = useAsyncData(() =>
     categoriesService.getNavCategories()
+  );
+
+  const { data: dynamicNavServices } = useAsyncData(() =>
+    servicesService.getNavServices()
   );
 
   useEffect(() => {
@@ -62,6 +67,15 @@ export default function Navbar() {
     dynamicNavCategories && dynamicNavCategories.length > 0
       ? dynamicNavCategories
       : categoriesLink?.categories;
+
+  const servicesLink = navLinks.find(
+    (link) => link.label === "Services"
+  );
+
+  const activeServices =
+    dynamicNavServices && dynamicNavServices.length > 0
+      ? dynamicNavServices
+      : servicesLink?.dropdownItems;
 
   return (
     <header
@@ -154,10 +168,10 @@ export default function Navbar() {
                     )}
                   </div>
 
-                  {/* PROGRAMS SPECIAL DROPDOWN */}
+                  {/* PROGRAMS & SERVICES SPECIAL DROPDOWN */}
                   {(isPrograms || isServices) &&
                     isDropdownOpen &&
-                    link.dropdownItems?.length && (
+                    Boolean(isServices ? activeServices?.length : link.dropdownItems?.length) && (
                       <div className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-[24px]">
                         <div className="w-[292px] rounded-[14px] border border-white/[0.04] bg-[#130E0F] p-[13px] shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
                           {/* IMAGE PREVIEW — only visible while hovering a specific link */}
@@ -191,9 +205,9 @@ export default function Navbar() {
                             )}
                           </div>
 
-                          {/* PROGRAM LIST */}
+                          {/* PROGRAM / SERVICE LIST */}
                           <div>
-                            {link.dropdownItems.map(
+                            {(isServices ? activeServices : link.dropdownItems)?.map(
                               (program) => {
                                 const isHovered =
                                   hoveredProgram?.label ===
@@ -252,6 +266,7 @@ export default function Navbar() {
                               Explore all Programs
                             </Link>
                           )}
+                         
                         </div>
                       </div>
                     )}
@@ -580,11 +595,11 @@ export default function Navbar() {
                     )}
                   </div>
 
-                  {/* PROGRAMS MOBILE MENU — no hover on touch, so each item shows its own image inline */}
+                  {/* PROGRAMS & SERVICES MOBILE MENU — no hover on touch, so each item shows its own image inline */}
                   {(isPrograms || isServices) && isExpanded && (
                     <div className="mb-4 mt-2">
                       <div className="rounded-[10px] bg-[#130E0F] p-[10px]">
-                        {link.dropdownItems?.map((program) => (
+                        {(isServices ? activeServices : link.dropdownItems)?.map((program) => (
                           <Link
                             key={program.label}
                             to={program.href}
@@ -619,6 +634,7 @@ export default function Navbar() {
                             Explore all Programs
                           </Link>
                         )}
+                        
                       </div>
                     </div>
                   )}

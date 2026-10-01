@@ -1,5 +1,6 @@
 import { Play, ArrowUpRight } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { scalingBrands } from "@/features/home/data/scalingBrands";
 import { gsap, revealLeft, revealRight, revealVisible, useGSAP } from "@/shared/animations";
 import Button from "@/shared/components/ui/Button";
@@ -7,7 +8,19 @@ import { usePrefersReducedMotion } from "@/shared/hooks/usePrefersReducedMotion"
 
 export default function ScalingBrands() {
   const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [hasStarted, setHasStarted] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
+
+  const handlePlay = () => {
+    if (videoRef.current) {
+      if (videoRef.current.ended) {
+        videoRef.current.currentTime = 0;
+      }
+      void videoRef.current.play();
+      setHasStarted(true);
+    }
+  };
 
   useGSAP(
     () => {
@@ -44,32 +57,59 @@ export default function ScalingBrands() {
       <div className="relative mx-auto grid max-w-[1512px] items-center gap-10 px-6 md:px-10 lg:grid-cols-2 lg:gap-14 lg:px-16">
         <div
           data-scaling-model
-          className="group relative mx-auto w-full max-w-[560px] overflow-hidden rounded-2xl border border-white/10 shadow-2xl transition-all duration-500 hover:border-[#E51B24]/40"
+          className="group relative mx-auto h-[360px] w-full max-w-[560px] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl transition-all duration-500 hover:border-[#E51B24]/40 sm:h-[420px] lg:h-[480px]"
         >
-          <img
-  src={scalingBrands.videoThumbnail}
-  alt={scalingBrands.videoThumbnailAlt}
-  className="max-h-[480px] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-/>
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          {scalingBrands.videoUrl && (
+            <video
+              ref={videoRef}
+              src={scalingBrands.videoUrl}
+              poster={scalingBrands.videoThumbnail}
+              controls={hasStarted}
+              playsInline
+              preload="metadata"
+              onEnded={() => setHasStarted(false)}
+              className="h-full w-full object-cover"
+            />
+          )}
 
-          <a
-            href={scalingBrands.videoUrl}
-            aria-label="Play video"
-            className="absolute inset-0 flex flex-col items-center justify-center gap-3"
-          >
-            <div className="relative flex items-center justify-center">
-              {!prefersReducedMotion && (
-                <span className="absolute inset-0 animate-ping rounded-full bg-[#E51B24]/40 opacity-75" />
-              )}
-              <span className="relative flex h-12 w-12 items-center justify-center rounded-full bg-[#E51B24] shadow-[0_0_20px_rgba(229,27,36,0.6)] transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
-                <Play size={18} className="ml-0.5 fill-white text-white" />
-              </span>
-            </div>
-            <span className="font-space-grotesk text-xs font-medium uppercase tracking-widest text-white transition-colors duration-300 group-hover:text-[#E51B24]">
-              {scalingBrands.watchLabel ?? "Watch Our Story"}
-            </span>
-          </a>
+          <AnimatePresence>
+            {!hasStarted && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="absolute inset-0 h-full w-full"
+              >
+                <img
+                  src={scalingBrands.videoThumbnail}
+                  alt={scalingBrands.videoThumbnailAlt}
+                  className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                />
+
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+                <button
+                  type="button"
+                  onClick={handlePlay}
+                  aria-label="Play video"
+                  className="absolute inset-0 flex h-full w-full cursor-pointer flex-col items-center justify-center gap-3 outline-none focus-visible:ring-2 focus-visible:ring-[#E51B24]"
+                >
+                  <div className="relative z-10 flex items-center justify-center">
+                    {!prefersReducedMotion && (
+                      <span className="absolute inset-0 animate-ping rounded-full bg-[#E51B24]/40 opacity-75" />
+                    )}
+                    <span className="relative flex h-12 w-12 items-center justify-center rounded-full bg-[#E51B24] shadow-[0_0_20px_rgba(229,27,36,0.6)] transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
+                      <Play size={18} className="ml-0.5 fill-white text-white" />
+                    </span>
+                  </div>
+                  <span className="relative z-10 font-space-grotesk text-xs font-medium uppercase tracking-widest text-white transition-colors duration-300 group-hover:text-[#E51B24]">
+                    {scalingBrands.watchLabel ?? "Watch Our Story"}
+                  </span>
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <div data-scaling-content className="flex flex-col gap-4">

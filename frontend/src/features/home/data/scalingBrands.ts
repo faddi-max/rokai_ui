@@ -1,9 +1,9 @@
-import { scalingBrandsImage } from "@/assets";
+import { scalingBrandsImage, rokaiManufacturingVideo } from "@/assets";
 
 export const scalingBrands = {
   videoThumbnail: scalingBrandsImage,
   videoThumbnailAlt: "ROKAI factory team producing custom BJJ apparel and fightwear",
-  videoUrl: "#",
+  videoUrl: rokaiManufacturingVideo,
   eyebrow: "Custom Fightwear Manufacturing",
   headingLine1: "Your Product.",
   headingLine2: "Your Brand.",
