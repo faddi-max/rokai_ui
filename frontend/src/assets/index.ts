@@ -94,7 +94,15 @@ import customizationRushguard from './customizationRushguard.png'
 import sizeChartMen from './sizeChartMen.png'
 import sizeChartWomen from './sizeChartWomen.png'
 import sizeChartKids from './sizeChartKids.png'
+import jackets from './jackets.png'
+import pants from './pants.png'
+import rashguards from './rashguards.png'
+import rokaiManufacturingVideo from './rokai manufacturing video.mp4'
 export {
+  rokaiManufacturingVideo,
+  jackets,
+  pants,
+  rashguards,
   sizeChartMen,
   sizeChartWomen,
   sizeChartKids,

@@ -8,7 +8,7 @@ interface CapabilityCardProps {
 }
 
 const CapabilityCard = ({ item }: CapabilityCardProps) => {
-  const { image, title, subtitle, ctaText, ctaHref } = item;
+  const { image, title, titleHref, subtitle, ctaText, ctaHref } = item;
 
   return (
     <article className="group relative aspect-[3/4] w-full overflow-hidden rounded-2xl">
@@ -23,7 +23,7 @@ const CapabilityCard = ({ item }: CapabilityCardProps) => {
 
       <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1.5 p-5 sm:p-6">
         <h3 className="font-space-grotesk text-[17px] font-bold leading-tight text-[#E51B24] sm:text-lg">
-          {title}
+          {titleHref ? <a href={titleHref}>{title}</a> : title}
         </h3>
         <p className="font-space-grotesk text-[12px] font-light leading-snug text-white/75 sm:text-[13px]">
           {subtitle}

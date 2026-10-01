@@ -9,6 +9,7 @@ export interface CapabilityItem {
   id: string;
   image: string;
   title: string;
+  titleHref?: string;
   subtitle: string;
   ctaText: string;
   ctaHref: string;
@@ -24,35 +25,36 @@ export const capabilitiesHeading = {
 
 export const capabilities: CapabilityItem[] = [
   {
-    id: "custom-development",
+    id: "flagship-fabrics",
     image: capabilityFabricsImage,
-    title: "Custom Development",
-    subtitle: "Fit, fabric, construction and finishing developed around your requirements.",
-    ctaText: "See How We Build",
-    ctaHref: "/custom-fightwear-manufacturing/",
+    title: "BJJ Flagships Fabrics",
+    titleHref: "/services/bjj-apparel-fabrics",
+    subtitle: "Premium fabrics engineered for BJJ apparel, delivering unmatched durability, comfort and performance.",
+    ctaText: "Explore Fabrics",
+    ctaHref: "/services/bjj-apparel-fabrics",
   },
   {
-    id: "brand-control",
-    image: capabilityCustomizationImage,
-    title: "Brand Control",
-    subtitle: "Custom colors, graphics, labels, patches, embroidery and packaging.",
-    ctaText: "Customize Your Brand",
-    ctaHref: "/custom-fightwear-manufacturing/",
-  },
-  {
-    id: "scalable-production",
+    id: "catalogue",
     image: capabilityCatalogueImage,
-    title: "Scalable Production",
-    subtitle: "Approved samples move into consistent bulk manufacturing.",
-    ctaText: "See How We Scale",
-    ctaHref: "/custom-fightwear-manufacturing/",
+    title: "Catalogue",
+    subtitle: "Discover a complete range of BJJ apparel, jiu jitsu gear, and custom fightwear.",
+    ctaText: "View Catalogue",
+    ctaHref: "/categories",
   },
-    {
-    id: "brand-control",
+  {
+    id: "bespoke-customization",
     image: capabilityCustomizationImage,
-    title: "Brand Control",
-    subtitle: "Custom colors, graphics, labels, patches, embroidery and packaging.",
-    ctaText: "Customize Your Brand",
-    ctaHref: "/custom-fightwear-manufacturing/",
+    title: "Bespoke & Customizations",
+    subtitle: "Create fully customized BJJ apparel and jiu jitsu uniforms with unique designs and branding.",
+    ctaText: "Customize Now",
+    ctaHref: "/services/bespoke-customization",
+  },
+  {
+    id: "size-guideline",
+    image: capabilitySizeGuideImage,
+    title: "Size Guideline",
+    subtitle: "Find the right fit with our easy-to-follow BJJ sizing guide for apparel and uniforms.",
+    ctaText: "Check Sizes",
+    ctaHref: "/services/bjj-apparel-size-chart",
   },
 ];

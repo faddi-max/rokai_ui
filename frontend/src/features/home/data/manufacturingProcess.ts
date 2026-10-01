@@ -1,4 +1,4 @@
-import { manufacturingProcessImage } from "@/assets";
+import { manufacturingProcessImage, rokaiManufacturingVideo } from "@/assets";
 
 export const manufacturingProcess = {
   eyebrow: "Manufacturing Process",
@@ -7,5 +7,5 @@ export const manufacturingProcess = {
   image: manufacturingProcessImage,
   description:
     "A controlled six-stage manufacturing workflow takes your combat sports apparel from requirements to approved samples, production and international delivery.",
-  videoUrl: undefined as string | undefined,
+  videoUrl: rokaiManufacturingVideo,
 };

@@ -1,6 +1,6 @@
 import { Play } from "lucide-react";
-import { motion } from "framer-motion";
-import { useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useRef, useState } from "react";
 import SectionEyebrow from "./SectionEyebrow";
 import { manufacturingProcess } from "@/features/home/data/manufacturingProcess";
 import { gsap, motion as gsapMotion, revealLeft, revealVisible, useGSAP } from "@/shared/animations";
@@ -8,9 +8,21 @@ import { usePrefersReducedMotion } from "@/shared/hooks/usePrefersReducedMotion"
 
 const ManufacturingProcessSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [hasStarted, setHasStarted] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
   const { eyebrow, titleTop, titleBottom, description, image, videoUrl } =
     manufacturingProcess;
+
+  const handlePlay = () => {
+    if (videoRef.current) {
+      if (videoRef.current.ended) {
+        videoRef.current.currentTime = 0;
+      }
+      void videoRef.current.play();
+      setHasStarted(true);
+    }
+  };
 
   useGSAP(
     () => {
@@ -97,45 +109,68 @@ const ManufacturingProcessSection = () => {
         </div>
       </div>
 
-      {/* Video / image block */}
-      <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-[68px]">
-        <motion.button
-          type="button"
-          onClick={() => videoUrl && window.open(videoUrl, "_blank")}
-          whileHover="hover"
-          initial="rest"
-          animate="rest"
-          className="group relative aspect-[16/9] w-full overflow-hidden text-left outline-none focus-visible:ring-2 focus-visible:ring-[#E51B24] md:aspect-auto md:h-[380px] lg:h-[480px]"
-        >
-          <motion.img
-            src={image}
-            alt={`${titleTop} ${titleBottom}`}
-            variants={{ rest: { scale: 1 }, hover: { scale: 1.03 } }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="absolute inset-0 h-full w-full object-cover object-top"
-          />
+      {/* Video block */}
+      <div className="mx-auto w-full max-w-[1440px] px-6 pb-16 sm:px-10 sm:pb-20 lg:px-[68px] lg:pb-24">
+        <div className="group relative aspect-video w-full overflow-hidden rounded-md bg-black text-left">
+          {videoUrl ? (
+            <video
+              ref={videoRef}
+              src={videoUrl}
+              poster={image}
+              controls={hasStarted}
+              playsInline
+              preload="metadata"
+              onEnded={() => setHasStarted(false)}
+              className={`h-full w-full object-contain transition-transform duration-500 ease-out ${
+                !hasStarted ? "group-hover:scale-[1.02]" : ""
+              }`}
+            />
+          ) : (
+            <motion.img
+              src={image}
+              alt={`${titleTop} ${titleBottom}`}
+              variants={{ rest: { scale: 1 }, hover: { scale: 1.02 } }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="h-full w-full object-cover object-top"
+            />
+          )}
 
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%)",
-            }}
-          />
+          <AnimatePresence>
+            {!hasStarted && (
+              <motion.button
+                type="button"
+                onClick={handlePlay}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                aria-label="Watch full Process"
+                className="absolute inset-0 flex h-full w-full cursor-pointer flex-col items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-[#E51B24]"
+              >
+                <div
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    background:
+                      "radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%)",
+                  }}
+                />
 
-          <motion.div
-            variants={{ rest: { scale: 1 }, hover: { scale: 1.05 } }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
-            className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-3"
-          >
-            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#E51B24] shadow-[0_8px_24px_rgba(229,27,36,0.45)] sm:h-[72px] sm:w-[72px]">
-              <Play className="ml-0.5 h-6 w-6 fill-white text-white sm:h-7 sm:w-7" />
-            </span>
-            <span className="font-sans text-sm text-white/90 sm:text-base">
-              Watch full Process
-            </span>
-          </motion.div>
-        </motion.button>
+                <motion.div
+                  variants={{ rest: { scale: 1 }, hover: { scale: 1.05 } }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  className="relative z-10 flex flex-col items-center gap-3"
+                >
+                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#E51B24] shadow-[0_8px_24px_rgba(229,27,36,0.45)] sm:h-[72px] sm:w-[72px]">
+                    <Play className="ml-0.5 h-6 w-6 fill-white text-white sm:h-7 sm:w-7" />
+                  </span>
+                  <span className="font-sans text-sm text-white/90 sm:text-base">
+                    Watch full Process
+                  </span>
+                </motion.div>
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </section>
   );
