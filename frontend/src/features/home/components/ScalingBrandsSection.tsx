@@ -59,7 +59,7 @@ export default function ScalingBrands() {
           data-scaling-model
           className="group relative mx-auto h-[360px] w-full max-w-[560px] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl transition-all duration-500 hover:border-[#E51B24]/40 sm:h-[420px] lg:h-[480px]"
         >
-          {scalingBrands.videoUrl && (
+          {/* {scalingBrands.videoUrl && (
             <video
               ref={videoRef}
               src={scalingBrands.videoUrl}
@@ -70,7 +70,7 @@ export default function ScalingBrands() {
               onEnded={() => setHasStarted(false)}
               className="h-full w-full object-cover"
             />
-          )}
+          )} */}
 
           <AnimatePresence>
             {!hasStarted && (

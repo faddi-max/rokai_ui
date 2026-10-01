@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import HeroSection from "@/shared/components/sections/HeroSection";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
-import { categoriesService } from "@/shared/api/services/categoriesService";
+import { programsService } from "@/shared/api/services/programsService";
 import { DataLoader, PageLoader } from "@/shared/components/feedback";
 import ProgramOverviewSection from "./components/ProgramOverviewSection";
 import PartnershipSection from "./components/PartnershipSection";
@@ -15,7 +15,7 @@ import { ambassadorProgramOverview } from "./data/programData";
 import HeroTrustBadges from "@/features/home/components/HeroTrustBadges";
 export default function AmbassadorProgramPage() {
   const { data, loading, error, refetch } = useAsyncData(() =>
-    categoriesService.getAmbassadorPageData()
+    programsService.getProgramPageData("ambassador")
   );
 
   return (

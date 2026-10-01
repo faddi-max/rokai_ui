@@ -22,6 +22,7 @@ import {
   localServices,
   getServiceSlug,
 } from "@/shared/api/services/servicesService";
+import { programsService } from "@/shared/api/services/programsService";
 
 export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState<boolean>(false);
@@ -44,6 +45,9 @@ export default function Navbar() {
 
   const { data: dynamicNavServices } = useAsyncData(() =>
     servicesService.getNavServices()
+  );
+  const { data: dynamicNavPrograms } = useAsyncData(() =>
+    programsService.getNavPrograms()
   );
 
   useEffect(() => {
@@ -81,6 +85,15 @@ export default function Navbar() {
       ? dynamicNavServices
       : servicesLink?.dropdownItems;
 
+  const programsLink = navLinks.find(
+    (link) => link.label === "Programs"
+  );
+
+  const activePrograms =
+    dynamicNavPrograms && dynamicNavPrograms.length > 0
+      ? dynamicNavPrograms
+      : programsLink?.dropdownItems;
+
   return (
     <header
       ref={navRef}
@@ -116,6 +129,11 @@ export default function Navbar() {
               const isPrograms = link.label === "Programs";
               const isServices = link.label === "Services";
               const isCategories = link.label === "Categories";
+              const activeDropdownItems = isServices
+                ? activeServices
+                : isPrograms
+                  ? activePrograms
+                  : link.dropdownItems;
 
               return (
                 <li
@@ -175,8 +193,8 @@ export default function Navbar() {
                   {/* PROGRAMS & SERVICES SPECIAL DROPDOWN */}
                   {(isPrograms || isServices) &&
                     isDropdownOpen &&
-                    Boolean(isServices ? activeServices?.length : link.dropdownItems?.length) && (() => {
-                      const dropdownItems = (isServices ? activeServices : link.dropdownItems) || [];
+                    Boolean(activeDropdownItems?.length) && (() => {
+                      const dropdownItems = activeDropdownItems || [];
                       const currentProgram = hoveredProgram || dropdownItems[0] || null;
 
                       return (
@@ -526,6 +544,11 @@ export default function Navbar() {
               const isPrograms = link.label === "Programs";
               const isServices = link.label === "Services";
               const isCategories = link.label === "Categories";
+              const activeDropdownItems = isServices
+                ? activeServices
+                : isPrograms
+                  ? activePrograms
+                  : link.dropdownItems;
 
               return (
                 <li
@@ -595,7 +618,7 @@ export default function Navbar() {
                   {(isPrograms || isServices) && isExpanded && (
                     <div className="mb-4 mt-2">
                       <div className="rounded-[10px] bg-[#130E0F] p-[10px]">
-                        {(isServices ? activeServices : link.dropdownItems)?.map((program) => (
+                        {activeDropdownItems?.map((program) => (
                           <Link
                             key={program.label}
                             to={program.href}
