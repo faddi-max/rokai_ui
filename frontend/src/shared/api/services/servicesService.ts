@@ -41,6 +41,14 @@ export const PUBLIC_HOST = (() => {
   }
 })();
 
+export const SERVER_BASE_URL = (() => {
+  try {
+    return new URL(API_BASE_URL).origin;
+  } catch {
+    return "";
+  }
+})();
+
 export function sanitizeImageUrl(
   url: string | null | undefined,
   fallback: string = servicemanufacturehero
@@ -56,18 +64,27 @@ export function sanitizeImageUrl(
     return cleanUrl;
   }
 
-  // 2. If it points to local dev server (127.0.0.1 or localhost), replace with PUBLIC_HOST
+  // 2. If it points to local dev server (127.0.0.1 or localhost), replace with SERVER_BASE_URL / PUBLIC_HOST
   if (/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?/i.test(cleanUrl)) {
+    if (SERVER_BASE_URL) {
+      return cleanUrl.replace(/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?/i, SERVER_BASE_URL);
+    }
     if (PUBLIC_HOST) {
       const protocol = API_BASE_URL.startsWith("https") ? "https" : "http";
       return cleanUrl.replace(/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?/i, `${protocol}://${PUBLIC_HOST}`);
     }
   }
 
-  // 3. Prepend host for relative /storage paths
-  if (cleanUrl.startsWith("/storage/") && PUBLIC_HOST) {
-    const protocol = API_BASE_URL.startsWith("https") ? "https" : "http";
-    return `${protocol}://${PUBLIC_HOST}${cleanUrl}`;
+  // 3. Prepend origin / host for relative /storage paths (or any relative path)
+  if ((cleanUrl.startsWith("/storage/") || cleanUrl.startsWith("storage/")) && (SERVER_BASE_URL || PUBLIC_HOST)) {
+    const base = SERVER_BASE_URL || `${API_BASE_URL.startsWith("https") ? "https" : "http"}://${PUBLIC_HOST}`;
+    const path = cleanUrl.startsWith("/") ? cleanUrl : `/${cleanUrl}`;
+    return `${base}${path}`;
+  }
+
+  if (cleanUrl.startsWith("/") && (SERVER_BASE_URL || PUBLIC_HOST)) {
+    const base = SERVER_BASE_URL || `${API_BASE_URL.startsWith("https") ? "https" : "http"}://${PUBLIC_HOST}`;
+    return `${base}${cleanUrl}`;
   }
 
   return cleanUrl;
@@ -237,9 +254,14 @@ export const servicesService = {
       await Promise.resolve();
       try {
         const raw = await apiClient.get<ApiServiceItem[]>("/services", { forceRefresh });
+
         const mapped = Array.isArray(raw) && raw.length > 0
-          ? raw.map(mapApiServiceToService)
+          ? raw
+              .slice()
+              .sort((a, b) => Number(a.id) - Number(b.id))
+              .map(mapApiServiceToService)
           : localServices;
+
         servicesCache = { data: mapped, timestamp: Date.now() };
         return mapped;
       } catch (err) {

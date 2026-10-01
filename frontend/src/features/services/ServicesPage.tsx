@@ -2,7 +2,12 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import HeroSection from "@/shared/components/sections/HeroSection";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
-import { servicesService, type ServiceItem } from "@/shared/api/services/servicesService";
+import {
+  servicesService,
+  localServices,
+  type ServiceItem,
+} from "@/shared/api/services/servicesService";
+import { servicemanufacturehero } from "@/assets";
 import { DataLoader, PageLoader } from "@/shared/components/feedback";
 import WhyRokaiSection from "@/shared/components/sections/WhyRokaiSection";
 import FAQSection from "@/features/home/components/FAQSection";
@@ -69,6 +74,12 @@ export default function ServicesPage() {
                           <img
                             src={item.image}
                             alt={item.imageAlt || item.title}
+                            onError={(e) => {
+                              const fallback =
+                                localServices.find((s) => s.slug === item.slug)?.image ||
+                                servicemanufacturehero;
+                              (e.currentTarget as HTMLImageElement).src = fallback;
+                            }}
                             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-[#130E0F] via-transparent to-transparent" />

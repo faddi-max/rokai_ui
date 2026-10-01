@@ -37,7 +37,7 @@ export default function ShippingLogisticsPage() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="relative w-full"
         >
-            <HeroSection {...shippinglabelhero} />
+            <HeroSection {...(pageData?.hero || shippinglabelhero)} />
             <ShippingOverviewSection image={shippingoverview} />
             <ShippingProtocolSection image={shippingprotocol} />
             <WhatWeManufactureGridSection />

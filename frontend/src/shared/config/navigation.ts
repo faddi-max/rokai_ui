@@ -36,7 +36,6 @@ import {
   ambassadorProgramhero,
   sponserhero,
   competitionGiCategoryImage,
-  labelmanufacture1,
   manufactureProduct,
   oemhero,
   servicemanufacturehero,

@@ -14,10 +14,14 @@ import {
   type CategoryLink,
 } from "@/shared/config/navigation";
 import Button from "@/shared/components/ui/Button";
-import { logo } from "@/assets";
+import { logo, servicemanufacturehero, affiliateProgramhero } from "@/assets";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
 import { categoriesService } from "@/shared/api/services/categoriesService";
-import { servicesService } from "@/shared/api/services/servicesService";
+import {
+  servicesService,
+  localServices,
+  getServiceSlug,
+} from "@/shared/api/services/servicesService";
 
 export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState<boolean>(false);
@@ -171,62 +175,57 @@ export default function Navbar() {
                   {/* PROGRAMS & SERVICES SPECIAL DROPDOWN */}
                   {(isPrograms || isServices) &&
                     isDropdownOpen &&
-                    Boolean(isServices ? activeServices?.length : link.dropdownItems?.length) && (
-                      <div className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-[24px]">
-                        <div className="w-[292px] rounded-[14px] border border-white/[0.04] bg-[#130E0F] p-[13px] shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
-                          {/* IMAGE PREVIEW — only visible while hovering a specific link */}
-                          <div
-                            className={`overflow-hidden rounded-[6px] transition-all duration-300 ease-out ${
-                              hoveredProgram
-                                ? "mb-[13px] h-[145px] opacity-100"
-                                : "mb-0 h-0 opacity-0"
-                            }`}
-                          >
-                            {hoveredProgram && (
-                              <Link
-                                to={hoveredProgram.href}
-                                onClick={() =>
-                                  setActiveDropdown(null)
-                                }
-                                className="group relative block h-[145px] w-full"
-                              >
-                                <img
-                                  src={hoveredProgram.image}
-                                  alt={hoveredProgram.label}
-                                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                                />
+                    Boolean(isServices ? activeServices?.length : link.dropdownItems?.length) && (() => {
+                      const dropdownItems = (isServices ? activeServices : link.dropdownItems) || [];
+                      const currentProgram = hoveredProgram || dropdownItems[0] || null;
 
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                      return (
+                        <div className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-[24px]">
+                          <div className="w-[292px] rounded-[14px] border border-white/[0.04] bg-[#130E0F] p-[13px] shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
+                            {/* IMAGE PREVIEW */}
+                            {currentProgram && (
+                              <div className="mb-[13px] h-[145px] overflow-hidden rounded-[6px] transition-all duration-300 ease-out opacity-100">
+                                <Link
+                                  to={currentProgram.href}
+                                  onClick={() => setActiveDropdown(null)}
+                                  className="group relative block h-[145px] w-full"
+                                >
+                                  <img
+                                    src={currentProgram.image}
+                                    alt={currentProgram.label}
+                                    onError={(e) => {
+                                      const fallback = isServices
+                                        ? (localServices.find((s) => s.slug === getServiceSlug({ title: currentProgram.label }))?.image || servicemanufacturehero)
+                                        : affiliateProgramhero;
+                                      (e.currentTarget as HTMLImageElement).src = fallback;
+                                    }}
+                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                                  />
 
-                                <span className="absolute bottom-[14px] left-[15px] font-space-grotesk text-[13px] font-bold uppercase text-white">
-                                  {hoveredProgram.label}
-                                </span>
-                              </Link>
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+
+                                  <span className="absolute bottom-[14px] left-[15px] font-space-grotesk text-[13px] font-bold uppercase text-white">
+                                    {currentProgram.label}
+                                  </span>
+                                </Link>
+                              </div>
                             )}
-                          </div>
 
-                          {/* PROGRAM / SERVICE LIST */}
-                          <div>
-                            {(isServices ? activeServices : link.dropdownItems)?.map(
-                              (program) => {
-                                const isHovered =
-                                  hoveredProgram?.label ===
-                                  program.label;
+                            {/* PROGRAM / SERVICE LIST */}
+                            <div>
+                              {dropdownItems.map((program, index) => {
+                                const isHovered = hoveredProgram
+                                  ? hoveredProgram.label === program.label
+                                  : index === 0;
 
                                 return (
                                   <Link
                                     key={program.label}
                                     to={program.href}
-                                    onClick={() =>
-                                      setActiveDropdown(null)
-                                    }
-                                    onMouseEnter={() =>
-                                      setHoveredProgram(program)
-                                    }
+                                    onClick={() => setActiveDropdown(null)}
+                                    onMouseEnter={() => setHoveredProgram(program)}
                                     className={`group flex min-h-[59px] items-center justify-between rounded-[6px] px-[14px] py-[10px] transition-colors duration-200 ${
-                                      isHovered
-                                        ? "bg-[#EF3340]"
-                                        : ""
+                                      isHovered ? "bg-[#EF3340]" : ""
                                     }`}
                                   >
                                     <span
@@ -250,26 +249,23 @@ export default function Navbar() {
                                     />
                                   </Link>
                                 );
-                              }
+                              })}
+                            </div>
+
+                            {/* EXPLORE ALL */}
+                            {isPrograms && (
+                              <Link
+                                to="/programs"
+                                onClick={() => setActiveDropdown(null)}
+                                className="mt-[4px] block px-[14px] pb-[4px] pt-[11px] font-space-grotesk text-[15px] font-bold text-[#EF3340] transition-colors hover:text-[#ff5964]"
+                              >
+                                Explore all Programs
+                              </Link>
                             )}
                           </div>
-
-                          {/* EXPLORE ALL */}
-                          {isPrograms && (
-                            <Link
-                              to="/programs"
-                              onClick={() =>
-                                setActiveDropdown(null)
-                              }
-                              className="mt-[4px] block px-[14px] pb-[4px] pt-[11px] font-space-grotesk text-[15px] font-bold text-[#EF3340] transition-colors hover:text-[#ff5964]"
-                            >
-                              Explore all Programs
-                            </Link>
-                          )}
-                         
                         </div>
-                      </div>
-                    )}
+                      );
+                    })()}
 
                   {/* CATEGORIES MEGA MENU — nothing shown until hover; image + submenu animate in */}
                   {isCategories &&
@@ -612,6 +608,12 @@ export default function Navbar() {
                               <img
                                 src={program.image}
                                 alt={program.label}
+                                onError={(e) => {
+                                  const fallback = isServices
+                                    ? (localServices.find((s) => s.slug === getServiceSlug({ title: program.label }))?.image || servicemanufacturehero)
+                                    : affiliateProgramhero;
+                                  (e.currentTarget as HTMLImageElement).src = fallback;
+                                }}
                                 className="h-full w-full object-cover"
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -634,7 +636,17 @@ export default function Navbar() {
                             Explore all Programs
                           </Link>
                         )}
-                        
+                        {/* {isServices && (
+                          <Link
+                            to="/services"
+                            onClick={() =>
+                              setIsMobileOpen(false)
+                            }
+                            className="block px-[4px] pb-[5px] pt-[10px] font-space-grotesk text-[15px] font-bold text-[#EF3340]"
+                          >
+                            Explore all Services
+                          </Link>
+                        )} */}
                       </div>
                     </div>
                   )}
