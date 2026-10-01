@@ -91,7 +91,13 @@ import bespokehero from './bespokehero.png'
 import customizationShort from './customizationShort.png'
 import customizationGi from './customizationGi.png'
 import customizationRushguard from './customizationRushguard.png'
+import sizeChartMen from './sizeChartMen.png'
+import sizeChartWomen from './sizeChartWomen.png'
+import sizeChartKids from './sizeChartKids.png'
 export {
+  sizeChartMen,
+  sizeChartWomen,
+  sizeChartKids,
   customizationShort,
   customizationGi,
   customizationRushguard,

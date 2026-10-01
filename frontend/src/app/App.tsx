@@ -22,6 +22,7 @@ import { CustomLabelPackagingPage } from "@/features/services/CustomLabelsPackag
 import PrivateLabelManufacturingPage from "@/features/services/PrivateLabelManufacturingPage/PrivateLabelManufacturingPage";
 import ShippingLogisticsPage from "@/features/services/ShippingLogisticsPage/ShippingLogisticsPage";
 import BespokeCustomizationPage from "@/features/services/BespokeCustomizationPage/BespokeCustomizationPage";
+import BJJApparelSizeChartPage from "@/features/services/BJJApparelSizeChartPage/BJJApparelSizeChartPage";
 import AboutUs from "@/features/AboutUs/AboutUs";
 import { ContactPage } from "@/features/contact/ContactPage";
 import PrivacyPolicy from "@/features/PrivacyPolicy/PrivacyPolicy";
@@ -129,6 +130,7 @@ export default function App() {
 <Route path="/services/custom-labels-packaging" element={<CustomLabelPackagingPage />} />
 <Route path="/services/shipping-logistics" element={<ShippingLogisticsPage />} />
 <Route path="/services/bespoke-customization" element={<BespokeCustomizationPage />} />
+<Route path="/services/bjj-apparel-size-chart" element={<BJJApparelSizeChartPage />} />
 
 <Route
   path="/programs/affiliate"
