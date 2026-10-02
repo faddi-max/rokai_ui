@@ -7,6 +7,7 @@ import {
   type AuthResponse,
 } from "@/shared/api/services/affiliateAuthService";
 import { authStorage } from "@/shared/utils/authStorage";
+import SectionGlow from "@/shared/components/layout/SectionGlow";
 
 type View = "signup" | "login";
 
@@ -75,6 +76,7 @@ function AffiliateDashboard({ account }: { account: AuthResponse | null }) {
   const status = account?.profile.status ?? "Signed in";
 
   return (
+    <SectionGlow>
     <div className="mx-auto my-6 w-full max-w-193.5 rounded-xl border border-white/10 bg-[#111] p-6 text-white sm:p-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -112,5 +114,6 @@ function AffiliateDashboard({ account }: { account: AuthResponse | null }) {
         </dl>
       )}
     </div>
+    </SectionGlow>
   );
 }
