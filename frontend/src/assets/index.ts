@@ -98,8 +98,10 @@ import jackets from './jackets.png'
 import pants from './pants.png'
 import rashguards from './rashguards.png'
 import rokaiManufacturingVideo from './rokai manufacturing video.mp4'
+import rokailogo from './rokailogo.png'
 export {
   rokaiManufacturingVideo,
+  rokailogo,
   jackets,
   pants,
   rashguards,
