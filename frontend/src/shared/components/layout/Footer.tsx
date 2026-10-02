@@ -78,6 +78,7 @@ const footerColumns: FooterColumn[] = [
       { label: "Sustainability", href: "/services" },
       { label: "Blogs", href: "/blogs" },
       { label: "About Us", href: "/about" },
+      { label: "Testimonials", href: "/testimonials" },
       { label: "News", href: "/blogs" },
       { label: "Contact Us", href: "/contact" },
     ],

@@ -1,4 +1,4 @@
-import React from "react";
+
 import {rokailogo} from "@/assets";
 
 interface RokaiLoaderProps {

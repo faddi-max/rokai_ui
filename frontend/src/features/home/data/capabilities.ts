@@ -37,9 +37,10 @@ export const capabilities: CapabilityItem[] = [
     id: "catalogue",
     image: capabilityCatalogueImage,
     title: "Catalogue",
+    titleHref: "/catalogue",
     subtitle: "Discover a complete range of BJJ apparel, jiu jitsu gear, and custom fightwear.",
     ctaText: "View Catalogue",
-    ctaHref: "/categories",
+    ctaHref: "/catalogue",
   },
   {
     id: "bespoke-customization",
