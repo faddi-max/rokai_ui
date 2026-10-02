@@ -12,7 +12,7 @@ export const heroContent: HeroContent = {
     type: "background",
     image: bloghero,
     imageAlt: "Rokai BJJ gi",
-    position: { width: 1250, height: 612, top: -25, left: 365, opacity: 0.6, angle: 0 },
+    position: { width: 1250, height: 612, top: -25, left: 365, opacity: 0.3, angle: 0 },
   },
   subscribe: {
     placeholder: "Enter Your Email Address",

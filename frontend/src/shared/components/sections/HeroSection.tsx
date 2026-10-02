@@ -112,18 +112,24 @@ export default function HeroSection({
           {isBackgroundVisual && (
             <div
               className="absolute overflow-hidden"
-              style={fullWidthBackground ? { inset: 0 } : {
-                  width: isSideBackgroundVisual
-                    ? `min(${visual.position.width}px, 52vw)`
-                    : visual.position.width,
-                  height: isSideBackgroundVisual
-                    ? `min(${visual.position.height}px, 100%)`
-                    : visual.position.height,
-                  top: visual.position.top,
-                  left: isSideBackgroundVisual ? undefined : visual.position.left,
-                  right: isSideBackgroundVisual ? 0 : undefined,
-                  transform: visual.position.angle ? `rotate(${visual.position.angle}deg)` : undefined,
-                }}
+              // CHANGED: explicit top/right/bottom/left instead of `inset: 0`
+              // to avoid the "Removing a style property during rerender" warning.
+              style={
+                fullWidthBackground
+                  ? { top: 0, right: 0, bottom: 0, left: 0 }
+                  : {
+                      width: isSideBackgroundVisual
+                        ? `min(${visual.position.width}px, 52vw)`
+                        : visual.position.width,
+                      height: isSideBackgroundVisual
+                        ? `min(${visual.position.height}px, 100%)`
+                        : visual.position.height,
+                      top: visual.position.top,
+                      left: isSideBackgroundVisual ? undefined : visual.position.left,
+                      right: isSideBackgroundVisual ? 0 : undefined,
+                      transform: visual.position.angle ? `rotate(${visual.position.angle}deg)` : undefined,
+                    }
+              }
             >
               <img
                 data-hero-visual
@@ -144,7 +150,6 @@ export default function HeroSection({
             </div>
           )}
 
-       
           {brandCard && (
             <div
               data-hero-brand-card
@@ -267,7 +272,7 @@ export default function HeroSection({
             )}
           </div>
 
-          {/* NEW — small uppercase feature-tag row under the CTAs */}
+          {/* Small uppercase feature-tag row under the CTAs */}
           {featureTags && featureTags.length > 0 && (
             <div  className="flex flex-wrap items-center gap-y-2 pt-1">
               {featureTags.map((tag, i) => (
@@ -371,7 +376,9 @@ export default function HeroSection({
         )}
       </div>
 
-      {isBackgroundVisual && (
+      {/* CHANGED: added `!fullWidthBackground` so the stacked mobile image
+          doesn't duplicate the full-bleed background image. */}
+      {isBackgroundVisual && !fullWidthBackground && (
         <div className="relative mt-6 w-full overflow-hidden lg:hidden">
           <img
             src={visual.image}

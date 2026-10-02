@@ -128,7 +128,7 @@ const ManufacturingProcessSection = () => {
     )}
   </div>
 </div>
-```
+
 
     </section>
   );

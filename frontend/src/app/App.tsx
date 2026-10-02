@@ -27,10 +27,12 @@ import BJJApparelFabricsPage from "@/features/services/BJJApparelFabricsPage/BJJ
 import AboutUs from "@/features/AboutUs/AboutUs";
 import { ContactPage } from "@/features/contact/ContactPage";
 import PrivacyPolicy from "@/features/PrivacyPolicy/PrivacyPolicy";
+import TestimonialPage from "@/features/testimonials/TestimonialPage";
 
 
 const HomePage = lazy(() => import("@/features/home/HomePage"));
 const CategoriesPage = lazy(() => import("@/features/categories/CategoriesPage"));
+const CataloguePage = lazy(() => import("@/features/catalogue/CataloguePage"));
 const BlogsPage = lazy(() => import("@/features/blogs/BlogsPage"));
 const ProgramsPage = lazy(() => import("@/features/programs/affiliate-program/Affiliate-page"));
 const ServicesPage = lazy(() => import("@/features/services/ServicesPage"));
@@ -115,6 +117,7 @@ export default function App() {
             <Route path="/about" element={<AboutUs />} />
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/categories/:slug" element={<CategoriesPage />} />
+            <Route path="/catalogue" element={<CataloguePage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/services/:slug" element={<ServicesPage />} />
             <Route path="/contact" element={<ContactPage />} />
@@ -122,6 +125,7 @@ export default function App() {
                <Route path="/legal" element={<PrivacyPolicy />} />
             <Route path="/blogs" element={<BlogsPage />} />
             <Route path="/resources" element={<ResourcesPage />} />
+            <Route path="/testimonials" element={<TestimonialPage />} />
             <Route path="/blogs/category/:slug" element={<BlogCategoryPage />} />
             <Route path="/blogs/:slug" element={<SinglePageBlog />} />
             <Route path="*" element={<NotFoundPage />} />
