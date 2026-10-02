@@ -7,7 +7,7 @@ const safe = <T,>(fn: () => T, fallback: T): T => {
   try {
     return fn();
   } catch {
-    return fallback; // storage blocked (private mode, etc.)
+    return fallback; 
   }
 };
 

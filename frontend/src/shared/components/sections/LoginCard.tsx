@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import SectionGlow from "../layout/SectionGlow";
 
 
-// Keep your existing variants if you already have them
 const formVariants = {
   hidden: {},
   visible: {

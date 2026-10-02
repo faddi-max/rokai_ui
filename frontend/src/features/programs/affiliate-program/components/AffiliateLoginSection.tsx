@@ -136,7 +136,6 @@ const handleLogin = async (email: string, password: string) => {
   try {
     const authData: any = await affiliateAuthService.login({ email, password });
 
-    // User verified nahi hai: OTP screen par bhejo
     if (authData?.is_verified === false) {
       setPendingEmail(email);
       authStorage.saveSignup("", email);
@@ -209,7 +208,6 @@ const handleLogin = async (email: string, password: string) => {
         />
       )}
 
-      {/* Global Dynamic Notification Modal */}
       <NotificationModal 
         isOpen={modalOpen}
         type={modalType}
