@@ -9,6 +9,10 @@ export interface LoginPayload {
   email: string;
   password: string;
 }
+export interface OtpVerifyPayload {
+  email: string;
+  otp: string;
+}
 export interface AuthResponse {
   user: {
     id: number;
@@ -26,12 +30,33 @@ export interface AuthResponse {
   token: string;
 }
 
+// interface ApiResponse<T> {
+//   success: boolean;
+//   message: string;
+//   data?: T;
+// }
+
 export const affiliateAuthService = {
   async signup(payload: SignupPayload): Promise<AuthResponse> {
-    return apiClient.post<AuthResponse, SignupPayload>("/affiliate/register", payload);
+    const res = await apiClient.post<any, SignupPayload>("/affiliate/register", payload);
+    console.log(res);
+    return res.data?.data || res.data || res;
   },
 
   async login(payload: LoginPayload): Promise<AuthResponse> {
-    return apiClient.post<AuthResponse, LoginPayload>("/affiliate/login", payload);
+    const res = await apiClient.post<any, LoginPayload>("/affiliate/login", payload);
+    console.log(res);
+    return res.data?.data || res.data || res;
+  },
+
+  async verifyOtp(payload: OtpVerifyPayload): Promise<AuthResponse> {
+    const res = await apiClient.post<any, OtpVerifyPayload>("/affiliate/verify-otp", payload);
+    console.log(res.message);
+    return res.data?.data || res.data || res;
+  },
+
+  async resendOtp(payload: { email: string }): Promise<{ success: boolean; message: string }> {
+    const res = await apiClient.post<any, { email: string }>("/affiliate/resend-otp", payload);
+    return res.data || res;
   },
 };

@@ -196,7 +196,7 @@ export default function RokaiLoader({
             max-[600px]:text-[7px]
           "
         >
-          SYSTEM <span className="text-[#E63946]">01</span>
+          {/* SYSTEM <span className="text-[#E63946]">01</span> */}
         </div>
 
         {/* Top-right */}
@@ -213,7 +213,7 @@ export default function RokaiLoader({
             max-[600px]:text-[7px]
           "
         >
-          ROKAI <span className="text-[#E63946]">/</span> EXPERIENCE
+          {/* ROKAI <span className="text-[#E63946]">/</span> EXPERIENCE */}
         </div>
 
         {/* Bottom-left */}
@@ -230,7 +230,7 @@ export default function RokaiLoader({
             max-[600px]:text-[7px]
           "
         >
-          PRECISION / CRAFT
+          {/* PRECISION / CRAFT */}
         </div>
 
         {/* Bottom-right */}
@@ -247,7 +247,7 @@ export default function RokaiLoader({
             max-[600px]:text-[7px]
           "
         >
-          EST. <span className="text-[#E63946]">2026</span>
+          {/* EST. <span className="text-[#E63946]">2026</span> */}
         </div>
 
         {/* Loader center */}
