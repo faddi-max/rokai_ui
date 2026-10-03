@@ -183,13 +183,45 @@ export const apiClient = {
       });
 
       if (!response.ok) {
+        const responseText = await response.text();
+        let details: unknown;
+        if (responseText) {
+          try {
+            details = JSON.parse(responseText);
+          } catch {
+            details = responseText;
+          }
+        }
+
+        const message =
+          details &&
+          typeof details === "object" &&
+          "message" in details &&
+          typeof details.message === "string"
+            ? details.message
+            : `POST ${endpoint} failed with status ${response.status}`;
+
         throw new ApiError(
           response.status,
-          `POST ${endpoint} failed with status ${response.status}`
+          message,
+          details
         );
       }
 
       const resJson = await response.json();
+
+      if (
+        resJson &&
+        typeof resJson === "object" &&
+        "success" in resJson &&
+        resJson.success === false
+      ) {
+        const message =
+          "message" in resJson && typeof resJson.message === "string"
+            ? resJson.message
+            : `POST ${endpoint} was not successful`;
+        throw new ApiError(response.status, message, resJson);
+      }
 
       const result: T =
         resJson && typeof resJson === "object" && "data" in resJson

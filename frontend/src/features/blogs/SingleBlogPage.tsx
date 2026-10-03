@@ -44,7 +44,11 @@ export default function SinglePageBlog() {
           <BlogHeroDetail post={post} />
         
           <BlogContentSection post={post} categories={categories} />
-          <TrendingBlogsSection />
+          <TrendingBlogsSection
+            eyebrow="Keep reading"
+            title="RELATED"
+            highlight="ARTICLES"
+          />
           <CommunityDiscussionSection postId=""/>
        
           {/* <FAQSection /> */}

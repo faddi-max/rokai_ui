@@ -117,6 +117,7 @@ export default function App() {
             <Route path="/about" element={<AboutUs />} />
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/categories/:slug" element={<CategoriesPage />} />
+             <Route path="/categories/:slug/:slug" element={<CategoriesPage />} />
             <Route path="/catalogue" element={<CataloguePage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/services/:slug" element={<ServicesPage />} />

@@ -2,6 +2,7 @@ import { Check, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import SectionGlow from "@/shared/components/layout/SectionGlow";
 import SectionHeaderblog from "@/shared/components/sections/SectionHeaderblog";
+import ResourceSearchBar from "@/shared/components/sections/SearchBar";
 
 /* -------------------------------------------------------------------------- */
 /*  Types — API-ready                                                         */
@@ -152,6 +153,7 @@ export default function ResourceCategoriesSection({
 }: ResourceCategoriesSectionProps) {
   return (
     <SectionGlow className="relative py-10 overflow-hidden">
+        <ResourceSearchBar />
       {/* --- Header --- */}
       <SectionHeaderblog
         bare

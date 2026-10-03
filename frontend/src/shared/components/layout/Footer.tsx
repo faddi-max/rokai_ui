@@ -11,6 +11,10 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { logo } from "@/assets";
+import { categoriesService } from "@/shared/api/services/categoriesService";
+import { programsService } from "@/shared/api/services/programsService";
+import { servicesService } from "@/shared/api/services/servicesService";
+import { useAsyncData } from "@/shared/hooks/useAsyncData";
 
 type FooterLink = {
   label: string;
@@ -32,66 +36,6 @@ type SocialLink = {
   label: string;
   icon: LucideIcon;
 };
-
-const footerColumns: FooterColumn[] = [
-  {
-    title: "Products",
-    links: [
-      { label: "Boxing", href: "/categories#catalog" },
-      { label: "MMA", href: "/categories#catalog" },
-      { label: "BJJ & Gears", href: "/categories#catalog" },
-      { label: "Fight Wear", href: "/categories#catalog" },
-      { label: "Protective Gear", href: "/categories#catalog" },
-      { label: "Trending Equipment", href: "/categories#catalog" },
-      { label: "All Products", href: "/categories" },
-    ],
-  },
-  {
-    title: "Solutions",
-    links: [
-      { label: "Brands", href: "/services#capabilities" },
-      { label: "Academies", href: "/programs#programs-catalog" },
-      { label: "Gyms & Clubs", href: "/programs#programs-catalog" },
-      { label: "Distributors", href: "/programs#programs-catalog" },
-      { label: "Teams & Organizations", href: "/programs#programs-catalog" },
-      { label: "Athletes & Coaches", href: "/programs#programs-catalog" },
-      { label: "Events Organizers", href: "/programs#programs-catalog" },
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
-      { label: "Buying Guides", href: "/resources#downloads" },
-      { label: "Manufacturing Guides", href: "/resources#sizing-matrix" },
-      { label: "Technical Resources", href: "/resources#downloads" },
-      { label: "Industry Thoughts", href: "/blogs" },
-      { label: "Case Studies", href: "/blogs" },
-      { label: "FAQs", href: "/contact#swatches" },
-      { label: "Downloads", href: "/resources" },
-    ],
-  },
-  {
-    title: "About",
-    links: [
-      { label: "Our Story", href: "/services" },
-      { label: "Our Manufacturing", href: "/services#capabilities" },
-      { label: "Sustainability", href: "/services" },
-      { label: "Blogs", href: "/blogs" },
-      { label: "About Us", href: "/about" },
-      { label: "Testimonials", href: "/testimonials" },
-      { label: "News", href: "/blogs" },
-      { label: "Contact Us", href: "/contact" },
-    ],
-  },
-  {
-    title: "Support",
-    links: [
-      { label: "Privacy Policy", href: "/legal/privacy-policy" },
-      { label: "Shipping Policy", href: "/legal/shipping-policy" },
-      { label: "Terms & Conditions", href: "/legal/terms-conditions" },
-    ],
-  },
-];
 
 const socialLinks: SocialLink[] = [
   { label: "Facebook", icon: Globe2 },
@@ -144,6 +88,51 @@ const PaymentMethods = () => (
 );
 
 const Footer = () => {
+  const { data: categories } = useAsyncData(() => categoriesService.getParentCategories());
+  const { data: services } = useAsyncData(() => servicesService.getServices());
+  const { data: programs } = useAsyncData(() => programsService.getPrograms());
+
+  const footerColumns: FooterColumn[] = [
+    {
+      title: "Categories",
+      links: (categories ?? []).map((category) => ({
+        label: category.title,
+        href: `/categories/${category.slug || category.id}`,
+      })),
+    },
+    {
+      title: "Services",
+      links: (services ?? []).map((service) => ({
+        label: service.title,
+        href: service.href,
+      })),
+    },
+    {
+      title: "Programs",
+      links: (programs ?? []).map((program) => ({
+        label: program.title,
+        href: program.href,
+      })),
+    },
+    {
+      title: "About",
+      links: [
+        { label: "Blogs", href: "/blogs" },
+        { label: "About Us", href: "/about" },
+        { label: "Testimonials", href: "/testimonials" },
+        { label: "Contact Us", href: "/contact" },
+      ],
+    },
+    {
+      title: "Support",
+      links: [
+        { label: "Privacy Policy", href: "/legal/privacy-policy" },
+        { label: "Shipping Policy", href: "/legal/shipping-policy" },
+        { label: "Terms & Conditions", href: "/legal/terms-conditions" },
+      ],
+    },
+  ];
+
   return (
     <footer className="bg-black text-white">
       <div className="mx-auto w-full max-w-[1250px] px-5 pb-8 pt-12 sm:px-8 md:pt-14 lg:px-0 lg:pt-16">

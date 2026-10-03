@@ -99,17 +99,6 @@ export default function BlogHeroDetail({ post, meta = {} }: BlogHeroDetailProps)
 
   return (
     <section className="relative isolate min-h-140 overflow-hidden bg-[#0a0a0a] px-6 py-16 font-space-grotesk text-white md:px-10 lg:px-6">
-      <div className="absolute inset-0 z-0">
-        <img
-          src={post.image || blogcatagory}
-          alt=""
-          className="h-full w-full object-cover"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = blogcatagory;
-          }}
-        />
-        <div className="absolute inset-0 bg-black/70" />
-      </div>
       <div className="relative z-10 mx-auto w-full max-w-378">
         <div className="mb-6 flex items-center gap-2">
           <span className="h-[2px] w-6 bg-[#E63946]" />
@@ -155,6 +144,17 @@ export default function BlogHeroDetail({ post, meta = {} }: BlogHeroDetailProps)
             <Fact label="Content type" value={contentType} />
             <Fact label="Last reviewed" value={lastReviewedLabel} />
           </div>
+        </div>
+
+        <div className="mt-10 w-full overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+          <img
+            src={post.image || blogcatagory}
+            alt={post.title}
+            className="block h-auto w-full"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = blogcatagory;
+            }}
+          />
         </div>
 
         {secondaryImage && (

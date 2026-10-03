@@ -1,70 +1,156 @@
-import React from 'react';
+import React, { useEffect, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertTriangle, ArrowUpRight, Check, X } from "lucide-react";
 
 interface NotificationModalProps {
-    isOpen: boolean;
-    type?: 'success' | 'error';
-    message: string;
-    onClose: () => void;
+  isOpen: boolean;
+  type?: "success" | "error";
+  message: string;
+  onClose: () => void;
 }
 
-const NotificationModal: React.FC<NotificationModalProps> = ({ 
-    isOpen, 
-    type = 'success', 
-    message, 
-    onClose 
+const COPY = {
+  success: { eyebrow: "Confirmed", title: "Success" },
+  error: { eyebrow: "Attention", title: "Something went wrong" },
+} as const;
+
+const NotificationModal: React.FC<NotificationModalProps> = ({
+  isOpen,
+  type = "success",
+  message,
+  onClose,
 }) => {
-    if (!isOpen) return null;
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const isSuccess = type === "success";
+  const accent = isSuccess ? "#2FB574" : "#E63946";
+  const { eyebrow, title } = COPY[type];
 
-    const isSuccess = type === 'success';
-    
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity">
-            <div className="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left shadow-2xl transition-all dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
-                
-                {/* Icon Section */}
-                <div className="flex items-center space-x-4">
-                    <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full ${
-                        isSuccess ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400'
-                    }`}>
-                        {isSuccess ? (
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                            </svg>
-                        ) : (
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                            </svg>
-                        )}
-                    </div>
+  // Close on Escape, lock page scroll, focus the action button
+  useEffect(() => {
+    if (!isOpen) return;
 
-                    {/* Message Content */}
-                    <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white capitalize">
-                            {isSuccess ? 'Success!' : 'Notice / Error'}
-                        </h3>
-                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                            {message}
-                        </p>
-                    </div>
-                </div>
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKeyDown);
 
-                {/* Action Button */}
-                <div className="mt-6 flex justify-end">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className={`inline-flex justify-center rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 ${
-                            isSuccess 
-                                ? 'bg-emerald-600 hover:bg-emerald-500 focus:ring-emerald-500' 
-                                : 'bg-rose-600 hover:bg-rose-500 focus:ring-rose-500'
-                        } focus:outline-none focus:ring-2 focus:ring-offset-2`}
-                    >
-                        Okay
-                    </button>
-                </div>
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    buttonRef.current?.focus();
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen, onClose]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          onClick={onClose}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 px-5 backdrop-blur-sm"
+        >
+          <motion.div
+            role={isSuccess ? "dialog" : "alertdialog"}
+            aria-modal="true"
+            aria-labelledby="notification-title"
+            aria-describedby="notification-message"
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.98 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-[440px] overflow-hidden rounded-[8px] border border-white/10 bg-[#111111] px-7 pb-7 pt-8 text-left"
+            style={{
+              backgroundImage: `radial-gradient(circle at top right, ${accent}2E 0%, ${accent}00 45%)`,
+            }}
+          >
+            {/* Top accent line */}
+            <span
+              aria-hidden
+              className="absolute inset-x-0 top-0 h-[3px]"
+              style={{
+                background: `linear-gradient(90deg, ${accent} 0%, ${accent}00 100%)`,
+              }}
+            />
+
+            {/* Close */}
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close notification"
+              className="absolute right-4 top-4 flex size-8 items-center justify-center text-white/40 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E63946]"
+            >
+              <X size={16} aria-hidden />
+            </button>
+
+            {/* Icon */}
+            <span
+              className="flex size-11 items-center justify-center rounded-[6px] border"
+              style={{
+                color: accent,
+                borderColor: `${accent}59`,
+                backgroundColor: `${accent}1A`,
+              }}
+            >
+              {isSuccess ? (
+                <Check size={20} strokeWidth={2.5} aria-hidden />
+              ) : (
+                <AlertTriangle size={20} strokeWidth={2} aria-hidden />
+              )}
+            </span>
+
+            {/* Eyebrow */}
+            <div className="mt-6 flex items-center gap-3">
+              <span
+                className="font-space-grotesk text-[10px] font-bold uppercase tracking-[1.8px]"
+                style={{ color: accent }}
+              >
+                {eyebrow}
+              </span>
+              <span aria-hidden className="h-px w-8" style={{ backgroundColor: accent }} />
             </div>
-        </div>
-    );
+
+            {/* Title + message */}
+            <h3
+              id="notification-title"
+              className="mt-3 font-space-grotesk text-[24px] font-bold uppercase leading-[1.15] text-[#f7f7f5]"
+            >
+              {title}
+            </h3>
+            <p
+              id="notification-message"
+              className="mt-3 font-space-grotesk text-[14px] leading-[22px] text-[#c0c0c0]"
+            >
+              {message}
+            </p>
+
+            {/* Action */}
+            <div className="mt-8 flex justify-end border-t border-[#292929] pt-6">
+              <button
+                ref={buttonRef}
+                type="button"
+                onClick={onClose}
+                className="group flex h-[37px] items-center gap-[25px] rounded-[6px] bg-[#E63946] px-[13px] font-space-grotesk text-[13px] font-medium text-white transition-colors hover:bg-[#ee4250] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E63946]"
+              >
+                Okay
+                <ArrowUpRight
+                  size={16}
+                  aria-hidden
+                  className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                />
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 };
 
 export default NotificationModal;

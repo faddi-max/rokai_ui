@@ -39,7 +39,7 @@ const itemVariants = {
     scale: 1,
     transition: {
       duration: 0.7,
-      ease: [0.22, 1, 0.36, 1],
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
     },
   },
 };
@@ -66,14 +66,6 @@ export default function HeroTrustBadges({
             <motion.li
               key={block.title}
               variants={itemVariants}
-              whileHover={{
-                y: -6,
-                scale: 1.02,
-                transition: {
-                  duration: 0.3,
-                  ease: [0.22, 1, 0.36, 1],
-                },
-              }}
               className={[
                 "group relative flex min-w-0 items-start gap-3 px-6 py-7",
                 "cursor-pointer",

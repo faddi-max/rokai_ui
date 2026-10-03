@@ -1,8 +1,12 @@
-import { ArrowUpRight, Check, Loader2 } from "lucide-react";
+import { ArrowUpRight, Check, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import SectionGlow from "../layout/SectionGlow";
-
+import {
+  LIMITS,
+  validateEmail,
+  validateLoginPassword,
+} from "@/shared/utils/formValidation";
 
 const formVariants = {
   hidden: {},
@@ -43,18 +47,34 @@ export default function LoginCard({
 }: LoginCardProps) {
   const [email, setEmail] = useState(defaultEmail);
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (submitting) return;
 
-    setSubmitting(true);
+    const normalizedEmail = email.trim();
+    const emailMsg = validateEmail(normalizedEmail);
+    const passwordMsg = validateLoginPassword(password); // never trimmed
+
+    setEmailError(emailMsg || null);
+    setPasswordError(passwordMsg || null);
     setError(null);
 
+    if (emailMsg || passwordMsg) {
+      document.getElementById(emailMsg ? "login-email" : "login-password")?.focus();
+      return;
+    }
+
+    setSubmitting(true);
+
     try {
-      await onSubmit?.(email, password);
+      await onSubmit?.(normalizedEmail, password);
     } catch (err) {
       setError(
         err instanceof Error
@@ -89,6 +109,7 @@ export default function LoginCard({
             whileInView="visible"
             viewport={{ once: true }}
             onSubmit={handleSubmit}
+            noValidate
             className="flex flex-col gap-6 px-[42px] py-10"
           >
             <motion.div
@@ -114,6 +135,7 @@ export default function LoginCard({
               </p>
             </motion.div>
 
+            {/* Email */}
             <motion.div
               variants={itemVariants}
               className="flex flex-col gap-2"
@@ -131,12 +153,30 @@ export default function LoginCard({
                 required
                 autoComplete="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailError(null);
+                  setError(null);
+                }}
+                onBlur={() => {
+                  if (email.trim()) setEmailError(validateEmail(email) || null);
+                }}
                 placeholder="you@example.com"
-                className="h-[49px] w-full rounded-[6px] border border-[#383838] bg-[#101010] px-[14px] font-space-grotesk text-[16px] text-white placeholder:text-[#757575] transition-all duration-300 hover:border-[#555] focus:border-[#e63946] focus:ring-1 focus:ring-[#e63946]/50 focus:outline-none"
+                maxLength={254}
+                aria-invalid={!!emailError}
+                aria-describedby={emailError ? "login-email-error" : undefined}
+                className={`h-[49px] w-full rounded-[6px] border bg-[#101010] px-[14px] font-space-grotesk text-[16px] text-white placeholder:text-[#757575] transition-all duration-300 hover:border-[#555] focus:border-[#e63946] focus:ring-1 focus:ring-[#e63946]/50 focus:outline-none ${
+                  emailError ? "border-red-500" : "border-[#383838]"
+                }`}
               />
+              {emailError && (
+                <p id="login-email-error" className="text-xs text-red-400" role="alert">
+                  {emailError}
+                </p>
+              )}
             </motion.div>
 
+            {/* Password */}
             <motion.div
               variants={itemVariants}
               className="flex flex-col gap-2"
@@ -148,16 +188,42 @@ export default function LoginCard({
                 Password
               </label>
 
-              <input
-                id="login-password"
-                type="password"
-                required
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                className="h-[49px] w-full rounded-[6px] border border-[#383838] bg-[#101010] px-[14px] font-space-grotesk text-[16px] text-white placeholder:text-[#757575] transition-all duration-300 hover:border-[#555] focus:border-[#e63946] focus:ring-1 focus:ring-[#e63946]/50 focus:outline-none"
-              />
+              <div className="relative">
+                <input
+                  id="login-password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setPasswordError(null);
+                    setError(null);
+                  }}
+                  placeholder="Enter your password"
+                  maxLength={LIMITS.passwordMax}
+                  aria-invalid={!!passwordError}
+                  aria-describedby={passwordError ? "login-password-error" : undefined}
+                  className={`h-[49px] w-full rounded-[6px] border bg-[#101010] px-[14px] pr-12 font-space-grotesk text-[16px] text-white placeholder:text-[#757575] transition-all duration-300 hover:border-[#555] focus:border-[#e63946] focus:ring-1 focus:ring-[#e63946]/50 focus:outline-none ${
+                    passwordError ? "border-red-500" : "border-[#383838]"
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((visible) => !visible)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showPassword}
+                  className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[#a0a0a0] transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#e63946]"
+                >
+                  {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+                </button>
+              </div>
+
+              {passwordError && (
+                <p id="login-password-error" role="alert" className="text-xs text-red-400">
+                  {passwordError}
+                </p>
+              )}
 
               <a
                 href="#forgot-password"

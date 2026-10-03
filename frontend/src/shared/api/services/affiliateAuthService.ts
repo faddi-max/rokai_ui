@@ -14,6 +14,9 @@ export interface OtpVerifyPayload {
   otp: string;
 }
 export interface AuthResponse {
+  success?: boolean;
+  message?: string;
+  is_verified?: boolean;
   user: {
     id: number;
     name: string;
@@ -40,7 +43,11 @@ export const affiliateAuthService = {
   async signup(payload: SignupPayload): Promise<AuthResponse> {
     const res = await apiClient.post<any, SignupPayload>("/affiliate/register", payload);
     console.log(res);
-    return res.data?.data || res.data || res;
+    const result = res?.data?.data || res?.data || res;
+    if (result?.success === false) {
+      throw new Error(result.message || "This email is already registered. Please log in instead.");
+    }
+    return result;
   },
 
   async login(payload: LoginPayload): Promise<AuthResponse> {

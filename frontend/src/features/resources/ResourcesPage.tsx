@@ -34,7 +34,7 @@ export default function ResourcesPage() {
           className="relative w-full"
         >
           <HeroSection {...pageData.hero} />
-          <ResourceSearchBar />
+        
 
 
           <motion.div

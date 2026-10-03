@@ -1,7 +1,15 @@
-import { ArrowUpRight, Check, Loader2 } from "lucide-react";
+import { ArrowUpRight, Check, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import SectionGlow from "../layout/SectionGlow";
+import {
+  LIMITS,
+  normalizeName,
+  validateConfirmPassword,
+  validateEmail,
+  validateFullName,
+  validateNewPassword,
+} from "@/shared/utils/formValidation";
 
 export interface SignupValues {
   full_name: string;
@@ -14,6 +22,18 @@ interface SignupCardProps {
   onSwitchToLogin?: () => void;
 }
 
+type FieldKey = "full_name" | "email" | "password" | "confirmPassword" | "terms";
+
+const FIELD_ORDER: FieldKey[] = ["full_name", "email", "password", "confirmPassword", "terms"];
+
+const FIELD_IDS: Record<FieldKey, string> = {
+  full_name: "signup-name",
+  email: "signup-email",
+  password: "signup-password",
+  confirmPassword: "signup-confirm-password",
+  terms: "signup-terms",
+};
+
 const formVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
@@ -25,35 +45,79 @@ const itemVariants = {
 };
 
 const inputClass =
-  "h-[49px] w-full rounded-[6px] border border-[#383838] bg-[#101010] px-[14px] font-space-grotesk text-[16px] text-white placeholder:text-[#757575] transition-all duration-300 hover:border-[#555] focus:border-[#e63946] focus:ring-1 focus:ring-[#e63946]/50 focus:outline-none";
+  "h-[49px] w-full rounded-[6px] border bg-[#101010] px-[14px] font-space-grotesk text-[16px] text-white placeholder:text-[#757575] transition-all duration-300 hover:border-[#555] focus:border-[#e63946] focus:ring-1 focus:ring-[#e63946]/50 focus:outline-none";
+
+const borderFor = (hasError: boolean) => (hasError ? "border-red-500" : "border-[#383838]");
 
 const labelClass =
   "font-space-grotesk text-[12px] font-bold uppercase tracking-[1px] text-[#bcbcbc]";
 
 export default function SignupCard({ onSubmit, onSwitchToLogin }: SignupCardProps) {
   const [values, setValues] = useState<SignupValues>({ full_name: "", email: "", password: "" });
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agree, setAgree] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldKey, string>>>({});
 
-  const update = (key: keyof SignupValues) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setValues((prev) => ({ ...prev, [key]: e.target.value }));
+  const validateField = (key: FieldKey): string => {
+    switch (key) {
+      case "full_name":
+        return validateFullName(values.full_name);
+      case "email":
+        return validateEmail(values.email);
+      case "password":
+        return validateNewPassword(values.password);
+      case "confirmPassword":
+        return validateConfirmPassword(values.password, confirmPassword);
+      case "terms":
+        return agree ? "" : "Please agree to the affiliate terms to continue.";
+    }
+  };
+
+  const setFieldError = (key: FieldKey, message: string) =>
+    setFieldErrors((prev) => ({ ...prev, [key]: message }));
+
+  // Validate on blur, but only once the user has typed something
+  const handleBlur = (key: FieldKey, hasValue: boolean) => () => {
+    if (hasValue) setFieldError(key, validateField(key));
+  };
+
+  const update = (key: keyof SignupValues) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setValues((prev) => ({ ...prev, [key]: value }));
+    setFieldError(key, "");
+    setError(null);
+
+    // Keep the mismatch message live while editing the password
+    if (key === "password" && confirmPassword) {
+      setFieldError("confirmPassword", validateConfirmPassword(value, confirmPassword));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (values.password.length < 8) {
-      setError("Password must be at least 8 characters.");
+    if (submitting) return;
+
+    const errors = Object.fromEntries(
+      FIELD_ORDER.map((key) => [key, validateField(key)])
+    ) as Record<FieldKey, string>;
+    setFieldErrors(errors);
+
+    const firstInvalid = FIELD_ORDER.find((key) => errors[key]);
+    if (firstInvalid) {
+      setError("Please review the highlighted fields.");
+      document.getElementById(FIELD_IDS[firstInvalid])?.focus();
       return;
     }
-    if (!agree) {
-      setError("Please agree to the affiliate terms to continue.");
-      return;
-    }
+
     setSubmitting(true);
     setError(null);
     try {
       await onSubmit({
-        full_name: values.full_name.trim(),
+        full_name: normalizeName(values.full_name),
         email: values.email.trim(),
         password: values.password,
       });
@@ -84,6 +148,7 @@ export default function SignupCard({ onSubmit, onSwitchToLogin }: SignupCardProp
             whileInView="visible"
             viewport={{ once: true }}
             onSubmit={handleSubmit}
+            noValidate
             className="flex flex-col gap-6 px-6 py-10 sm:px-[42px]"
           >
             <motion.span
@@ -112,86 +177,206 @@ export default function SignupCard({ onSubmit, onSwitchToLogin }: SignupCardProp
               </motion.div>
             )}
 
+            {/* Full name */}
             <motion.div variants={itemVariants} className="flex flex-col gap-2">
-              <label htmlFor="signup-name" className={labelClass}>Full name</label>
+              <label htmlFor="signup-name" className={labelClass}>
+                Full name
+              </label>
               <input
                 id="signup-name"
                 type="text"
                 required
                 value={values.full_name}
                 onChange={update("full_name")}
+                onBlur={handleBlur("full_name", !!values.full_name)}
                 placeholder="Your full name"
                 autoComplete="name"
-                className={inputClass}
+                maxLength={LIMITS.nameMax}
+                aria-invalid={!!fieldErrors.full_name}
+                aria-describedby={fieldErrors.full_name ? "signup-name-error" : undefined}
+                className={`${inputClass} ${borderFor(!!fieldErrors.full_name)}`}
               />
+              {fieldErrors.full_name && (
+                <p id="signup-name-error" className="text-xs text-red-400">
+                  {fieldErrors.full_name}
+                </p>
+              )}
             </motion.div>
 
+            {/* Email */}
             <motion.div variants={itemVariants} className="flex flex-col gap-2">
-              <label htmlFor="signup-email" className={labelClass}>Email address</label>
+              <label htmlFor="signup-email" className={labelClass}>
+                Email address
+              </label>
               <input
                 id="signup-email"
                 type="email"
                 required
                 value={values.email}
                 onChange={update("email")}
+                onBlur={handleBlur("email", !!values.email)}
                 placeholder="you@example.com"
                 autoComplete="email"
-                className={inputClass}
+                maxLength={254}
+                aria-invalid={!!fieldErrors.email}
+                aria-describedby={fieldErrors.email ? "signup-email-error" : undefined}
+                className={`${inputClass} ${borderFor(!!fieldErrors.email)}`}
               />
+              {fieldErrors.email && (
+                <p id="signup-email-error" className="text-xs text-red-400">
+                  {fieldErrors.email}
+                </p>
+              )}
             </motion.div>
 
+            {/* Password */}
             <motion.div variants={itemVariants} className="flex flex-col gap-2">
-              <label htmlFor="signup-password" className={labelClass}>Password</label>
-              <input
-                id="signup-password"
-                type="password"
-                required
-                value={values.password}
-                onChange={update("password")}
-                placeholder="Minimum 8 characters"
-                autoComplete="new-password"
-                className={inputClass}
-              />
+              <label htmlFor="signup-password" className={labelClass}>
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="signup-password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={values.password}
+                  onChange={update("password")}
+                  onBlur={handleBlur("password", !!values.password)}
+                  placeholder="8–128 characters"
+                  autoComplete="new-password"
+                  minLength={LIMITS.passwordMin}
+                  maxLength={LIMITS.passwordMax}
+                  aria-invalid={!!fieldErrors.password}
+                  aria-describedby={
+                    fieldErrors.password ? "signup-password-error" : "signup-password-hint"
+                  }
+                  className={`${inputClass} pr-12 ${borderFor(!!fieldErrors.password)}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((visible) => !visible)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showPassword}
+                  className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[#a0a0a0] transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#e63946]"
+                >
+                  {showPassword ? (
+                    <EyeOff size={18} aria-hidden="true" />
+                  ) : (
+                    <Eye size={18} aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+              {fieldErrors.password ? (
+                <p id="signup-password-error" className="text-xs text-red-400">
+                  {fieldErrors.password}
+                </p>
+              ) : (
+                <p id="signup-password-hint" className="text-xs text-[#858585]">
+                  Use 8 or more characters with at least one letter and one number.
+                </p>
+              )}
             </motion.div>
 
-            <motion.div
-              variants={itemVariants}
-              className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <label className="flex cursor-pointer items-center gap-[13px]">
-                <input
-                  type="checkbox"
-                  checked={agree}
-                  onChange={(e) => setAgree(e.target.checked)}
-                  className="size-[13px] rounded-[2.5px] border border-[#767676] bg-white accent-[#e63946]"
-                />
-                <span className="font-space-grotesk text-[11px] leading-[17.6px] text-[#c0c0c0]">
-                  I agree to the affiliate program terms
-                </span>
+            {/* Confirm password */}
+            <motion.div variants={itemVariants} className="flex flex-col gap-2">
+              <label htmlFor="signup-confirm-password" className={labelClass}>
+                Confirm password
               </label>
+              <div className="relative">
+                <input
+                  id="signup-confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setFieldError("confirmPassword", "");
+                    setError(null);
+                  }}
+                  onBlur={handleBlur("confirmPassword", !!confirmPassword)}
+                  placeholder="Re-enter your password"
+                  autoComplete="new-password"
+                  maxLength={LIMITS.passwordMax}
+                  aria-invalid={!!fieldErrors.confirmPassword}
+                  aria-describedby={
+                    fieldErrors.confirmPassword ? "signup-confirm-password-error" : undefined
+                  }
+                  className={`${inputClass} pr-12 ${borderFor(!!fieldErrors.confirmPassword)}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((visible) => !visible)}
+                  aria-label={
+                    showConfirmPassword ? "Hide confirmation password" : "Show confirmation password"
+                  }
+                  aria-pressed={showConfirmPassword}
+                  className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[#a0a0a0] transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#e63946]"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={18} aria-hidden="true" />
+                  ) : (
+                    <Eye size={18} aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+              {fieldErrors.confirmPassword && (
+                <p id="signup-confirm-password-error" className="text-xs text-red-400">
+                  {fieldErrors.confirmPassword}
+                </p>
+              )}
+            </motion.div>
 
-              <motion.button
-                type="submit"
-                disabled={submitting}
-                whileHover={{ scale: 1.04, boxShadow: "0 6px 20px rgba(230,57,70,0.45)" }}
-                whileTap={{ scale: 0.96 }}
-                className="group flex h-[37px] w-fit items-center gap-[25px] rounded-[6px] bg-[#e63946] px-[13px] font-space-grotesk text-[13px] font-medium text-white transition-colors hover:bg-[#ee4250] disabled:opacity-60"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" />
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    Sign up
-                    <ArrowUpRight
-                      size={16}
-                      className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                    />
-                  </>
-                )}
-              </motion.button>
+            {/* Terms + submit */}
+            <motion.div variants={itemVariants} className="flex flex-col gap-3">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <label className="flex cursor-pointer items-center gap-[13px]">
+                  <input
+                    id="signup-terms"
+                    type="checkbox"
+                    checked={agree}
+                    onChange={(e) => {
+                      setAgree(e.target.checked);
+                      setFieldError("terms", "");
+                      setError(null);
+                    }}
+                    aria-invalid={!!fieldErrors.terms}
+                    aria-describedby={fieldErrors.terms ? "signup-terms-error" : undefined}
+                    className="size-[13px] rounded-[2.5px] border border-[#767676] bg-white accent-[#e63946]"
+                  />
+                  <span className="font-space-grotesk text-[11px] leading-[17.6px] text-[#c0c0c0]">
+                    I agree to the affiliate program terms
+                  </span>
+                </label>
+
+                <motion.button
+                  type="submit"
+                  disabled={submitting}
+                  whileHover={{ scale: 1.04, boxShadow: "0 6px 20px rgba(230,57,70,0.45)" }}
+                  whileTap={{ scale: 0.96 }}
+                  className="group flex h-[37px] w-fit items-center gap-[25px] rounded-[6px] bg-[#e63946] px-[13px] font-space-grotesk text-[13px] font-medium text-white transition-colors hover:bg-[#ee4250] disabled:opacity-60"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      Sign up
+                      <ArrowUpRight
+                        size={16}
+                        className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                      />
+                    </>
+                  )}
+                </motion.button>
+              </div>
+
+              {fieldErrors.terms && (
+                <p id="signup-terms-error" role="alert" className="text-xs text-red-400">
+                  {fieldErrors.terms}
+                </p>
+              )}
             </motion.div>
 
             <motion.div variants={itemVariants} className="flex items-center gap-2">
