@@ -1,12 +1,19 @@
 import { ArrowUpRight, Loader2, RefreshCw } from "lucide-react";
 import { useState } from "react";
+import type { ReactNode } from "react";
 import { motion } from "framer-motion";
 import SectionGlow from "../layout/SectionGlow";
+import { LIMITS, validateOtp } from "@/shared/utils/formValidation";
 
 interface OtpVerifyCardProps {
   email: string;
   onSubmit: (otp: string) => Promise<void>;
   onResend: () => Promise<void>;
+  eyebrow?: string;
+  title?: string;
+  description?: ReactNode;
+  submitLabel?: string;
+  onBack?: () => void;
 }
 
 const formVariants = {
@@ -25,7 +32,16 @@ const inputClass =
 const labelClass =
   "font-space-grotesk text-[12px] font-bold uppercase tracking-[1px] text-[#bcbcbc]";
 
-export default function OtpVerifyCard({ email, onSubmit, onResend }: OtpVerifyCardProps) {
+export default function OtpVerifyCard({
+  email,
+  onSubmit,
+  onResend,
+  eyebrow = "Email Verification",
+  title = "Enter Verification Code",
+  description,
+  submitLabel = "Verify OTP",
+  onBack,
+}: OtpVerifyCardProps) {
   const [otp, setOtp] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [resending, setResending] = useState(false);
@@ -34,10 +50,12 @@ export default function OtpVerifyCard({ email, onSubmit, onResend }: OtpVerifyCa
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!otp || otp.length < 4) {
-      setError("Please enter a valid verification code.");
+    const validationMessage = validateOtp(otp);
+    if (validationMessage) {
+      setError(validationMessage);
       return;
     }
+    if (submitting) return;
     setSubmitting(true);
     setError(null);
     try {
@@ -89,15 +107,21 @@ export default function OtpVerifyCard({ email, onSubmit, onResend }: OtpVerifyCa
               variants={itemVariants}
               className="font-space-grotesk text-[10px] font-bold uppercase tracking-[1.8px] text-[#e63946]"
             >
-              Email Verification
+              {eyebrow}
             </motion.span>
 
             <motion.div variants={itemVariants} className="flex flex-col gap-3">
               <h3 className="font-space-grotesk text-[27px] font-bold uppercase leading-[29.7px] text-[#f7f7f5]">
-                Enter Verification Code
+                {title}
               </h3>
               <p className="font-space-grotesk text-[13px] leading-[20.8px] text-[#c0c0c0]">
-                We have sent a one-time verification code to <span className="text-white font-medium">{email || "your email"}</span>. Enter it below to activate your account.
+                {description ?? (
+                  <>
+                    We have sent a one-time verification code to{" "}
+                    <span className="font-medium text-white">{email || "your email"}</span>. Enter
+                    it below to activate your account.
+                  </>
+                )}
               </p>
             </motion.div>
 
@@ -126,13 +150,20 @@ export default function OtpVerifyCard({ email, onSubmit, onResend }: OtpVerifyCa
                 id="otp-code"
                 type="text"
                 required
-                maxLength={6}
+                maxLength={LIMITS.otpLength}
+                inputMode="numeric"
                 value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="------"
+                onChange={(e) => {
+                  setOtp(e.target.value.replace(/\D/g, "").slice(0, LIMITS.otpLength));
+                  setError(null);
+                }}
+                placeholder={"-".repeat(LIMITS.otpLength)}
                 autoComplete="one-time-code"
+                aria-invalid={!!error}
+                aria-describedby={error ? "otp-code-error" : undefined}
                 className={inputClass}
               />
+              {error && <span id="otp-code-error" className="sr-only">{error}</span>}
             </motion.div>
 
             <motion.div
@@ -141,7 +172,7 @@ export default function OtpVerifyCard({ email, onSubmit, onResend }: OtpVerifyCa
             >
               <button
                 type="button"
-                disabled={resending}
+                disabled={resending || submitting}
                 onClick={handleResendOtp}
                 className="flex items-center gap-2 font-space-grotesk text-[12px] text-[#c0c0c0] transition-colors hover:text-white disabled:opacity-50"
               >
@@ -149,28 +180,39 @@ export default function OtpVerifyCard({ email, onSubmit, onResend }: OtpVerifyCa
                 {resending ? "Sending code..." : "Resend OTP code"}
               </button>
 
-              <motion.button
-                type="submit"
-                disabled={submitting}
-                whileHover={{ scale: 1.04, boxShadow: "0 6px 20px rgba(230,57,70,0.45)" }}
-                whileTap={{ scale: 0.96 }}
-                className="group flex h-[37px] w-fit items-center gap-[25px] rounded-[6px] bg-[#e63946] px-[13px] font-space-grotesk text-[13px] font-medium text-white transition-colors hover:bg-[#ee4250] disabled:opacity-60"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" />
-                    Verifying...
-                  </>
-                ) : (
-                  <>
-                    Verify OTP
-                    <ArrowUpRight
-                      size={16}
-                      className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                    />
-                  </>
+              <div className="flex items-center gap-4">
+                {onBack && (
+                  <button
+                    type="button"
+                    onClick={onBack}
+                    className="font-space-grotesk text-[12px] text-[#c0c0c0] transition-colors hover:text-white"
+                  >
+                    Back to login
+                  </button>
                 )}
-              </motion.button>
+                <motion.button
+                  type="submit"
+                  disabled={submitting || resending}
+                  whileHover={{ scale: 1.04, boxShadow: "0 6px 20px rgba(230,57,70,0.45)" }}
+                  whileTap={{ scale: 0.96 }}
+                  className="group flex h-[37px] w-fit items-center gap-[25px] rounded-[6px] bg-[#e63946] px-[13px] font-space-grotesk text-[13px] font-medium text-white transition-colors hover:bg-[#ee4250] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      Verifying...
+                    </>
+                  ) : (
+                    <>
+                      {submitLabel}
+                      <ArrowUpRight
+                        size={16}
+                        className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                      />
+                    </>
+                  )}
+                </motion.button>
+              </div>
             </motion.div>
           </motion.form>
         </motion.div>

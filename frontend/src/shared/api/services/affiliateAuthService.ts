@@ -13,6 +13,18 @@ export interface OtpVerifyPayload {
   email: string;
   otp: string;
 }
+export interface ForgotPasswordPayload {
+  email: string;
+}
+export interface ResetPasswordPayload {
+  email: string;
+  otp: string;
+  password: string;
+}
+export interface MessageResponse {
+  success: boolean;
+  message: string;
+}
 export interface AuthResponse {
   success?: boolean;
   message?: string;
@@ -31,6 +43,50 @@ export interface AuthResponse {
     badge_tier: string;
   };
   token: string;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isDisplayableMessage(value: string): boolean {
+  const message = value.trim();
+  return (
+    message.length > 0 &&
+    message.length <= 400 &&
+    !/<\/?[a-z][^>]*>|<style\b|<!doctype/i.test(message) &&
+    !/[{}]/.test(message) &&
+    !/(?:^|[;}])\s*[-\w]+\s*:\s*[^;{}]+;/.test(message)
+  );
+}
+
+function unwrapMessageResponse(response: unknown): MessageResponse {
+  let result = response;
+  if (isRecord(result) && "data" in result) {
+    result = result.data;
+    if (isRecord(result) && "data" in result) result = result.data;
+  }
+
+  if (!isRecord(result)) {
+    throw new Error("The server returned an unexpected response. Please try again.");
+  }
+  if (result.success === false) {
+    throw new Error(
+      typeof result.message === "string" && isDisplayableMessage(result.message)
+        ? result.message
+        : "The request could not be completed. Please try again."
+    );
+  }
+  if (
+    typeof result.success !== "boolean" ||
+    typeof result.message !== "string"
+  ) {
+    throw new Error("The server returned an unexpected response. Please try again.");
+  }
+  return {
+    success: result.success,
+    message: isDisplayableMessage(result.message) ? result.message : "",
+  };
 }
 
 // interface ApiResponse<T> {
@@ -65,5 +121,21 @@ export const affiliateAuthService = {
   async resendOtp(payload: { email: string }): Promise<{ success: boolean; message: string }> {
     const res = await apiClient.post<any, { email: string }>("/affiliate/resend-otp", payload);
     return res.data || res;
+  },
+
+  async forgotPassword(payload: ForgotPasswordPayload): Promise<MessageResponse> {
+    const response = await apiClient.post<unknown, ForgotPasswordPayload>(
+      "/affiliate/forgot-password",
+      payload
+    );
+    return unwrapMessageResponse(response);
+  },
+
+  async resetPassword(payload: ResetPasswordPayload): Promise<MessageResponse> {
+    const response = await apiClient.post<unknown, ResetPasswordPayload>(
+      "/affiliate/reset-password",
+      payload
+    );
+    return unwrapMessageResponse(response);
   },
 };

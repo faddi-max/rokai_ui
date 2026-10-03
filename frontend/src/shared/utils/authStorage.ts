@@ -1,5 +1,6 @@
 const SIGNUP_TOKEN_KEY = "rokai_affiliate_signup_token";
 const SIGNUP_EMAIL_KEY = "rokai_affiliate_signup_email";
+const RESET_EMAIL_KEY = "rokai_affiliate_reset_email";
 const SESSION_TOKEN_KEY = "rokai_affiliate_session";
 const USER_KEY = "rokai_affiliate_user";
 
@@ -20,6 +21,13 @@ export const authStorage = {
   },
   hasSignupToken: () => safe(() => !!localStorage.getItem(SIGNUP_TOKEN_KEY), false),
   getSignupEmail: () => safe(() => localStorage.getItem(SIGNUP_EMAIL_KEY) ?? "", ""),
+  saveResetEmail(email: string) {
+    safe(() => localStorage.setItem(RESET_EMAIL_KEY, email), undefined);
+  },
+  getResetEmail: () => safe(() => localStorage.getItem(RESET_EMAIL_KEY) ?? "", ""),
+  clearResetEmail() {
+    safe(() => localStorage.removeItem(RESET_EMAIL_KEY), undefined);
+  },
 
   saveUser(user: any) {
   safe(() => {

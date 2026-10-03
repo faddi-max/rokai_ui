@@ -35,6 +35,7 @@ const itemVariants = {
 interface LoginCardProps {
   onSubmit?: (email: string, password: string) => Promise<void> | void;
   onSwitchToSignup?: () => void;
+  onForgotPassword?: (email: string) => void;
   defaultEmail?: string;
   notice?: string;
 }
@@ -42,6 +43,7 @@ interface LoginCardProps {
 export default function LoginCard({
   onSubmit,
   onSwitchToSignup,
+  onForgotPassword,
   defaultEmail = "",
   notice,
 }: LoginCardProps) {
@@ -225,12 +227,13 @@ export default function LoginCard({
                 </p>
               )}
 
-              <a
-                href="#forgot-password"
+              <button
+                type="button"
+                onClick={() => onForgotPassword?.(email.trim())}
                 className="self-end font-space-grotesk text-[11px] leading-[17.6px] text-[#e63946] transition-opacity hover:opacity-80 hover:underline"
               >
                 Forgot password?
-              </a>
+              </button>
             </motion.div>
 
             <motion.div

@@ -4,6 +4,8 @@ import LoginCard from "@/shared/components/sections/LoginCard";
 import SignupCard, { type SignupValues } from "@/shared/components/sections/SignupCard";
 import OtpVerifyCard from "@/shared/components/sections/OtpVerifyCard";
 import NotificationModal from "@/shared/components/sections/NotificationModal";
+import ForgotPasswordCard from "@/shared/components/sections/ForgotPasswordCard";
+import ResetPasswordCard from "@/shared/components/sections/ResetPasswordCard";
 import { ApiError } from "@/shared/api/apiClient";
 import {
   affiliateAuthService,
@@ -13,33 +15,49 @@ import { authStorage } from "@/shared/utils/authStorage";
 import { validateOtp } from "@/shared/utils/formValidation";
 import SectionGlow from "@/shared/components/layout/SectionGlow";
 
-type View = "signup" | "login" | "verify-otp";
+type View =
+  | "signup"
+  | "login"
+  | "verify-otp"
+  | "forgot-password"
+  | "reset-otp"
+  | "reset-password";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+function isDisplayableMessage(value: string): boolean {
+  const message = value.trim();
+  if (!message || message.length > 400) return false;
+  if (/<\/?[a-z][^>]*>|<style\b|<!doctype/i.test(message)) return false;
+  if (/[{}]/.test(message) || /(?:^|[;}])\s*[-\w]+\s*:\s*[^;{}]+;/.test(message)) {
+    return false;
+  }
+  return true;
+}
+
 function extractServerMessage(payload: unknown): string | null {
   if (typeof payload === "string") {
     const message = payload.trim();
-    return message || null;
+    return isDisplayableMessage(message) ? message : null;
   }
   if (!isRecord(payload)) return null;
 
   for (const key of ["message", "error", "errors"]) {
     const value = payload[key];
-    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "string" && isDisplayableMessage(value)) return value.trim();
     if (Array.isArray(value)) {
       const firstMessage = value.find(
-        (item): item is string => typeof item === "string" && !!item.trim()
+        (item): item is string =>
+          typeof item === "string" && isDisplayableMessage(item)
       );
       if (firstMessage) return firstMessage.trim();
     }
     if (isRecord(value)) {
-      const firstFieldError = Object.values(value).find(
-        (item) => typeof item === "string" || Array.isArray(item)
-      );
-      const message = extractServerMessage(firstFieldError);
+      const message = Object.values(value)
+        .map((item) => extractServerMessage(item))
+        .find((item): item is string => item !== null);
       if (message) return message;
     }
   }
@@ -76,8 +94,22 @@ function getErrorMessage(error: unknown, fallback: string): string {
     }
   }
 
-  if (error instanceof Error && error.message.trim()) return error.message;
+  if (error instanceof Error && isDisplayableMessage(error.message)) {
+    return error.message.trim();
+  }
   return fallback;
+}
+
+function isResetCodeError(error: unknown): boolean {
+  if (error instanceof ApiError) {
+    const message = `${error.message} ${extractServerMessage(error.details) ?? ""}`;
+    return (
+      [400, 401, 422].includes(error.status) &&
+      /(otp|verification|reset|code|expired|invalid)/i.test(message)
+    );
+  }
+
+  return error instanceof Error && /(otp|verification|reset) code.*(invalid|expired)/i.test(error.message);
 }
 
 export default function AffiliateLoginSection() {
@@ -89,6 +121,7 @@ export default function AffiliateLoginSection() {
   const [pendingEmail, setPendingEmail] = useState<string>(
     () => authStorage.getSignupEmail() || ""
   );
+  const [resetOtp, setResetOtp] = useState("");
 
   // Modal States
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -177,7 +210,91 @@ export default function AffiliateLoginSection() {
       await affiliateAuthService.resendOtp({ email: activeEmail });
       openModal("success", "New OTP has been sent to your email!");
     } catch (error) {
-      showError(error, "We couldn't resend the verification code. Please try again.");
+      throw new Error(
+        getErrorMessage(error, "We couldn't resend the verification code. Please try again.")
+      );
+    }
+  };
+
+  const handleForgotPassword = async (email: string) => {
+    try {
+      const response = await affiliateAuthService.forgotPassword({ email });
+      authStorage.saveResetEmail(email);
+      setPendingEmail(email);
+      setResetOtp("");
+      setView("reset-otp");
+      openModal(
+        "success",
+        response.message || "If an account matches that email, a reset code has been sent."
+      );
+    } catch (error) {
+      showError(error, "We couldn't send the reset code. Please try again.");
+    }
+  };
+
+  const handleVerifyResetOtp = async (otp: string) => {
+    const email = authStorage.getResetEmail() || pendingEmail;
+    if (!email) {
+      setView("forgot-password");
+      openModal("error", "Enter your email address to request a password reset code.");
+      return;
+    }
+
+    setResetOtp(otp);
+    setView("reset-password");
+  };
+
+  const handleResendResetCode = async () => {
+    const email = authStorage.getResetEmail() || pendingEmail;
+    if (!email) {
+      openModal("error", "Enter your email address to request a password reset code.");
+      setView("forgot-password");
+      return;
+    }
+    try {
+      const response = await affiliateAuthService.forgotPassword({ email });
+      openModal(
+        "success",
+        response.message || "If an account matches that email, a new reset code has been sent."
+      );
+    } catch (error) {
+      throw new Error(getErrorMessage(error, "We couldn't resend the reset code. Please try again."));
+    }
+  };
+
+  const handleResetPassword = async (password: string) => {
+    const email = authStorage.getResetEmail() || pendingEmail;
+    if (!email || !resetOtp) {
+      openModal("error", "Request a password reset code before submitting a new password.");
+      setView("forgot-password");
+      return;
+    }
+    try {
+      const response = await affiliateAuthService.resetPassword({
+        email,
+        otp: resetOtp,
+        password,
+      });
+      authStorage.saveSignup("", email);
+      authStorage.clearResetEmail();
+      setResetOtp("");
+      setView("login");
+      openModal(
+        "success",
+        response.message || "Your password has been changed. You can now log in."
+      );
+    } catch (error) {
+      if (isResetCodeError(error)) {
+        setResetOtp("");
+        setView("reset-otp");
+        openModal(
+          "error",
+          (error instanceof ApiError && extractServerMessage(error.details)) ||
+            "The reset code is invalid or expired. Please enter it again."
+        );
+        return;
+      }
+      showError(error, "We couldn't reset your password. Check the code and try again.");
     }
   };
 
@@ -223,19 +340,47 @@ export default function AffiliateLoginSection() {
             ? "Affiliate account"
             : view === "verify-otp"
             ? "Email verification"
+            : view === "forgot-password" || view === "reset-otp" || view === "reset-password"
+            ? "Password recovery"
             : "Affiliate account access"
         }
         title={
-          showDashboard ? "Your affiliate" : view === "verify-otp" ? "Confirm your" : "Start new"
+          showDashboard
+            ? "Your affiliate"
+            : view === "verify-otp"
+            ? "Confirm your"
+            : view === "forgot-password"
+            ? "Recover your"
+            : view === "reset-otp"
+            ? "Enter your"
+            : view === "reset-password"
+            ? "Choose a new"
+            : "Start new"
         }
         highlight={
-          showDashboard ? "dashboard." : view === "verify-otp" ? "identity." : "or continue."
+          showDashboard
+            ? "dashboard."
+            : view === "verify-otp"
+            ? "identity."
+            : view === "forgot-password"
+            ? "account."
+            : view === "reset-otp"
+            ? "reset code."
+            : view === "reset-password"
+            ? "password."
+            : "or continue."
         }
         description={
           showDashboard
             ? "Your account is ready. Find your affiliate status and program details below."
             : view === "verify-otp"
             ? "Enter the 6-digit verification code sent to your email to continue."
+            : view === "forgot-password"
+            ? "Enter your email and we'll send a code so you can reset your password."
+            : view === "reset-otp"
+            ? "Enter the 6-digit code we sent to your email."
+            : view === "reset-password"
+            ? "Your code is verified. Set a new password to finish."
             : "Create an affiliate account to begin your journey. Already registered? Log in to access your dashboard and track your activity."
         }
       />
@@ -248,13 +393,53 @@ export default function AffiliateLoginSection() {
           onSubmit={handleVerifyOtp}
           onResend={handleResendOtp}
         />
+      ) : view === "forgot-password" ? (
+        <ForgotPasswordCard
+          defaultEmail={
+            pendingEmail || authStorage.getResetEmail() || authStorage.getSignupEmail()
+          }
+          onSubmit={handleForgotPassword}
+          onBackToLogin={(email) => {
+            if (email) setPendingEmail(email);
+            setView("login");
+          }}
+        />
+      ) : view === "reset-otp" ? (
+        <OtpVerifyCard
+          email={authStorage.getResetEmail() || pendingEmail}
+          onSubmit={handleVerifyResetOtp}
+          onResend={handleResendResetCode}
+          eyebrow="Password recovery"
+          title="Enter reset code"
+          description={
+            <>
+              We sent a one-time code to{" "}
+              <span className="font-medium text-white">
+                {authStorage.getResetEmail() || pendingEmail || "your email"}
+              </span>
+              . Enter it below to continue.
+            </>
+          }
+          submitLabel="Verify code"
+          onBack={() => setView("login")}
+        />
+      ) : view === "reset-password" ? (
+        <ResetPasswordCard
+          email={authStorage.getResetEmail() || pendingEmail}
+          onSubmit={handleResetPassword}
+          onBackToLogin={() => setView("login")}
+        />
       ) : view === "signup" ? (
         <SignupCard onSubmit={handleSignup} onSwitchToLogin={() => setView("login")} />
       ) : (
         <LoginCard
-          defaultEmail={authStorage.getSignupEmail()}
+          defaultEmail={pendingEmail || authStorage.getSignupEmail()}
           onSubmit={handleLogin}
           onSwitchToSignup={() => setView("signup")}
+          onForgotPassword={(email) => {
+            if (email) setPendingEmail(email);
+            setView("forgot-password");
+          }}
         />
       )}
 
@@ -313,16 +498,6 @@ function AffiliateDashboard({ account }: { account: AuthResponse | null }) {
     </SectionGlow>
   );
 }
-
-
-
-
-
-
-
-
-
-
 
 
 

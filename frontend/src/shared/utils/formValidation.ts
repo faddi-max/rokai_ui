@@ -3,6 +3,7 @@ import { isValidEmail } from "@/shared/utils/emailValidation";
 export const LIMITS = {
   nameMin: 2,
   nameMax: 80,
+  emailMax: 254,
   passwordMin: 8,
   passwordMax: 128,
   otpLength: 6,
