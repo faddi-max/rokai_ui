@@ -2,8 +2,11 @@ import { motion } from "framer-motion";
 
 import LeadMagnetHero from "./components/LeadMagnetHero";
 
+import AcademyIntelligenceForm from "./components/AcademyIntelligenceForm";
+
 import FAQSection from "@/features/home/components/FAQSection";
 import ClientFeedbackSection from "@/features/categories/componnets/ClientFeedbackSection";
+import EliteStandardsSection from "./components/EliteStandardsSection";
 
 export default function LeadMagnetStudioPage() {
   return (
@@ -14,9 +17,10 @@ export default function LeadMagnetStudioPage() {
       className="w-full"
     >
       <LeadMagnetHero />
-        <ClientFeedbackSection />
-           <FAQSection />
-     
+      <EliteStandardsSection />
+      <AcademyIntelligenceForm />
+      <ClientFeedbackSection />
+      <FAQSection />
     </motion.main>
   );
 }
