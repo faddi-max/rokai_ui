@@ -2,12 +2,26 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Loader2 } from "lucide-react";
 import SectionGlow from "@/shared/components/layout/SectionGlow";
+import {
+  FIELD_MAX_LENGTH,
+  FIELD_ORDER,
+  FormSubmitError,
+  SCORE_META,
+  toPayload,
+  validateAll,
+  validateField,
+  type AcademyFormValues,
+  type AcademyPayload,
+  type FieldErrors,
+} from "../data/academyReport";
 
 /* -------------------------------------------------------------------------- */
 /*  Types — API-ready                                                         */
 /* -------------------------------------------------------------------------- */
 
-export type AcademyFormValues = Record<string, string>;
+export type { AcademyFormValues };
+
+type ScoreMeta = (typeof SCORE_META)[number];
 
 interface TextFieldConfig {
   name: string;
@@ -18,21 +32,15 @@ interface TextFieldConfig {
   fullWidth?: boolean;
 }
 
-interface ScoreFieldConfig {
-  name: string;
-  label: string;
-  hint: string;
-}
-
 export interface AcademyIntelligenceFormProps {
   eyebrow?: string;
   title?: string;
   description?: string;
-  onGenerate?: (values: AcademyFormValues) => Promise<void> | void;
+  onGenerate?: (payload: AcademyPayload) => Promise<void> | void;
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Field config (score labels inferred from a low-res screenshot — verify)   */
+/*  Field config    */
 /* -------------------------------------------------------------------------- */
 
 const PROFILE_FIELDS: TextFieldConfig[] = [
@@ -45,16 +53,7 @@ const PROFILE_FIELDS: TextFieldConfig[] = [
   { name: "academyAge", label: "Academy Age (Years)", placeholder: "e.g. 5", type: "number" },
 ];
 
-const SCORE_FIELDS: ScoreFieldConfig[] = [
-  { name: "brandIdentity", label: "Brand Identity", hint: "Logo, colors and visual consistency" },
-  { name: "teamIdentity", label: "Team Identity", hint: "Uniform and team pride" },
-  { name: "communityStrength", label: "Community Strength", hint: "Member loyalty and retention" },
-  { name: "contentMarketing", label: "Content Marketing", hint: "Posts, videos and reach" },
-  { name: "socialPresence", label: "Social Media Presence", hint: "Following and engagement" },
-  { name: "memberExperience", label: "Member Experience", hint: "Onboarding and day-to-day service" },
-  { name: "merchSystem", label: "Merchandise System", hint: "Apparel ordering and sales" },
-  { name: "leadershipCulture", label: "Leadership Culture", hint: "Coaching and values" },
-];
+const SCORE_FIELDS = SCORE_META;
 
 const DEFAULT_SCORE = "50";
 
@@ -80,6 +79,11 @@ const itemVariants = {
 const inputClass =
   "h-[49px] w-full rounded-[6px] border border-[#383838] bg-[#101010] px-[14px] font-space-grotesk text-[16px] text-white placeholder:text-[#757575] transition-all duration-300 hover:border-[#555] focus:border-[#e63946] focus:ring-1 focus:ring-[#e63946]/50 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none";
 
+const errorInputClass = "!border-[#e63946] focus:!ring-[#e63946]/50";
+
+const errorTextClass =
+  "font-space-grotesk text-[11px] text-[#ff6b75]";
+
 const labelClass =
   "font-space-grotesk text-[12px] font-bold uppercase tracking-[1px] text-[#bcbcbc]";
 
@@ -104,17 +108,16 @@ function GroupHeading({ title, meta }: { title: string; meta: string }) {
 }
 
 function TextField({
-  config,
-  value,
-  onChange,
+  config, value, error, onChange, onBlur,
 }: {
   config: TextFieldConfig;
   value: string;
+  error?: string;
   onChange: (name: string, value: string) => void;
+  onBlur: (name: string) => void;
 }) {
   const { name, label, placeholder, type = "text", required, fullWidth } = config;
   const id = `academy-${name}`;
-
   return (
     <div className={`flex flex-col gap-2 ${fullWidth ? "md:col-span-2" : ""}`}>
       <label htmlFor={id} className={labelClass}>
@@ -124,34 +127,39 @@ function TextField({
       <input
         id={id}
         name={name}
-        type={type}
-        required={required}
-        min={type === "number" ? 0 : undefined}
+        type={type === "number" ? "text" : type}
+        inputMode={type === "number" ? "numeric" : undefined}
+        maxLength={FIELD_MAX_LENGTH[name]}
         value={value}
         placeholder={placeholder}
-        onChange={(e) => onChange(name, e.target.value)}
-        className={inputClass}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${id}-error` : undefined}
+        onChange={(e) =>
+          onChange(name, type === "number" ? e.target.value.replace(/\D/g, "") : e.target.value)
+        }
+        onBlur={() => onBlur(name)}
+        className={`${inputClass} ${error ? errorInputClass : ""}`}
       />
+      {error && <p id={`${id}-error`} role="alert" className={errorTextClass}>{error}</p>}
     </div>
   );
 }
 
 function ScoreField({
-  config,
-  value,
-  onChange,
+  config, value, error, onChange, onBlur,
 }: {
-  config: ScoreFieldConfig;
+  config: ScoreMeta;
   value: string;
+  error?: string;
   onChange: (name: string, value: string) => void;
+  onBlur: (name: string) => void;
 }) {
   const { name, label, hint } = config;
   const id = `academy-${name}`;
 
   const handleChange = (raw: string) => {
-    if (raw === "") return onChange(name, "");
-    const n = Math.min(100, Math.max(0, Math.round(Number(raw))));
-    onChange(name, Number.isNaN(n) ? "" : String(n));
+    const digits = raw.replace(/\D/g, "").slice(0, 3);
+    onChange(name, digits === "" ? "" : String(Math.min(100, Number(digits))));
   };
 
   return (
@@ -166,14 +174,14 @@ function ScoreField({
         <input
           id={id}
           name={name}
-          type="number"
+          type="text"
           inputMode="numeric"
-          min={0}
-          max={100}
-          required
           value={value}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${id}-error` : undefined}
           onChange={(e) => handleChange(e.target.value)}
-          className={`${inputClass} pr-16`}
+          onBlur={() => onBlur(name)}
+          className={`${inputClass} pr-16 ${error ? errorInputClass : ""}`}
         />
         <span
           aria-hidden
@@ -182,6 +190,7 @@ function ScoreField({
           / 100
         </span>
       </div>
+      {error && <p id={`${id}-error`} role="alert" className={errorTextClass}>{error}</p>}
     </div>
   );
 }
@@ -197,27 +206,55 @@ export default function AcademyIntelligenceForm({
   onGenerate,
 }: AcademyIntelligenceFormProps) {
   const [values, setValues] = useState<AcademyFormValues>(buildInitialValues);
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const update = (name: string, value: string) =>
+  const update = (name: string, value: string) => {
     setValues((prev) => ({ ...prev, [name]: value }));
+    if (touched[name] || errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
+    }
+  };
+
+  const handleBlur = (name: string) => {
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, values[name]) }));
+  };
+
+  const focusField = (name: string) =>
+    document.getElementById(`academy-${name}`)?.focus();
 
   const handleReset = () => {
     setValues(buildInitialValues());
+    setErrors({});
+    setTouched({});
     setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const found = validateAll(values);
+    setTouched(Object.fromEntries(FIELD_ORDER.map((n) => [n, true])));
+    setErrors(found);
+    const first = FIELD_ORDER.find((n) => found[n]);
+    if (first) {
+      setError("Please fix the highlighted fields.");
+      focusField(first);
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
-      await onGenerate?.(values);
+      await onGenerate?.(toPayload(values));
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Something went wrong. Please try again."
-      );
+      if (err instanceof FormSubmitError) {
+        setErrors(err.fieldErrors);
+        const f = FIELD_ORDER.find((n) => err.fieldErrors[n]);
+        if (f) focusField(f);
+      }
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -243,6 +280,7 @@ export default function AcademyIntelligenceForm({
             whileInView="visible"
             viewport={{ once: true, amount: 0.05 }}
             onSubmit={handleSubmit}
+            noValidate
             className="flex flex-col gap-6 px-6 py-10 sm:px-[42px]"
           >
             {/* Header */}
@@ -280,7 +318,9 @@ export default function AcademyIntelligenceForm({
                     key={field.name}
                     config={field}
                     value={values[field.name]}
+                    error={errors[field.name]}
                     onChange={update}
+                    onBlur={handleBlur}
                   />
                 ))}
               </div>
@@ -295,7 +335,9 @@ export default function AcademyIntelligenceForm({
                     key={field.name}
                     config={field}
                     value={values[field.name]}
+                    error={errors[field.name]}
                     onChange={update}
+                    onBlur={handleBlur}
                   />
                 ))}
               </div>

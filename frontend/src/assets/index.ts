@@ -35,6 +35,12 @@ import work3 from './work3.png'
 import work4 from './work4.png'
 import work5 from './work5.png'
 import work6 from './work6.png'
+import collaboration from './collaboration.jpg'
+import respect from './respect.jpg'
+import growth from './growth.jpg'
+import craft from './craft.jpg'
+import careerImage from './career.png'
+import founderImage from './founder.jpg'
 import bloghero from './bloghero.png'
 import blogcatagory from './blogcatagory.png' 
 import affiliateProgramhero from './affiliatehero.png'
@@ -99,7 +105,11 @@ import pants from './pants.png'
 import rashguards from './rashguards.png'
 import rokaiManufacturingVideo from './rokai manufacturing video.mp4'
 import rokailogo from './rokailogo.png'
+import mainimage from './mainimage.png'
+import secondaryimage from './secondaryImage.jpg'
 export {
+  mainimage,
+  secondaryimage,
   rokaiManufacturingVideo,
   rokailogo,
   jackets,
@@ -169,6 +179,12 @@ export {
   work4,
   work5,
   work6,
+  collaboration,
+  respect,
+  growth,
+  craft,
+  careerImage,
+  founderImage,
   gi,
   gi1,
   group,

@@ -27,6 +27,7 @@ import BJJApparelSizeChartPage from "@/features/services/BJJApparelSizeChartPage
 import BJJApparelFabricsPage from "@/features/services/BJJApparelFabricsPage/BJJApparelFabricsPage";
 import AboutUs from "@/features/AboutUs/AboutUs";
 import { ContactPage } from "@/features/contact/ContactPage";
+import CareersPage from "@/features/careers/CareersPage";
 import PrivacyPolicy from "@/features/PrivacyPolicy/PrivacyPolicy";
 import TestimonialPage from "@/features/testimonials/TestimonialPage";
 
@@ -123,6 +124,7 @@ export default function App() {
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/services/:slug" element={<ServicesPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/careers" element={<CareersPage />} />
             <Route path="/legal/:slug" element={<PrivacyPolicy />} />
                <Route path="/legal" element={<PrivacyPolicy />} />
             <Route path="/blogs" element={<BlogsPage />} />

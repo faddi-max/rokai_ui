@@ -41,6 +41,12 @@ export interface AuthResponse {
     status: string;
     commission_percentage: string | number;
     badge_tier: string;
+    website_url?: string | null;
+    linkedin?: string | null;
+    youtube?: string | null;
+    instagram?: string | null;
+    facebook?: string | null;
+    tiktok?: string | null;
   };
   token: string;
 }

@@ -18,6 +18,7 @@ export interface ContactHeroProps {
   primaryCta?: HeroCta;
   secondaryCta?: HeroCta;
   quickLinks?: string[];
+  iscontactPage?: boolean;
 }
 
 const BG_COLOR = "#111111";
@@ -48,6 +49,7 @@ export default function ContactHero({
   primaryCta = { label: "Send an Enquiry", href: "#enquiry" },
   secondaryCta = { label: "Find Rokai", href: "#location" },
   quickLinks = ["General Inquiries", "Partnerships", "Manufacturing", "Support"],
+  iscontactPage = true,
 }: ContactHeroProps) {
   return (
     <section
@@ -135,22 +137,28 @@ export default function ContactHero({
             {secondaryCta.label}
           </Button>
         </motion.div>
-
-        {quickLinks.length > 0 && (
-          <motion.div
-            variants={item}
-            className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5"
-          >
-            {quickLinks.map((link, i) => (
-              <span key={link} className="flex items-center gap-3">
-                {i > 0 && <span aria-hidden className="text-[10px] text-white/25">|</span>}
-                <span className="font-space-grotesk text-[9px] font-medium uppercase tracking-[0.1em] text-white/40">
-                  {link}
-                </span>
-              </span>
-            ))}
-          </motion.div>
+            
+{iscontactPage && quickLinks.length > 0 && (
+  <motion.div
+    variants={item}
+    className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5"
+  >
+    {quickLinks.map((link, i) => (
+      <span key={link} className="flex items-center gap-3">
+        {i > 0 && (
+          <span aria-hidden className="text-[10px] text-white/25">
+            |
+          </span>
         )}
+        <span className="font-space-grotesk text-[9px] font-medium uppercase tracking-[0.1em] text-white/40">
+          {link}
+        </span>
+      </span>
+    ))}
+  </motion.div>
+)}
+
+        
       </motion.div>
     </section>
   );

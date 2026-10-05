@@ -55,6 +55,7 @@ export default function LoginCard({
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [keepSignedInError, setKeepSignedInError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -63,13 +64,22 @@ export default function LoginCard({
     const normalizedEmail = email.trim();
     const emailMsg = validateEmail(normalizedEmail);
     const passwordMsg = validateLoginPassword(password); // never trimmed
+    const keepSignedInMsg = keepSignedIn
+      ? null
+      : "Please check “Keep me signed in” to continue.";
 
     setEmailError(emailMsg || null);
     setPasswordError(passwordMsg || null);
+    setKeepSignedInError(keepSignedInMsg);
     setError(null);
 
-    if (emailMsg || passwordMsg) {
-      document.getElementById(emailMsg ? "login-email" : "login-password")?.focus();
+    if (emailMsg || passwordMsg || keepSignedInMsg) {
+      const invalidFieldId = emailMsg
+        ? "login-email"
+        : passwordMsg
+        ? "login-password"
+        : "keep-signed-in";
+      document.getElementById(invalidFieldId)?.focus();
       return;
     }
 
@@ -242,9 +252,18 @@ export default function LoginCard({
             >
               <label className="flex cursor-pointer items-center gap-[13px]">
                 <input
+                  id="keep-signed-in"
                   type="checkbox"
                   checked={keepSignedIn}
-                  onChange={(e) => setKeepSignedIn(e.target.checked)}
+                  onChange={(e) => {
+                    setKeepSignedIn(e.target.checked);
+                    setKeepSignedInError(null);
+                  }}
+                  required
+                  aria-invalid={Boolean(keepSignedInError)}
+                  aria-describedby={
+                    keepSignedInError ? "keep-signed-in-error" : undefined
+                  }
                   className="size-[13px] rounded-[2.5px] border border-[#767676] bg-white accent-[#e63946] transition-transform hover:scale-110"
                 />
 
@@ -287,6 +306,15 @@ export default function LoginCard({
                 )}
               </motion.button>
             </motion.div>
+            {keepSignedInError && (
+              <p
+                id="keep-signed-in-error"
+                role="alert"
+                className="-mt-4 text-right text-xs text-red-400"
+              >
+                {keepSignedInError}
+              </p>
+            )}
 
             <motion.div
               variants={itemVariants}

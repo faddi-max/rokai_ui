@@ -120,6 +120,7 @@ const Footer = () => {
         { label: "Blogs", href: "/blogs" },
         { label: "About Us", href: "/about" },
         { label: "Testimonials", href: "/testimonials" },
+        { label: "Careers", href: "/careers" },
         { label: "Contact Us", href: "/contact" },
       ],
     },

@@ -127,6 +127,9 @@ export default function AffiliateLoginSection() {
   const [showDashboard, setShowDashboard] = useState(
     () => Boolean(authStorage.getSession())
   );
+  const [account, setAccount] = useState<AuthResponse | null>(
+    () => authStorage.getUser()
+  );
   const [view, setView] = useState<View>("signup");
 
   const [pendingEmail, setPendingEmail] = useState<string>(
@@ -200,6 +203,7 @@ export default function AffiliateLoginSection() {
       authStorage.saveSession(authData.token);
       authStorage.saveSignup(authData.token, email);
       authStorage.saveUser(authData);
+      setAccount(authData);
       setShowDashboard(true);
 
       openModal("success", "Your email has been successfully verified!");
@@ -333,6 +337,7 @@ export default function AffiliateLoginSection() {
       authStorage.saveSession(authData.token);
       authStorage.saveSignup(authData.token, email);
       authStorage.saveUser(authData);
+      setAccount(authData);
       setShowDashboard(true);
 
       openModal("success", "Login successful!");
@@ -349,8 +354,6 @@ export default function AffiliateLoginSection() {
       showError(error, "Email or password is incorrect. Check your details and try again.");
     }
   };
-
-  const user = authStorage.getUser();
 
   return (
     <section>
@@ -406,7 +409,13 @@ export default function AffiliateLoginSection() {
       />
 
       {showDashboard ? (
-        <AffiliateDashboard account={user} />
+        <AffiliateDashboard
+          account={account}
+          onUpdateAccount={(updatedAccount) => {
+            authStorage.saveUser(updatedAccount);
+            setAccount(updatedAccount);
+          }}
+        />
       ) : view === "verify-otp" ? (
         <OtpVerifyCard
           email={pendingEmail || authStorage.getSignupEmail()}
@@ -473,12 +482,167 @@ export default function AffiliateLoginSection() {
   );
 }
 
-function AffiliateDashboard({ account }: { account: AuthResponse | null }) {
+type ProfileLinkField =
+  | "website_url"
+  | "linkedin"
+  | "youtube"
+  | "instagram"
+  | "facebook"
+  | "tiktok";
+
+const PROFILE_LINK_FIELDS: {
+  key: ProfileLinkField;
+  label: string;
+  placeholder: string;
+}[] = [
+  { key: "website_url", label: "Website", placeholder: "https://yourwebsite.com" },
+  { key: "linkedin", label: "LinkedIn", placeholder: "https://linkedin.com/in/yourname" },
+  { key: "youtube", label: "YouTube", placeholder: "https://youtube.com/@yourchannel" },
+  { key: "instagram", label: "Instagram", placeholder: "https://instagram.com/yourname" },
+  { key: "facebook", label: "Facebook", placeholder: "https://facebook.com/yourpage" },
+  { key: "tiktok", label: "TikTok", placeholder: "https://tiktok.com/@yourname" },
+];
+
+function isSafeProfileUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function AffiliateDashboard({
+  account,
+  onUpdateAccount,
+}: {
+  account: AuthResponse | null;
+  onUpdateAccount: (account: AuthResponse) => void;
+}) {
   const status = account?.profile?.status ?? "Signed in";
+  const missingFields = PROFILE_LINK_FIELDS.filter(
+    ({ key }) => account?.profile?.[key] == null
+  );
+  const [profileLinks, setProfileLinks] = useState<Record<ProfileLinkField, string>>(
+    () => Object.fromEntries(PROFILE_LINK_FIELDS.map(({ key }) => [key, ""])) as Record<ProfileLinkField, string>
+  );
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<ProfileLinkField, string>>>({});
+  const [formError, setFormError] = useState("");
+
+  const saveProfileLinks = () => {
+    if (!account?.profile) return;
+
+    const nextFieldErrors: Partial<Record<ProfileLinkField, string>> = {};
+    let hasLink = false;
+
+    for (const { key, label } of missingFields) {
+      const value = profileLinks[key].trim();
+      if (value) {
+        hasLink = true;
+        if (!isSafeProfileUrl(value)) {
+          nextFieldErrors[key] = `${label} must be a valid URL beginning with http:// or https://.`;
+        }
+      }
+    }
+
+    setFieldErrors(nextFieldErrors);
+    if (Object.keys(nextFieldErrors).length > 0) {
+      setFormError("Please correct the highlighted links before saving.");
+      return;
+    }
+    if (!hasLink) {
+      setFormError("Enter at least one website or social link.");
+      return;
+    }
+
+    const updatedAccount: AuthResponse = {
+      ...account,
+      profile: {
+        ...account.profile,
+        ...Object.fromEntries(
+          missingFields
+            .filter(({ key }) => profileLinks[key].trim())
+            .map(({ key }) => [key, profileLinks[key].trim()])
+        ),
+      },
+    };
+    onUpdateAccount(updatedAccount);
+    setFormError("");
+    setFieldErrors({});
+  };
 
   return (
     <SectionGlow>
       <div className="mx-auto my-6 w-full max-w-193.5 rounded-xl border border-white/10 bg-[#111] p-6 text-white sm:p-8">
+        {missingFields.length > 0 && account?.profile && (
+          <form
+            className="mb-8 border-b border-white/10 pb-7"
+            onSubmit={(event) => {
+              event.preventDefault();
+              saveProfileLinks();
+            }}
+          >
+            <p className="font-space-grotesk text-xs font-bold uppercase tracking-[1px] text-[#e63946]">
+              Complete your profile
+            </p>
+            <h3 className="mt-2 font-space-grotesk text-xl font-bold">
+              Add your website and social links
+            </h3>
+
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              {missingFields.map(({ key, label, placeholder }) => (
+                <label
+                  key={key}
+                  className="flex flex-col gap-2 font-space-grotesk text-xs text-white/70"
+                >
+                  {label}
+                  <input
+                    type="text"
+                    inputMode="url"
+                    value={profileLinks[key]}
+                    onChange={(event) => {
+                      setProfileLinks((current) => ({
+                        ...current,
+                        [key]: event.target.value,
+                      }));
+                      setFieldErrors((current) => {
+                        const next = { ...current };
+                        delete next[key];
+                        return next;
+                      });
+                      setFormError("");
+                    }}
+                    placeholder={placeholder}
+                    aria-invalid={Boolean(fieldErrors[key])}
+                    aria-describedby={fieldErrors[key] ? `${key}-error` : undefined}
+                    className={`h-11 rounded-md border bg-black/30 px-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-[#e63946] ${
+                      fieldErrors[key] ? "border-red-400" : "border-white/15"
+                    }`}
+                  />
+                  {fieldErrors[key] && (
+                    <span id={`${key}-error`} className="text-xs text-red-300">
+                      {fieldErrors[key]}
+                    </span>
+                  )}
+                </label>
+              ))}
+            </div>
+
+            {formError && (
+              <p role="alert" className="mt-4 font-space-grotesk text-sm text-red-300">
+                {formError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className="mt-5 inline-flex min-h-11 items-center justify-center rounded-md bg-[#e63946] px-5 font-space-grotesk text-sm font-bold text-white transition hover:bg-[#c92e3a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              Save profile
+            </button>
+          </form>
+        )}
+
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="font-space-grotesk text-xs font-bold uppercase tracking-[1px] text-[#e63946]">
@@ -512,17 +676,36 @@ function AffiliateDashboard({ account }: { account: AuthResponse | null }) {
               <dt className="font-space-grotesk text-xs text-white/50">Affiliate tier</dt>
               <dd className="mt-1 font-space-grotesk text-sm">{account.profile.badge_tier}</dd>
             </div>
+            {PROFILE_LINK_FIELDS.map(({ key, label }) => {
+              const value = account.profile[key];
+              return (
+                <div key={key}>
+                  <dt className="font-space-grotesk text-xs text-white/50">{label}</dt>
+                  <dd className="mt-1 break-all font-space-grotesk text-sm">
+                    {value && isSafeProfileUrl(value) ? (
+                      <a
+                        href={value}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-white underline decoration-white/30 underline-offset-4 hover:text-[#ff7b82]"
+                      >
+                        {value}
+                      </a>
+                    ) : value ? (
+                      value
+                    ) : (
+                      <span className="text-white/40">Not provided</span>
+                    )}
+                  </dd>
+                </div>
+              );
+            })}
           </dl>
         )}
       </div>
     </SectionGlow>
   );
 }
-
-
-
-
-
 
 
 
