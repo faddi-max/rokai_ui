@@ -15,6 +15,7 @@ import ClubPartnershipProgram from "@/features/programs/club-partnership/ClubPar
 import SinglePageBlog from "@/features/blogs/SingleBlogPage";
 import ProgramApplyPage from "@/features/programs/ProgramForm/ProgramApplyPage";
 import ResourcesPage from "@/features/resources/ResourcesPage";
+import LeadMagnetStudioPage from "@/features/resources/lead-magnet-studio/LeadMagnetStudioPage";
 
 import { OemManufacturingPage } from "@/features/services/OemManufacturingPage/OemManufacturingPage";
 import { CustomLabelPackagingPage } from "@/features/services/CustomLabelsPackagingPage/CustomLabelsPackagingPage";
@@ -126,6 +127,7 @@ export default function App() {
                <Route path="/legal" element={<PrivacyPolicy />} />
             <Route path="/blogs" element={<BlogsPage />} />
             <Route path="/resources" element={<ResourcesPage />} />
+            <Route path="/resources/lead-magnet-studio" element={<LeadMagnetStudioPage />} />
             <Route path="/testimonials" element={<TestimonialPage />} />
             <Route path="/blogs/category/:slug" element={<BlogCategoryPage />} />
             <Route path="/blogs/:slug" element={<SinglePageBlog />} />

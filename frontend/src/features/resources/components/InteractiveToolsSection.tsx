@@ -15,6 +15,7 @@ export interface ToolCardData {
   title: string;
   description: string;
   featured?: boolean;
+  href?: string;
 }
 
 export interface InteractiveToolsSectionProps {
@@ -62,20 +63,18 @@ const DEFAULT_TOOLS: ToolCardData[] = [
     description: "Build a more accurate size recommendation.",
     featured: true,
   },
+  {
+    id: "lead-magnet-studio",
+    label: "Content Tool",
+    title: "Lead Magnet Studio",
+    description: "Shape a useful content offer for your audience.",
+    href: "/resources/lead-magnet-studio",
+  },
 ];
 
-function ToolCard({ label, title, description, featured, index }: ToolCardData & { index: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.45, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -4 }}
-      className={`flex h-full min-h-[150px] w-full max-w-[312.49px] flex-col rounded-[13.33px] px-5 py-5 shadow-[0px_0px_9px_0px_#E6394647] transition-colors duration-300 ${
-        featured ? "bg-[#E63946]" : "border border-white/10 bg-[#111111] hover:border-[#E63946]/40"
-      }`}
-    >
+function ToolCard({ label, title, description, featured, href, index }: ToolCardData & { index: number }) {
+  const content = (
+    <>
       <span
         className={`font-space-grotesk text-[10px] font-bold uppercase tracking-[0.08em] ${
           featured ? "text-white/75" : "text-[#E63946]"
@@ -84,12 +83,9 @@ function ToolCard({ label, title, description, featured, index }: ToolCardData &
         {label}
       </span>
 
-      <h3
-        className={`mt-10 font-space-grotesk text-[16px] font-bold leading-[1.25] ${
-          featured ? "text-white" : "text-white"
-        }`}
-      >
+      <h3 className="mt-10 flex items-center gap-2 font-space-grotesk text-[16px] font-bold leading-[1.25] text-white">
         {title}
+        {href && <ArrowUpRight size={16} aria-hidden="true" />}
       </h3>
 
       <p
@@ -99,6 +95,33 @@ function ToolCard({ label, title, description, featured, index }: ToolCardData &
       >
         {description}
       </p>
+    </>
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.45, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -4 }}
+      className={`flex h-full min-h-[150px] w-full max-w-[312.49px] flex-col rounded-[13.33px] shadow-[0px_0px_9px_0px_#E6394647] transition-colors duration-300 ${
+        featured ? "bg-[#E63946]" : "border border-white/10 bg-[#111111] hover:border-[#E63946]/40"
+      }`}
+    >
+      {href ? (
+        <a
+          href={href}
+          aria-label={`${title}: ${description}`}
+          className="flex h-full flex-col rounded-[13.33px] px-5 py-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        >
+          {content}
+        </a>
+      ) : (
+        <div className="flex h-full flex-col rounded-[13.33px] px-5 py-5">
+          {content}
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -126,7 +149,7 @@ export default function InteractiveToolsSection({
         accentColor="#E63946"
       />
 
-      <div className="relative py-10 z-10 mx-auto grid w-full max-w-[1178px] grid-cols-1 gap-10 px-5 pb-16 sm:px-8 lg:grid-cols-2 lg:gap-14 lg:px-[30px]">
+      <div id="tools" className="relative py-10 z-10 mx-auto grid w-full max-w-[1178px] grid-cols-1 gap-10 px-5 pb-16 sm:px-8 lg:grid-cols-2 lg:gap-14 lg:px-[30px]">
         <div className="flex flex-col gap-6">
           <div className="flex flex-wrap items-center gap-5">
             {stats.map((stat, i) => (

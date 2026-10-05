@@ -100,6 +100,17 @@ function getErrorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
+function getEmailVerificationMessage(error: unknown): string | null {
+  if (!(error instanceof ApiError)) return null;
+
+  const message = extractServerMessage(error.details) ?? error.message;
+  return /(?:otp|one[- ]time (?:password|code)).{0,80}(?:sent|send)|(?:unverified|not verified)/i.test(
+    message
+  )
+    ? message
+    : null;
+}
+
 function isResetCodeError(error: unknown): boolean {
   if (error instanceof ApiError) {
     const message = `${error.message} ${extractServerMessage(error.details) ?? ""}`;
@@ -326,6 +337,15 @@ export default function AffiliateLoginSection() {
 
       openModal("success", "Login successful!");
     } catch (error) {
+      const verificationMessage = getEmailVerificationMessage(error);
+      if (verificationMessage) {
+        setPendingEmail(email);
+        authStorage.saveSignup("", email);
+        setView("verify-otp");
+        openModal("success", verificationMessage);
+        return;
+      }
+
       showError(error, "Email or password is incorrect. Check your details and try again.");
     }
   };
