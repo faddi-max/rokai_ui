@@ -418,15 +418,39 @@ export const programsService = {
     try {
       return await apiClient.post<ProgramApplicationResponse, ProgramApplicationPayload>(
         "/programs/apply",
-        payload
+        payload,
+        {
+          Accept: "application/json",
+        }
       );
-    } catch (err) {
-      console.warn("API submission endpoint offline, returning simulated success:", err);
-      // Simulate clean API response fallback for development
+    } catch (err: unknown) {
+      const apiErr = err as {
+        message?: string;
+        details?: { message?: string; errors?: Record<string, string[] | string> };
+      };
+
+      let errorMessage =
+        apiErr?.details?.message || apiErr?.message || "Failed to submit application. Please try again.";
+
+      if (apiErr?.details?.errors && typeof apiErr.details.errors === "object") {
+        const messages: string[] = [];
+        for (const key of Object.keys(apiErr.details.errors)) {
+          const val = apiErr.details.errors[key];
+          if (Array.isArray(val)) {
+            messages.push(...val);
+          } else if (typeof val === "string") {
+            messages.push(val);
+          }
+        }
+        if (messages.length > 0) {
+          errorMessage = messages.join(" ");
+        }
+      }
+
+      console.error("Program application failed:", err);
       return {
-        success: true,
-        message: `Application submitted successfully for ${payload.program_id} program!`,
-        id: `APP-${Date.now().toString().slice(-6)}`,
+        success: false,
+        message: errorMessage,
       };
     }
   },

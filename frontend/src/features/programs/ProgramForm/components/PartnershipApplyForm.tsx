@@ -95,7 +95,8 @@ export default function PartnershipApplyForm({
     setError(null);
     try {
       const res = await onSubmit(values);
-      if (res.success) {
+      if (res && res.success) {
+        console.log("Form submission success:", res);
         setSuccess({ id: res.id, message: res.message });
       } else {
         setError(res.message || "Something went wrong. Please try again.");
@@ -332,6 +333,13 @@ export default function PartnershipApplyForm({
                 />
                 {config.termsLabel}
               </label>
+
+              {error && (
+                <div className="mt-4 rounded-md border border-red-500/40 bg-red-500/15 p-3 text-xs text-red-300">
+                  <span className="font-semibold block mb-0.5 text-red-400">Submission Error:</span>
+                  {error}
+                </div>
+              )}
 
               <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
                 <span className="flex items-center gap-1.5 text-[10px] text-white/35">

@@ -1,6 +1,7 @@
 import { ArrowUpRight, Download } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Guide } from "../data/guides.data";
+import { bloghero } from "@/assets";
 
 interface GuideCardProps {
   guide: Guide;
@@ -24,6 +25,9 @@ export default function GuideCard({ guide, index }: GuideCardProps) {
           src={image}
           alt={imageAlt}
           loading="lazy"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = bloghero;
+          }}
           className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
         <span className="absolute left-2.5 top-2.5 flex h-[26px] items-center rounded-[4px] bg-[#7A1B22] px-2 font-space-grotesk text-[10px] font-bold uppercase leading-none text-white">
@@ -47,6 +51,8 @@ export default function GuideCard({ guide, index }: GuideCardProps) {
           <a
             href={downloadHref}
             download
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex h-[34px] items-center gap-2 rounded-[4px] bg-[#E63946] px-3.5 font-space-grotesk text-[11px] font-medium text-white transition-colors hover:bg-[#c9161e] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             Download Now

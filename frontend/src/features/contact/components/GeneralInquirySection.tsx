@@ -92,6 +92,7 @@ export default function GeneralInquirySection({
           setError(res.message || "Something went wrong. Please try again.");
           return;
         }
+        console.log("Inquiry form submission success:", res);
       }
       setSuccess(true);
       setValues(EMPTY_VALUES);

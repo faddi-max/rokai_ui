@@ -51,7 +51,14 @@ export const authStorage = {
     safe(() => localStorage.setItem(SESSION_TOKEN_KEY, token), undefined);
   },
   getSession: () => safe(() => localStorage.getItem(SESSION_TOKEN_KEY), null),
-  clearSession() {
-    safe(() => localStorage.removeItem(SESSION_TOKEN_KEY), undefined);
+  clearAll() {
+    // Remove all stored affiliate related data
+    safe(() => {
+      localStorage.removeItem(SIGNUP_TOKEN_KEY);
+      localStorage.removeItem(SIGNUP_EMAIL_KEY);
+      localStorage.removeItem(RESET_EMAIL_KEY);
+      localStorage.removeItem(SESSION_TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+    }, undefined);
   },
 };
