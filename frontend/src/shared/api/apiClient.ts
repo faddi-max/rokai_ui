@@ -1,11 +1,3 @@
-/**
- * ROKAI API Client
- *
- * Centralized, production-ready HTTP client for handling backend API integration.
- * Includes an in-memory caching mechanism (TTL / Stale-While-Revalidate) to prevent
- * redundant network calls when users navigate between pages or reopen routes.
- */
-
 export interface ApiResponse<T> {
   success?: boolean;
   data: T;
@@ -27,13 +19,9 @@ export class ApiError extends Error {
 
 export interface RequestOptions {
   headers?: HeadersInit;
-
   cache?: boolean;
-
   ttlMs?: number;
-
   forceRefresh?: boolean;
-
   timeoutMs?: number;
 }
 
@@ -42,13 +30,16 @@ interface CacheEntry<T> {
   timestamp: number;
 }
 
-const DEFAULT_TTL_MS = 5 * 60 * 1000; 
+const DEFAULT_TTL_MS = 5 * 60 * 1000;
+
 const apiCache = new Map<string, CacheEntry<unknown>>();
 const inFlightGetRequests = new Map<string, Promise<unknown>>();
 const inFlightGetRequestTokens = new Map<string, symbol>();
 
 const getEnvBaseUrl = (): string => {
-  const env = (import.meta as unknown as { env?: Record<string, string> }).env || {};
+  const env =
+    (import.meta as unknown as { env?: Record<string, string> }).env || {};
+
   const rawUrl =
     env.VITE_API_BASE_URL ||
     env.VITE_API_URL ||
@@ -56,24 +47,126 @@ const getEnvBaseUrl = (): string => {
     "https://augmented-glucose-platform.ngrok-free.dev";
 
   const cleanUrl = rawUrl.replace(/\/+$/, "");
-  return cleanUrl.endsWith("/api/v1") ? cleanUrl : `${cleanUrl}/api/v1`;
+
+  return cleanUrl.endsWith("/api/v1")
+    ? cleanUrl
+    : `${cleanUrl}/api/v1`;
 };
 
 export const API_BASE_URL = getEnvBaseUrl();
 
 function buildUrl(endpoint: string): string {
   const cleanBase = API_BASE_URL.replace(/\/+$/, "");
-  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const cleanEndpoint = endpoint.startsWith("/")
+    ? endpoint
+    : `/${endpoint}`;
+
   return `${cleanBase}${cleanEndpoint}`;
+}
+
+async function parseResponseBody(response: Response): Promise<unknown> {
+  const text = await response.text();
+
+  if (!text) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    // Laravel sometimes returns an HTML error page instead of JSON.
+    if (text.includes("<html") || text.includes("<!DOCTYPE")) {
+      const titleMatch = text.match(
+        /<title[^>]*>(.*?)<\/title>/is
+      );
+
+      const title = titleMatch?.[1]
+        ?.replace(/\s+/g, " ")
+        .trim();
+
+      console.error(
+        "[API] Server returned HTML instead of JSON."
+      );
+
+      console.error(
+        "[API] HTML response:",
+        text
+      );
+
+      return {
+        html: true,
+        title: title || "Laravel Server Error",
+        raw: text,
+      };
+    }
+
+    return text;
+  }
+}
+
+function getErrorMessage(
+  method: string,
+  endpoint: string,
+  status: number,
+  details: unknown
+): string {
+  if (
+    details &&
+    typeof details === "object" &&
+    "message" in details &&
+    typeof details.message === "string"
+  ) {
+    return details.message;
+  }
+
+  return `${method} ${endpoint} failed with status ${status}`;
+}
+
+function unwrapData<T>(value: unknown): T {
+  if (
+    value &&
+    typeof value === "object" &&
+    "data" in value
+  ) {
+    return (value as { data: T }).data;
+  }
+
+  return value as T;
+}
+
+function throwIfApiFailure(
+  method: string,
+  endpoint: string,
+  status: number,
+  responseBody: unknown
+): void {
+  if (
+    responseBody &&
+    typeof responseBody === "object" &&
+    "success" in responseBody &&
+    responseBody.success === false
+  ) {
+    const message =
+      "message" in responseBody &&
+      typeof responseBody.message === "string"
+        ? responseBody.message
+        : `${method} ${endpoint} was not successful`;
+
+    throw new ApiError(status, message, responseBody);
+  }
 }
 
 export const apiClient = {
   baseUrl: API_BASE_URL,
 
-  /**
-   * Performs an HTTP GET request with automatic in-memory caching to eliminate redundant network calls.
-   */
-  async get<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+  /* ------------------------------------------------------------------------ */
+  /* GET                                                                      */
+  /* ------------------------------------------------------------------------ */
+
+  async get<T>(
+    endpoint: string,
+    options: RequestOptions = {}
+  ): Promise<T> {
     const {
       headers = {},
       cache = true,
@@ -84,28 +177,33 @@ export const apiClient = {
 
     const url = buildUrl(endpoint);
 
-    // 1. Check in-memory cache if enabled and not forcing a refresh
     if (cache && !forceRefresh && apiCache.has(url)) {
       const entry = apiCache.get(url) as CacheEntry<T>;
       const isFresh = Date.now() - entry.timestamp < ttlMs;
+
       if (isFresh) {
         return entry.data;
       }
     }
 
-    // 2. Reuse a request that is already fetching this endpoint. This matters when
-    // the Navbar and page mount together and both request the same data.
     if (cache && !forceRefresh) {
       const inFlightRequest = inFlightGetRequests.get(url);
-      if (inFlightRequest) return inFlightRequest as Promise<T>;
+
+      if (inFlightRequest) {
+        return inFlightRequest as Promise<T>;
+      }
     }
 
     const requestToken = Symbol(url);
+
     const request = (async (): Promise<T> => {
-      // Allow the in-flight entry to be registered before any synchronous failure.
       await Promise.resolve();
+
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      const timer = setTimeout(
+        () => controller.abort(),
+        timeoutMs
+      );
 
       try {
         const response = await fetch(url, {
@@ -118,20 +216,29 @@ export const apiClient = {
           },
         });
 
+        const responseBody = await parseResponseBody(response);
+
         if (!response.ok) {
           throw new ApiError(
             response.status,
-            `GET ${endpoint} failed with status ${response.status}`
+            getErrorMessage(
+              "GET",
+              endpoint,
+              response.status,
+              responseBody
+            ),
+            responseBody
           );
         }
 
-        const resJson = await response.json();
+        throwIfApiFailure(
+          "GET",
+          endpoint,
+          response.status,
+          responseBody
+        );
 
-        // Unwrap API response envelope ({ success: true, data: T })
-        const result: T =
-          resJson && typeof resJson === "object" && "data" in resJson
-            ? (resJson as { data: T }).data
-            : (resJson as T);
+        const result = unwrapData<T>(responseBody);
 
         if (cache) {
           apiCache.set(url, {
@@ -142,14 +249,27 @@ export const apiClient = {
 
         return result;
       } catch (error) {
-        if (error instanceof ApiError) throw error;
-        if ((error as Error)?.name === "AbortError") {
-          throw new ApiError(408, `GET ${endpoint} timed out after ${timeoutMs}ms`);
+        if (error instanceof ApiError) {
+          throw error;
         }
-        throw new ApiError(500, (error as Error).message || "Network Error");
+
+        if ((error as Error)?.name === "AbortError") {
+          throw new ApiError(
+            408,
+            `GET ${endpoint} timed out after ${timeoutMs}ms`
+          );
+        }
+
+        throw new ApiError(
+          500,
+          (error as Error)?.message || "Network Error"
+        );
       } finally {
         clearTimeout(timer);
-        if (inFlightGetRequestTokens.get(url) === requestToken) {
+
+        if (
+          inFlightGetRequestTokens.get(url) === requestToken
+        ) {
           inFlightGetRequests.delete(url);
           inFlightGetRequestTokens.delete(url);
         }
@@ -164,6 +284,9 @@ export const apiClient = {
     return request;
   },
 
+  /* ------------------------------------------------------------------------ */
+  /* POST                                                                     */
+  /* ------------------------------------------------------------------------ */
 
   async post<T, B = unknown>(
     endpoint: string,
@@ -171,6 +294,7 @@ export const apiClient = {
     headers: HeadersInit = {}
   ): Promise<T> {
     const url = buildUrl(endpoint);
+
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -182,67 +306,124 @@ export const apiClient = {
         body: JSON.stringify(body),
       });
 
+      const responseBody = await parseResponseBody(response);
+
       if (!response.ok) {
-        const responseText = await response.text();
-        let details: unknown;
-        if (responseText) {
-          try {
-            details = JSON.parse(responseText);
-          } catch {
-            details = responseText;
-          }
-        }
-
-        const message =
-          details &&
-          typeof details === "object" &&
-          "message" in details &&
-          typeof details.message === "string"
-            ? details.message
-            : `POST ${endpoint} failed with status ${response.status}`;
-
         throw new ApiError(
           response.status,
-          message,
-          details
+          getErrorMessage(
+            "POST",
+            endpoint,
+            response.status,
+            responseBody
+          ),
+          responseBody
         );
       }
 
-      const resJson = await response.json();
+      throwIfApiFailure(
+        "POST",
+        endpoint,
+        response.status,
+        responseBody
+      );
 
-      if (
-        resJson &&
-        typeof resJson === "object" &&
-        "success" in resJson &&
-        resJson.success === false
-      ) {
-        const message =
-          "message" in resJson && typeof resJson.message === "string"
-            ? resJson.message
-            : `POST ${endpoint} was not successful`;
-        throw new ApiError(response.status, message, resJson);
-      }
+      const result = unwrapData<T>(responseBody);
 
-      const result: T =
-        resJson && typeof resJson === "object" && "data" in resJson
-          ? (resJson as { data: T }).data
-          : (resJson as T);
-
-      // Invalidate cache on mutations
+      // POST mutates server data, so invalidate stale GET data.
       apiCache.clear();
+      inFlightGetRequests.clear();
+      inFlightGetRequestTokens.clear();
 
       return result;
     } catch (error) {
-      if (error instanceof ApiError) throw error;
-      throw new ApiError(500, (error as Error).message || "Network Error");
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
+      throw new ApiError(
+        500,
+        (error as Error)?.message || "Network Error"
+      );
     }
   },
 
+  /* ------------------------------------------------------------------------ */
+  /* PUT                                                                      */
+  /* ------------------------------------------------------------------------ */
+
   /**
-   * Tries to fetch data from the real API endpoint first (with caching).
-   * If the request fails (e.g. backend offline, ngrok down, 404),
-   * it falls back to local data gracefully.
+   * HTTP PUT for resource updates.
+   *
+   * Example:
+   * PUT /affiliate/update/67
+   *
+   * Successful mutations invalidate the GET cache.
    */
+  async put<T, B = unknown>(
+    endpoint: string,
+    body: B,
+    headers: HeadersInit = {}
+  ): Promise<T> {
+    const url = buildUrl(endpoint);
+
+    try {
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true",
+          ...headers,
+        },
+        body: JSON.stringify(body),
+      });
+
+      const responseBody = await parseResponseBody(response);
+
+      if (!response.ok) {
+        throw new ApiError(
+          response.status,
+          getErrorMessage(
+            "PUT",
+            endpoint,
+            response.status,
+            responseBody
+          ),
+          responseBody
+        );
+      }
+
+      throwIfApiFailure(
+        "PUT",
+        endpoint,
+        response.status,
+        responseBody
+      );
+
+      const result = unwrapData<T>(responseBody);
+
+      // PUT mutates server data, so invalidate every stale GET response.
+      apiCache.clear();
+      inFlightGetRequests.clear();
+      inFlightGetRequestTokens.clear();
+
+      return result;
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
+      throw new ApiError(
+        500,
+        (error as Error)?.message || "Network Error"
+      );
+    }
+  },
+
+  /* ------------------------------------------------------------------------ */
+  /* FALLBACK                                                                 */
+  /* ------------------------------------------------------------------------ */
+
   async fetchWithFallback<T>(
     endpoint: string,
     fallbackData: T,
@@ -256,26 +437,33 @@ export const apiClient = {
     }
   },
 
-  /**
-   * Clears specific cached endpoint or all cached API responses.
-   */
+  /* ------------------------------------------------------------------------ */
+  /* CACHE                                                                    */
+  /* ------------------------------------------------------------------------ */
+
   clearCache(endpoint?: string): void {
     if (endpoint) {
       const url = buildUrl(endpoint);
+
       apiCache.delete(url);
       inFlightGetRequests.delete(url);
       inFlightGetRequestTokens.delete(url);
-    } else {
-      apiCache.clear();
-      inFlightGetRequests.clear();
-      inFlightGetRequestTokens.clear();
+      return;
     }
+
+    apiCache.clear();
+    inFlightGetRequests.clear();
+    inFlightGetRequestTokens.clear();
   },
 
-  /**
-   * Utility helper to simulate an asynchronous API call with realistic latency.
-   */
-  simulateCall<T>(data: T, delayMs = 300): Promise<T> {
+  /* ------------------------------------------------------------------------ */
+  /* SIMULATION                                                               */
+  /* ------------------------------------------------------------------------ */
+
+  simulateCall<T>(
+    data: T,
+    delayMs = 300
+  ): Promise<T> {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(data);
