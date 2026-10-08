@@ -777,15 +777,30 @@ function AffiliateDashboard({
                 </p>
               </div>
 
-              <div className="flex items-center gap-3">
-                <span className="rounded-full border border-[#e63946]/40 bg-[#e63946]/10 px-3 py-1 font-space-grotesk text-xs capitalize text-[#ff7b82]">
-                  {status}
-                </span>
-                <button type="button" onClick={handleLogoutClick} className={logoutButtonClass}>
-                  Log out
-                  <LogOut size={14} aria-hidden />
-                </button>
-              </div>
+            <div className="flex items-center gap-3">
+  <span className="rounded-full border border-[#e63946]/40 bg-[#e63946]/10 px-3 py-1 font-space-grotesk text-xs capitalize text-[#ff7b82]">
+    {status}
+  </span>
+
+  {isEditing ? (
+    <button
+      type="button"
+      onClick={cancelEditing}
+      className="inline-flex h-9 items-center gap-2 rounded-md border border-white/20 px-4 font-space-grotesk text-xs font-bold text-white transition hover:border-white/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+    >
+      Back to profile
+    </button>
+  ) : (
+    <button
+      type="button"
+      onClick={handleLogoutClick}
+      className={logoutButtonClass}
+    >
+      Log out
+      <LogOut size={14} aria-hidden />
+    </button>
+  )}
+</div>
             </div>
 
             {account?.profile && (
