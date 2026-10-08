@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogOut, Loader2 } from "lucide-react";
+import { LogOut, Loader2,Pencil } from "lucide-react";
 import SectionHeaderblog from "@/shared/components/sections/SectionHeaderblog";
 import LoginCard from "@/shared/components/sections/LoginCard";
 import SignupCard, { type SignupValues } from "@/shared/components/sections/SignupCard";
@@ -8,6 +8,7 @@ import NotificationModal from "@/shared/components/sections/NotificationModal";
 import ForgotPasswordCard from "@/shared/components/sections/ForgotPasswordCard";
 import ResetPasswordCard from "@/shared/components/sections/ResetPasswordCard";
 import { ApiError, apiClient } from "@/shared/api/apiClient";
+
 import {
   affiliateAuthService,
   type AuthResponse,
@@ -15,7 +16,6 @@ import {
 import {
   affiliateProfileService,
   buildProfilePayload,
-  PROFILE_DEFAULTS,
 } from "@/shared/api/services/affiliateProfileService";
 import { authStorage } from "@/shared/utils/authStorage";
 import { validateOtp } from "@/shared/utils/formValidation";
@@ -504,6 +504,10 @@ export default function AffiliateLoginSection() {
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/*  Dashboard                                                                 */
+/* -------------------------------------------------------------------------- */
+
 type ProfileLinkField =
   | "website_url"
   | "linkedin"
@@ -511,6 +515,10 @@ type ProfileLinkField =
   | "instagram"
   | "facebook"
   | "tiktok";
+
+type FormField = ProfileLinkField | "order_amount" | "notes";
+
+const NOTES_MAX_LENGTH = 1000;
 
 const PROFILE_LINK_FIELDS: {
   key: ProfileLinkField;
@@ -534,6 +542,36 @@ function isSafeProfileUrl(value: string): boolean {
   }
 }
 
+type ProfileFormState = Record<ProfileLinkField, string> & {
+  order_amount: string;
+  notes: string;
+};
+
+function toFormState(profile?: AuthResponse["profile"] | null): ProfileFormState {
+  const links = Object.fromEntries(
+    PROFILE_LINK_FIELDS.map(({ key }) => [key, (profile?.[key] as string | null | undefined) ?? ""])
+  ) as Record<ProfileLinkField, string>;
+
+  return {
+    ...links,
+    order_amount: profile?.order_amount != null ? String(profile.order_amount) : "",
+    notes: profile?.notes ?? "",
+  };
+}
+
+function formatAmount(value: number | string): string {
+  const amount = Number(value);
+  return Number.isFinite(amount) ? `$${amount.toLocaleString()}` : String(value);
+}
+
+const inputClass = (hasError: boolean) =>
+  `rounded-md border bg-black/30 px-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-[#e63946] disabled:opacity-50 ${
+    hasError ? "border-red-400" : "border-white/15"
+  }`;
+
+const logoutButtonClass =
+  "inline-flex h-9 items-center gap-2 rounded-md border border-white/20 px-4 font-space-grotesk text-xs font-bold text-white transition hover:border-[#e63946] hover:bg-[#e63946] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+
 function AffiliateDashboard({
   account,
   onUpdateAccount,
@@ -544,105 +582,163 @@ function AffiliateDashboard({
   onLogout: () => void;
 }) {
   const status = account?.profile?.status ?? "Signed in";
-  const missingFields = PROFILE_LINK_FIELDS.filter(
-    ({ key }) => account?.profile?.[key] == null
-  );
-  const [profileLinks, setProfileLinks] = useState<Record<ProfileLinkField, string>>(
-    () => Object.fromEntries(PROFILE_LINK_FIELDS.map(({ key }) => [key, ""])) as Record<ProfileLinkField, string>
-  );
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<ProfileLinkField, string>>>({});
+  const isPending = status.toLowerCase() === "pending";
+
+  const hasSavedDetails =
+    PROFILE_LINK_FIELDS.some(({ key }) => Boolean(account?.profile?.[key])) ||
+    account?.profile?.order_amount != null ||
+    Boolean(account?.profile?.notes?.trim());
+
+  // First-time users (nothing saved yet) start directly in edit mode.
+  const [isEditing, setIsEditing] = useState(!hasSavedDetails);
+  const [form, setForm] = useState<ProfileFormState>(() => toFormState(account?.profile));
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FormField, string>>>({});
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const saveProfileLinks = async () => {
+  // True only when the form differs from what is saved.
+  const isDirty = (() => {
+    const saved = toFormState(account?.profile);
+    return (Object.keys(saved) as (keyof ProfileFormState)[]).some(
+      (key) => form[key].trim() !== saved[key].trim()
+    );
+  })();
+
+  const updateField = (key: FormField, value: string) => {
+    setForm((current) => ({ ...current, [key]: value }));
+    setFieldErrors((current) => {
+      const next = { ...current };
+      delete next[key];
+      return next;
+    });
+    setFormError("");
+  };
+
+  const startEditing = () => {
+    setForm(toFormState(account?.profile)); // always start from the saved data
+    setFieldErrors({});
+    setFormError("");
+    setSaveSuccess(false);
+    setIsEditing(true);
+  };
+
+  const cancelEditing = () => {
+    if (isDirty && !window.confirm("Discard your unsaved changes?")) return;
+    setForm(toFormState(account?.profile));
+    setFieldErrors({});
+    setFormError("");
+    setIsEditing(false);
+  };
+
+  const saveProfile = async () => {
     if (!account?.user?.id) return;
 
-    const nextFieldErrors: Partial<Record<ProfileLinkField, string>> = {};
-    let hasLink = false;
+    if (!isDirty) {
+      setIsEditing(false); // nothing changed, just close the form
+      return;
+    }
 
-    for (const { key, label } of missingFields) {
-      const value = profileLinks[key].trim();
-      if (value) {
-        hasLink = true;
-        if (!isSafeProfileUrl(value)) {
-          nextFieldErrors[key] = `${label} must be a valid URL beginning with http:// or https://.`;
-        }
+    const errors: Partial<Record<FormField, string>> = {};
+
+    for (const { key, label } of PROFILE_LINK_FIELDS) {
+      const value = form[key].trim();
+      if (value && !isSafeProfileUrl(value)) {
+        errors[key] = `${label} must be a valid URL beginning with http:// or https://.`;
       }
     }
 
-    setFieldErrors(nextFieldErrors);
-    if (Object.keys(nextFieldErrors).length > 0) {
-      setFormError("Please correct the highlighted links before saving.");
-      return;
+    const amountText = form.order_amount.trim();
+    let orderAmount: number | null = null;
+    if (amountText) {
+      orderAmount = Number(amountText);
+      if (!Number.isFinite(orderAmount) || orderAmount < 0) {
+        errors.order_amount = "Order amount must be a number of 0 or more.";
+      }
     }
-    if (!hasLink) {
-      setFormError("Enter at least one website or social link.");
+
+    if (form.notes.length > NOTES_MAX_LENGTH) {
+      errors.notes = `Notes can be at most ${NOTES_MAX_LENGTH} characters.`;
+    }
+
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      setFormError("Please correct the highlighted fields before saving.");
       return;
     }
 
     setFormError("");
-    setFieldErrors({});
     setSubmitting(true);
     setSaveSuccess(false);
 
     try {
-      // Build filled-in links from the form
-      const newLinks: Partial<Record<ProfileLinkField, string>> = Object.fromEntries(
-        missingFields
-          .filter(({ key }) => profileLinks[key].trim())
-          .map(({ key }) => [key, profileLinks[key].trim()])
-      );
-
-      // Build POST payload: form links + static defaults (Pending / 10% / Starter)
       const payload = buildProfilePayload(
         account.user.id,
         account.user.role,
         account.profile,
-        newLinks
+        {
+          website_url: form.website_url,
+          linkedin: form.linkedin,
+          youtube: form.youtube,
+          instagram: form.instagram,
+          facebook: form.facebook,
+          tiktok: form.tiktok,
+          order_amount: orderAmount,
+          notes: form.notes,
+        }
       );
 
-      // POST /affiliate/profile
-      await affiliateProfileService.saveProfile(payload);
+      const savedProfile = await affiliateProfileService.saveProfile(payload);
 
-      // GET /affiliate/profile/{userId} to refresh the dashboard
-      const freshProfile = await affiliateProfileService.getProfile(account.user.id, true);
-
-      // Persist the fresh profile to localStorage cache
-      authStorage.saveProfile(freshProfile);
-
-      const updatedAccount: AuthResponse = {
-        ...account,
-        profile: {
-          ...account.profile,
-          ...freshProfile,
-        },
+      const mergedProfile = {
+        ...account.profile,
+        ...payload,
+        ...(savedProfile ?? {}),
       };
-      onUpdateAccount(updatedAccount);
+
+      authStorage.saveProfile(mergedProfile);
+      onUpdateAccount({ ...account, profile: mergedProfile });
+
+      setForm(toFormState(mergedProfile));
       setSaveSuccess(true);
-      setProfileLinks(
-        Object.fromEntries(PROFILE_LINK_FIELDS.map(({ key }) => [key, ""])) as Record<ProfileLinkField, string>
-      );
+      setIsEditing(false); // back to view mode with the new data
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Could not save profile. Please try again.";
-      setFormError(message);
+      // Stay in edit mode so the user doesn't lose what they typed.
+      setFormError(
+        err instanceof Error ? err.message : "Could not save profile. Please try again."
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
-  const isPending = status.toLowerCase() === "pending";
+  const handleLogoutClick = () => {
+    if (isEditing && isDirty && !window.confirm("You have unsaved changes. Log out anyway?")) {
+      return;
+    }
+    onLogout();
+  };
 
   return (
     <SectionGlow>
       <div className="mx-auto my-6 w-full max-w-193.5 rounded-xl border border-white/10 bg-[#111] p-6 text-white sm:p-8">
-
-        {/* Pending review — show nothing else */}
+        {/* Pending review: show nothing else */}
         {isPending ? (
           <div className="flex flex-col items-center justify-center gap-5 py-14 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full border border-yellow-400/30 bg-yellow-400/10">
-              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-400" aria-hidden>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-yellow-400"
+                aria-hidden
+              >
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg>
@@ -660,103 +756,13 @@ function AffiliateDashboard({
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={onLogout}
-              className="mt-2 inline-flex h-9 items-center gap-2 rounded-md border border-white/20 px-4 font-space-grotesk text-xs font-bold text-white transition hover:border-[#e63946] hover:bg-[#e63946] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-            >
+            <button type="button" onClick={onLogout} className={`mt-2 ${logoutButtonClass}`}>
               Log out
               <LogOut size={14} aria-hidden />
             </button>
           </div>
         ) : (
           <>
-            {/* Complete your profile form — only shown when fields are missing */}
-            {missingFields.length > 0 && account?.profile && (
-              <form
-                className="mb-8 border-b border-white/10 pb-7"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  saveProfileLinks();
-                }}
-              >
-                <p className="font-space-grotesk text-xs font-bold uppercase tracking-[1px] text-[#e63946]">
-                  Complete your profile
-                </p>
-                <h3 className="mt-2 font-space-grotesk text-xl font-bold">
-                  Add your website and social links
-                </h3>
-
-                <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  {missingFields.map(({ key, label, placeholder }) => (
-                    <label
-                      key={key}
-                      className="flex flex-col gap-2 font-space-grotesk text-xs text-white/70"
-                    >
-                      {label}
-                      <input
-                        type="text"
-                        inputMode="url"
-                        value={profileLinks[key]}
-                        onChange={(event) => {
-                          setProfileLinks((current) => ({
-                            ...current,
-                            [key]: event.target.value,
-                          }));
-                          setFieldErrors((current) => {
-                            const next = { ...current };
-                            delete next[key];
-                            return next;
-                          });
-                          setFormError("");
-                          setSaveSuccess(false);
-                        }}
-                        disabled={submitting}
-                        placeholder={placeholder}
-                        aria-invalid={Boolean(fieldErrors[key])}
-                        aria-describedby={fieldErrors[key] ? `${key}-error` : undefined}
-                        className={`h-11 rounded-md border bg-black/30 px-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-[#e63946] disabled:opacity-50 ${
-                          fieldErrors[key] ? "border-red-400" : "border-white/15"
-                        }`}
-                      />
-                      {fieldErrors[key] && (
-                        <span id={`${key}-error`} className="text-xs text-red-300">
-                          {fieldErrors[key]}
-                        </span>
-                      )}
-                    </label>
-                  ))}
-                </div>
-
-                {formError && (
-                  <p role="alert" className="mt-4 font-space-grotesk text-sm text-red-300">
-                    {formError}
-                  </p>
-                )}
-
-                {saveSuccess && (
-                  <p role="status" className="mt-4 font-space-grotesk text-sm text-green-400">
-                    Profile saved successfully!
-                  </p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[#e63946] px-5 font-space-grotesk text-sm font-bold text-white transition hover:bg-[#c92e3a] disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                >
-                  {submitting ? (
-                    <>
-                      <Loader2 size={14} className="animate-spin" />
-                      Saving…
-                    </>
-                  ) : (
-                    "Save profile"
-                  )}
-                </button>
-              </form>
-            )}
-
             {/* Dashboard header */}
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
@@ -775,63 +781,240 @@ function AffiliateDashboard({
                 <span className="rounded-full border border-[#e63946]/40 bg-[#e63946]/10 px-3 py-1 font-space-grotesk text-xs capitalize text-[#ff7b82]">
                   {status}
                 </span>
-                <button
-                  type="button"
-                  onClick={onLogout}
-                  className="inline-flex h-9 items-center gap-2 rounded-md border border-white/20 px-4 font-space-grotesk text-xs font-bold text-white transition hover:border-[#e63946] hover:bg-[#e63946] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                >
+                <button type="button" onClick={handleLogoutClick} className={logoutButtonClass}>
                   Log out
                   <LogOut size={14} aria-hidden />
                 </button>
               </div>
             </div>
 
-            {/* Profile details grid */}
-            {account && account.profile && (
-              <dl className="mt-6 grid gap-4 border-t border-white/10 pt-5 sm:grid-cols-3">
-                <div>
-                  <dt className="font-space-grotesk text-xs text-white/50">Email</dt>
-                  <dd className="mt-1 break-all font-space-grotesk text-sm">{account.user.email}</dd>
+            {account?.profile && (
+              <div className="mt-6 border-t border-white/10 pt-6">
+                {/* Section header with Edit button (view mode only) */}
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="font-space-grotesk text-xs font-bold uppercase tracking-[1px] text-[#e63946]">
+                      Your profile
+                    </p>
+                    <h3 className="mt-2 font-space-grotesk text-xl font-bold">
+                      {isEditing
+                        ? "Edit website, social links, order amount and notes"
+                        : "Website, social links, order amount and notes"}
+                    </h3>
+                  </div>
+
+                  {!isEditing && (
+                    <button
+                      type="button"
+                      onClick={startEditing}
+                      className="inline-flex h-9 items-center gap-2 rounded-md bg-[#e63946] px-4 font-space-grotesk text-xs font-bold text-white transition hover:bg-[#c92e3a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    >
+                      <Pencil size={14} aria-hidden />
+                      Edit profile
+                    </button>
+                  )}
                 </div>
-                <div>
-                  <dt className="font-space-grotesk text-xs text-white/50">Commission</dt>
-                  <dd className="mt-1 font-space-grotesk text-sm">
-                    {account.profile.commission_percentage}%
-                  </dd>
-                </div>
-                <div>
-                  <dt className="font-space-grotesk text-xs text-white/50">Affiliate tier</dt>
-                  <dd className="mt-1 font-space-grotesk text-sm">{account.profile.badge_tier}</dd>
-                </div>
-                {PROFILE_LINK_FIELDS.map(({ key, label }) => {
-                  const value = account.profile[key];
-                  return (
-                    <div key={key}>
-                      <dt className="font-space-grotesk text-xs text-white/50">{label}</dt>
-                      <dd className="mt-1 break-all font-space-grotesk text-sm">
-                        {value && isSafeProfileUrl(value) ? (
-                          <a
-                            href={value}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-white underline decoration-white/30 underline-offset-4 hover:text-[#ff7b82]"
-                          >
-                            {value}
-                          </a>
-                        ) : value ? (
-                          value
-                        ) : (
-                          <span className="text-white/40">Not provided</span>
+
+                {/* VIEW MODE */}
+                {!isEditing && (
+                  <>
+                    {saveSuccess && (
+                      <p role="status" className="mt-4 font-space-grotesk text-sm text-green-400">
+                        Profile saved successfully!
+                      </p>
+                    )}
+
+                    <dl className="mt-5 grid gap-4 sm:grid-cols-3">
+                      <div>
+                        <dt className="font-space-grotesk text-xs text-white/50">Email</dt>
+                        <dd className="mt-1 break-all font-space-grotesk text-sm">
+                          {account.user.email}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="font-space-grotesk text-xs text-white/50">Commission</dt>
+                        <dd className="mt-1 font-space-grotesk text-sm">
+                          {account.profile.commission_percentage}%
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="font-space-grotesk text-xs text-white/50">Affiliate tier</dt>
+                        <dd className="mt-1 font-space-grotesk text-sm">
+                          {account.profile.badge_tier}
+                        </dd>
+                      </div>
+
+                      <div>
+                        <dt className="font-space-grotesk text-xs text-white/50">Order amount</dt>
+                        <dd className="mt-1 font-space-grotesk text-sm">
+                          {account.profile.order_amount != null ? (
+                            formatAmount(account.profile.order_amount)
+                          ) : (
+                            <span className="text-white/40">Not provided</span>
+                          )}
+                        </dd>
+                      </div>
+
+                      {PROFILE_LINK_FIELDS.map(({ key, label }) => {
+                        const value = account.profile[key];
+                        return (
+                          <div key={key}>
+                            <dt className="font-space-grotesk text-xs text-white/50">{label}</dt>
+                            <dd className="mt-1 break-all font-space-grotesk text-sm">
+                              {value && isSafeProfileUrl(value) ? (
+                                <a
+                                  href={value}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-white underline decoration-white/30 underline-offset-4 hover:text-[#ff7b82]"
+                                >
+                                  {value}
+                                </a>
+                              ) : value ? (
+                                value
+                              ) : (
+                                <span className="text-white/40">Not provided</span>
+                              )}
+                            </dd>
+                          </div>
+                        );
+                      })}
+
+                      <div className="sm:col-span-3">
+                        <dt className="font-space-grotesk text-xs text-white/50">Notes</dt>
+                        <dd className="mt-1 whitespace-pre-line break-words font-space-grotesk text-sm">
+                          {account.profile.notes?.trim() ? (
+                            account.profile.notes
+                          ) : (
+                            <span className="text-white/40">No notes</span>
+                          )}
+                        </dd>
+                      </div>
+                    </dl>
+                  </>
+                )}
+
+                {/* EDIT MODE */}
+                {isEditing && (
+                  <form
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      saveProfile();
+                    }}
+                  >
+                    <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                      {PROFILE_LINK_FIELDS.map(({ key, label, placeholder }) => (
+                        <label
+                          key={key}
+                          className="flex flex-col gap-2 font-space-grotesk text-xs text-white/70"
+                        >
+                          {label}
+                          <input
+                            type="text"
+                            inputMode="url"
+                            value={form[key]}
+                            onChange={(event) => updateField(key, event.target.value)}
+                            disabled={submitting}
+                            placeholder={placeholder}
+                            aria-invalid={Boolean(fieldErrors[key])}
+                            aria-describedby={fieldErrors[key] ? `${key}-error` : undefined}
+                            className={`h-11 ${inputClass(Boolean(fieldErrors[key]))}`}
+                          />
+                          {fieldErrors[key] && (
+                            <span id={`${key}-error`} className="text-xs text-red-300">
+                              {fieldErrors[key]}
+                            </span>
+                          )}
+                        </label>
+                      ))}
+
+                      <label className="flex flex-col gap-2 font-space-grotesk text-xs text-white/70">
+                        Order amount ($)
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          value={form.order_amount}
+                          onChange={(event) => updateField("order_amount", event.target.value)}
+                          disabled={submitting}
+                          placeholder="0.00"
+                          aria-invalid={Boolean(fieldErrors.order_amount)}
+                          aria-describedby={
+                            fieldErrors.order_amount ? "order_amount-error" : undefined
+                          }
+                          className={`h-11 ${inputClass(Boolean(fieldErrors.order_amount))}`}
+                        />
+                        {fieldErrors.order_amount && (
+                          <span id="order_amount-error" className="text-xs text-red-300">
+                            {fieldErrors.order_amount}
+                          </span>
                         )}
-                      </dd>
+                      </label>
+
+                      <label className="flex flex-col gap-2 font-space-grotesk text-xs text-white/70 sm:col-span-2">
+                        <span className="flex items-center justify-between">
+                          Notes
+                          <span className="text-white/30">
+                            {form.notes.length}/{NOTES_MAX_LENGTH}
+                          </span>
+                        </span>
+                        <textarea
+                          value={form.notes}
+                          onChange={(event) =>
+                            updateField("notes", event.target.value.slice(0, NOTES_MAX_LENGTH))
+                          }
+                          disabled={submitting}
+                          rows={4}
+                          placeholder="Anything you'd like us to know..."
+                          aria-invalid={Boolean(fieldErrors.notes)}
+                          aria-describedby={fieldErrors.notes ? "notes-error" : undefined}
+                          className={`resize-none py-3 ${inputClass(Boolean(fieldErrors.notes))}`}
+                        />
+                        {fieldErrors.notes && (
+                          <span id="notes-error" className="text-xs text-red-300">
+                            {fieldErrors.notes}
+                          </span>
+                        )}
+                      </label>
                     </div>
-                  );
-                })}
-              </dl>
+
+                    {formError && (
+                      <p role="alert" className="mt-4 font-space-grotesk text-sm text-red-300">
+                        {formError}
+                      </p>
+                    )}
+
+                    <div className="mt-5 flex flex-wrap items-center gap-3">
+                      <button
+                        type="submit"
+                        disabled={submitting || !isDirty}
+                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[#e63946] px-5 font-space-grotesk text-sm font-bold text-white transition hover:bg-[#c92e3a] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                      >
+                        {submitting ? (
+                          <>
+                            <Loader2 size={14} className="animate-spin" />
+                            Saving…
+                          </>
+                        ) : (
+                          "Save changes"
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={cancelEditing}
+                        disabled={submitting}
+                        className="inline-flex min-h-11 items-center justify-center rounded-md border border-white/20 px-5 font-space-grotesk text-sm font-bold text-white transition hover:border-white/50 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
             )}
           </>
         )}
       </div>
     </SectionGlow>
   );
-}
+}

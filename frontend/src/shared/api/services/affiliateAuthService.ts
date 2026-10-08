@@ -26,9 +26,6 @@ export interface MessageResponse {
   message: string;
 }
 export interface AuthResponse {
-  success?: boolean;
-  message?: string;
-  is_verified?: boolean;
   user: {
     id: number;
     name: string;
@@ -47,9 +44,13 @@ export interface AuthResponse {
     instagram?: string | null;
     facebook?: string | null;
     tiktok?: string | null;
+    order_amount?: number | string | null;
+    notes?: string | null;
   };
   token: string;
+ 
 }
+
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -144,4 +145,5 @@ export const affiliateAuthService = {
     );
     return unwrapMessageResponse(response);
   },
+  
 };
