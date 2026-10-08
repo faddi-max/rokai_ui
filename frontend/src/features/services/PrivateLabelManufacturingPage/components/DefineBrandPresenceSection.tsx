@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import SectionGlow from "@/shared/components/layout/SectionGlow";
 import SectionHeaderblog from "@/shared/components/sections/SectionHeaderblog";
 import { InstagramIcon, FacebookIcon, LinkedinIcon, YoutubeIcon } from "@/shared/icons/socialmediaicons";
+import { inquiriesService } from "@/shared/api/services/inquiriesService";
 
 /* -------------------------------------------------------------------------- */
 /*  Types — API-ready                                                         */
@@ -134,6 +135,18 @@ export default function DefineBrandPresenceSection({
     try {
       if (onSubmit) {
         const res = await onSubmit(values);
+        if (!res.success) {
+          setError(res.message || "Something went wrong. Please try again.");
+          return;
+        }
+      } else {
+        const res = await inquiriesService.submitInquiry({
+          name: values.firstName.trim(),
+          brand_name: values.brandName.trim(),
+          email: values.email.trim(),
+          inquiry_type: values.subject.trim(),
+          message: values.message.trim(),
+        });
         if (!res.success) {
           setError(res.message || "Something went wrong. Please try again.");
           return;
