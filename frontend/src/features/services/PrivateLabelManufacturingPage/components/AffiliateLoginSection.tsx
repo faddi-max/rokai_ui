@@ -136,6 +136,7 @@ export default function AffiliateLoginSection() {
   const [account, setAccount] = useState<AuthResponse | null>(
     () => authStorage.getUser()
   );
+  const [startProfileEdit, setStartProfileEdit] = useState(false);
   const [view, setView] = useState<View>("signup");
 
   const [pendingEmail, setPendingEmail] = useState<string>(
@@ -211,6 +212,7 @@ export default function AffiliateLoginSection() {
       authStorage.saveUser(authData);
       if (authData.profile) authStorage.saveProfile(authData.profile);
       setAccount(authData);
+      setStartProfileEdit(true);
       setShowDashboard(true);
 
       openModal("success", "Your email has been successfully verified!");
@@ -346,6 +348,7 @@ export default function AffiliateLoginSection() {
       authStorage.saveUser(authData);
       if (authData.profile) authStorage.saveProfile(authData.profile);
       setAccount(authData);
+      setStartProfileEdit(true);
       setShowDashboard(true);
 
       openModal("success", "Login successful!");
@@ -369,6 +372,7 @@ export default function AffiliateLoginSection() {
     authStorage.clearAll();
     apiClient.clearCache();
     setAccount(null);
+    setStartProfileEdit(false);
     setShowDashboard(false);
     setPendingEmail("");
     setResetOtp("");
@@ -432,6 +436,7 @@ export default function AffiliateLoginSection() {
       {showDashboard ? (
         <AffiliateDashboard
           account={account}
+          startInEditMode={startProfileEdit}
           onLogout={handleLogout}
           onUpdateAccount={(updatedAccount) => {
             authStorage.saveUser(updatedAccount);
@@ -574,10 +579,12 @@ const logoutButtonClass =
 
 function AffiliateDashboard({
   account,
+  startInEditMode,
   onUpdateAccount,
   onLogout,
 }: {
   account: AuthResponse | null;
+  startInEditMode: boolean;
   onUpdateAccount: (account: AuthResponse) => void;
   onLogout: () => void;
 }) {
@@ -589,8 +596,9 @@ function AffiliateDashboard({
     account?.profile?.order_amount != null ||
     Boolean(account?.profile?.notes?.trim());
 
-  // First-time users (nothing saved yet) start directly in edit mode.
-  const [isEditing, setIsEditing] = useState(!hasSavedDetails);
+  // A successful sign-in always starts with profile completion. Users without
+  // saved details also enter edit mode when restoring an existing session.
+  const [isEditing, setIsEditing] = useState(startInEditMode || !hasSavedDetails);
   const [form, setForm] = useState<ProfileFormState>(() => toFormState(account?.profile));
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<FormField, string>>>({});
   const [formError, setFormError] = useState("");
@@ -747,8 +755,8 @@ function AffiliateDashboard({
   return (
     <SectionGlow>
       <div className="mx-auto my-6 w-full max-w-193.5 rounded-xl border border-white/10 bg-[#111] p-6 text-white sm:p-8">
-        {/* Pending review: show nothing else */}
-        {isPending ? (
+        {/* Show the pending state only after the profile form has been saved. */}
+        {isPending && !isEditing ? (
           <div className="flex flex-col items-center justify-center gap-5 py-14 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full border border-yellow-400/30 bg-yellow-400/10">
               <svg

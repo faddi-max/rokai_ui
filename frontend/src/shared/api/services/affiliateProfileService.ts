@@ -292,6 +292,8 @@ export const affiliateProfileService = {
       authHeaders()
     );
 
+    console.log(raw)
+
    
     const updatedProfile = unwrapProfile(raw);
 
