@@ -112,7 +112,7 @@ function CalloutMarker({ callout }: { callout: CustomizationCallout }) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*  One category block: title, product + sticks, filters, options             */
+/*  One category block: title, product + sticks, slider, filters, options     */
 /* -------------------------------------------------------------------------- */
 
 function CategoryBlock({
@@ -126,8 +126,23 @@ function CategoryBlock({
 }) {
   const [filter, setFilter] = useState<CustomizationFilter>("all");
   const [picked, setPicked] = useState<string | null>(null);
+  const [slideIndex, setSlideIndex] = useState(0);
 
   const stageRef = useRef<HTMLDivElement>(null);
+
+  /* Slides: API images, or the single main image when there are none */
+  const slides =
+    category.slides && category.slides.length > 0
+      ? category.slides
+      : [{ id: "main", src: category.image, points: [] as string[] }];
+
+  const slide = slides[Math.min(slideIndex, slides.length - 1)];
+
+  /* x,y callouts were measured on the FIRST image only */
+  const isMainSlide = slideIndex === 0;
+
+  const go = (d: 1 | -1) =>
+    setSlideIndex((i) => (i + d + slides.length) % slides.length);
 
   const options =
     filter === "all"
@@ -201,8 +216,12 @@ function CategoryBlock({
         >
           {/* every % below is relative to THIS box */}
           <div ref={stageRef} className="absolute inset-0">
-            <img
-              src={category.image}
+            <motion.img
+              key={slide.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
+              src={slide.src}
               alt={category.imageAlt}
               loading="lazy"
               className="h-full w-full"
@@ -212,7 +231,7 @@ function CategoryBlock({
               }}
             />
 
-            {category.guides && (
+            {isMainSlide && category.guides && (
               <svg
                 aria-hidden
                 viewBox="0 0 100 100"
@@ -236,16 +255,18 @@ function CategoryBlock({
             )}
 
             {/* labels need side space, so they show from xl up */}
-            <div className="hidden xl:block">
-              <CalloutLines callouts={category.callouts} />
+            {isMainSlide && (
+              <div className="hidden xl:block">
+                <CalloutLines callouts={category.callouts} />
 
-              {category.callouts.map((c) => (
-                <CalloutMarker
-                  key={c.label + c.sublabel}
-                  callout={c}
-                />
-              ))}
-            </div>
+                {category.callouts.map((c) => (
+                  <CalloutMarker
+                    key={c.label + c.sublabel}
+                    callout={c}
+                  />
+                ))}
+              </div>
+            )}
 
             {debug && (
               <div
@@ -263,28 +284,84 @@ function CategoryBlock({
         </motion.div>
       </div>
 
-      {/* Legend for screens where sticks are hidden */}
-      <ul className="mt-6 grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3 xl:hidden">
-        {category.callouts.map((c) => (
-          <li
-            key={c.label + c.sublabel}
-            className="flex items-start gap-2"
+      {/* Image slider controls */}
+      {slides.length > 1 && (
+        <div className="mt-6 flex items-center justify-center gap-4">
+          <button
+            type="button"
+            aria-label="Previous image"
+            onClick={() => go(-1)}
+            className={arrowBtn}
           >
-            <span
-              aria-hidden
-              className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#E51B24]"
-            />
+            <ChevronLeft size={16} />
+          </button>
 
-            <span className="font-space-grotesk text-[12px] leading-[15px] text-white">
-              {c.label}
+          <div className="flex items-center gap-2">
+            {slides.map((s, i) => (
+              <button
+                key={s.id}
+                type="button"
+                aria-label={`Show image ${i + 1}`}
+                aria-current={i === slideIndex ? "true" : undefined}
+                onClick={() => setSlideIndex(i)}
+                className={`h-[3px] transition-all duration-300 ${
+                  i === slideIndex
+                    ? "w-8 bg-[#E51B24]"
+                    : "w-4 bg-white/25 hover:bg-white/50"
+                }`}
+              />
+            ))}
+          </div>
 
-              <span className="block text-[10px] font-light text-white/50">
-                {c.sublabel}
+          <button
+            type="button"
+            aria-label="Next image"
+            onClick={() => go(1)}
+            className={arrowBtn}
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
+
+      {/* API labels of the current (non-main) image */}
+      {!isMainSlide && slide.points.length > 0 && (
+        <ul className="mt-4 flex flex-wrap justify-center gap-2">
+          {slide.points.map((p) => (
+            <li
+              key={p}
+              className="rounded-[3px] border border-white/10 bg-[#111111] px-3 py-1.5 font-space-grotesk text-[10px] font-bold uppercase tracking-wide text-white/70"
+            >
+              {p}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Legend for screens where sticks are hidden */}
+      {isMainSlide && category.callouts.length > 0 && (
+        <ul className="mt-6 grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3 xl:hidden">
+          {category.callouts.map((c) => (
+            <li
+              key={c.label + c.sublabel}
+              className="flex items-start gap-2"
+            >
+              <span
+                aria-hidden
+                className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#E51B24]"
+              />
+
+              <span className="font-space-grotesk text-[12px] leading-[15px] text-white">
+                {c.label}
+
+                <span className="block text-[10px] font-light text-white/50">
+                  {c.sublabel}
+                </span>
               </span>
-            </span>
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {/* Filter tabs (per category) */}
       <div className="mt-12 flex flex-wrap gap-2 lg:mt-14">
@@ -334,9 +411,11 @@ function CategoryBlock({
               </p>
             </div>
 
-            <p className="mt-3 border-t border-white/5 pt-2 font-space-grotesk text-[9px] font-medium uppercase tracking-wide text-[#E51B24]">
-              {o.tag}
-            </p>
+            {o.tag && (
+              <p className="mt-3 border-t border-white/5 pt-2 font-space-grotesk text-[9px] font-medium uppercase tracking-wide text-[#E51B24]">
+                {o.tag}
+              </p>
+            )}
           </article>
         ))}
       </motion.div>
@@ -391,21 +470,10 @@ export default function CustomizationSection({
     });
   };
 
-  const slideBy = (d: 1 | -1) => {
-    const track = trackRef.current;
-
-    if (!track) return;
-
-    track.scrollBy({
-      left: d * track.clientWidth * 0.6,
-      behavior: "smooth",
-    });
-  };
-
   return (
     <SectionGlow className="relative overflow-hidden">
       <div className="mx-auto w-full max-w-[1180px] px-5 py-14 sm:px-8 lg:px-[30px] lg:py-20">
-        {/* Header + slider arrows */}
+        {/* Header */}
         <div className="flex items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-4">
@@ -429,26 +497,6 @@ export default function CustomizationSection({
               </span>
             </h2>
           </div>
-
-          {/* <div className="flex gap-2">
-            <button
-              type="button"
-              aria-label="Slide left"
-              onClick={() => slideBy(-1)}
-              className={arrowBtn}
-            >
-              <ChevronLeft size={16} />
-            </button>
-
-            <button
-              type="button"
-              aria-label="Slide right"
-              onClick={() => slideBy(1)}
-              className={arrowBtn}
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div> */}
         </div>
 
         {/* Slider: click = smooth scroll to that category */}

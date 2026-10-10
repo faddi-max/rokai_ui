@@ -158,7 +158,23 @@ export default function AffiliateLoginSection() {
   const showError = (error: unknown, fallback: string) => {
     openModal("error", getErrorMessage(error, fallback));
   };
+const loadAccountProfile = async (
+  authData: AuthResponse
+): Promise<AuthResponse> => {
+  if (!authData.user?.id) {
+    throw new Error("User information is missing.");
+  }
 
+  const profile = await affiliateProfileService.getProfile(
+    authData.user.id,
+    true
+  );
+
+  return {
+    ...authData,
+    profile,
+  };
+};
   const handleSignup = async (values: SignupValues) => {
     try {
       const response = await affiliateAuthService.signup({
@@ -179,50 +195,59 @@ export default function AffiliateLoginSection() {
       showError(error, "We couldn't create your account. Please try again.");
     }
   };
+const handleVerifyOtp = async (otp: string) => {
+  const otpMessage = validateOtp(otp);
 
-  const handleVerifyOtp = async (otp: string) => {
-    const otpMessage = validateOtp(otp);
-    if (otpMessage) {
-      openModal("error", otpMessage);
-      return;
-    }
-    const code = otp.trim();
+  if (otpMessage) {
+    openModal("error", otpMessage);
+    return;
+  }
 
-    const activeEmail = pendingEmail || authStorage.getSignupEmail();
+  const activeEmail = pendingEmail || authStorage.getSignupEmail();
 
-    if (!activeEmail) {
-      openModal("error", "Email address is missing. Please sign up or log in again.");
-      setView("signup");
-      return;
-    }
+  if (!activeEmail) {
+    openModal(
+      "error",
+      "Email address is missing. Please sign up or log in again."
+    );
+    setView("signup");
+    return;
+  }
 
-    try {
-      const authData = await affiliateAuthService.verifyOtp({
-        email: activeEmail,
-        otp: code,
-      });
+  try {
+    const authData = await affiliateAuthService.verifyOtp({
+      email: activeEmail,
+      otp: otp.trim(),
+    });
 
-      if (!authData?.token) {
-        throw new Error("Verification succeeded, but no sign-in token was returned.");
-      }
-      const email = authStorage.getSignupEmail();
-      authStorage.saveSession(authData.token);
-      authStorage.saveSignup(authData.token, email);
-      authStorage.saveUser(authData);
-      if (authData.profile) authStorage.saveProfile(authData.profile);
-      setAccount(authData);
-      setStartProfileEdit(true);
-      setShowDashboard(true);
-
-      openModal("success", "Your email has been successfully verified!");
-    } catch (error) {
-      showError(
-        error,
-        "The verification code is invalid or expired. Try again or request a new code."
+    if (!authData?.token) {
+      throw new Error(
+        "Verification succeeded, but no sign-in token was returned."
       );
     }
-  };
 
+    authStorage.saveSession(authData.token);
+    authStorage.saveSignup(authData.token, activeEmail);
+
+    const accountWithProfile = await loadAccountProfile(authData);
+
+    authStorage.saveUser(accountWithProfile);
+
+    if (accountWithProfile.profile) {
+      authStorage.saveProfile(accountWithProfile.profile);
+    }
+
+    setAccount(accountWithProfile);
+    setShowDashboard(true);
+
+    openModal("success", "Your email has been successfully verified!");
+  } catch (error) {
+    showError(
+      error,
+      "The verification code is invalid or expired. Try again or request a new code."
+    );
+  }
+};
   const handleResendOtp = async () => {
     const activeEmail = pendingEmail || authStorage.getSignupEmail();
     if (!activeEmail) {
@@ -321,49 +346,64 @@ export default function AffiliateLoginSection() {
     }
   };
 
-  const handleLogin = async (email: string, password: string) => {
-    try {
-      const authData = await affiliateAuthService.login({ email, password });
+const handleLogin = async (email: string, password: string) => {
+  try {
+    const authData = await affiliateAuthService.login({
+      email,
+      password,
+    });
 
-      if (authData?.is_verified === false) {
-        setPendingEmail(email);
-        authStorage.saveSignup("", email);
-        setView("verify-otp");
+    if (authData?.is_verified === false) {
+      setPendingEmail(email);
+      authStorage.saveSignup("", email);
+      setView("verify-otp");
 
-        openModal(
-          "error",
-          authData.message ||
-            "Please verify your email before signing in. A verification code is required."
-        );
-        return;
-      }
+      openModal(
+        "error",
+        authData.message ||
+          "Please verify your email before signing in."
+      );
 
-      if (!authData?.token) {
-        throw new Error("Login failed. No token received.");
-      }
-
-      authStorage.saveSession(authData.token);
-      authStorage.saveSignup(authData.token, email);
-      authStorage.saveUser(authData);
-      if (authData.profile) authStorage.saveProfile(authData.profile);
-      setAccount(authData);
-      setStartProfileEdit(true);
-      setShowDashboard(true);
-
-      openModal("success", "Login successful!");
-    } catch (error) {
-      const verificationMessage = getEmailVerificationMessage(error);
-      if (verificationMessage) {
-        setPendingEmail(email);
-        authStorage.saveSignup("", email);
-        setView("verify-otp");
-        openModal("success", verificationMessage);
-        return;
-      }
-
-      showError(error, "Email or password is incorrect. Check your details and try again.");
+      return;
     }
-  };
+
+    if (!authData?.token) {
+      throw new Error("Login failed. No token received.");
+    }
+
+    authStorage.saveSession(authData.token);
+    authStorage.saveSignup(authData.token, email);
+
+    const accountWithProfile = await loadAccountProfile(authData);
+
+    authStorage.saveUser(accountWithProfile);
+
+    if (accountWithProfile.profile) {
+      authStorage.saveProfile(accountWithProfile.profile);
+    }
+
+    setAccount(accountWithProfile);
+    setShowDashboard(true);
+
+    openModal("success", "Login successful!");
+  } catch (error) {
+    const verificationMessage = getEmailVerificationMessage(error);
+
+    if (verificationMessage) {
+      setPendingEmail(email);
+      authStorage.saveSignup("", email);
+      setView("verify-otp");
+
+      openModal("success", verificationMessage);
+      return;
+    }
+
+    showError(
+      error,
+      "Email or password is incorrect. Check your details and try again."
+    );
+  }
+};
 
   // Client-side logout: clears every stored affiliate value and resets the UI.
   // (The backend /affiliate/logout endpoint currently deletes the account, so it is NOT called here.)
@@ -588,8 +628,9 @@ function AffiliateDashboard({
   onUpdateAccount: (account: AuthResponse) => void;
   onLogout: () => void;
 }) {
-  const status = account?.profile?.status ?? "Signed in";
-  const isPending = status.toLowerCase() === "pending";
+const status = account?.profile?.status ?? "Pending";
+
+const isPending = status.trim().toLowerCase() === "pending";
 
   // order_amount is intentionally excluded: the backend returns a default
   // value (0 / "0.00") for brand new profiles, which is not "saved details".
@@ -833,7 +874,7 @@ function AffiliateDashboard({
               </div>
             </div>
 
-            {account?.profile && (
+       
               <div className="mt-6 border-t border-white/10 pt-6">
                 {/* Section header with Edit button (view mode only) */}
                 <div className="flex flex-wrap items-center justify-between gap-3">
@@ -1056,7 +1097,7 @@ function AffiliateDashboard({
                   </form>
                 )}
               </div>
-            )}
+            
           </>
         )}
       </div>

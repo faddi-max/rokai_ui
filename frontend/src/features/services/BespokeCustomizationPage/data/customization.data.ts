@@ -51,6 +51,14 @@ export interface CustomizationOption {
   filter: Exclude<CustomizationFilter, "all">;
 }
 
+/** One image of a category slider (API `images[]`). */
+export interface CustomizationSlide {
+  id: string;
+  src: string;
+  /** API labels for this image (e.g. SCREEN PRINTING, HEAT TRANSFER) */
+  points: string[];
+}
+
 export interface CustomizationCategory {
   id: string;
   /** text shown on the top slider button, e.g. "BJJ GI" */
@@ -67,9 +75,12 @@ export interface CustomizationCategory {
   /** "contain" = image never cropped (default), "cover" = fills and crops */
   objectFit?: "contain" | "cover";
   objectPosition?: string;
+  /** x,y callouts: they belong to the FIRST image only */
   callouts: CustomizationCallout[];
   guides?: CustomizationGuide[];
   options: CustomizationOption[];
+  /** All images for the per-category slider (first = main image) */
+  slides?: CustomizationSlide[];
 }
 
 export interface CustomizationFilterItem {
