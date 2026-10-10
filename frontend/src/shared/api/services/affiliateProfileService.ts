@@ -218,7 +218,35 @@ export const affiliateProfileService = {
     return profile;
   },
 
-  /** PUT /affiliate/update/{userId} */
+  /** POST /affiliate/profile - creates the initial affiliate profile */
+  async createProfile(payload: SaveProfilePayload): Promise<AffiliateProfile> {
+    const raw = await apiClient.post<unknown, SaveProfilePayload>(
+      PROFILE_ENDPOINT,
+      payload,
+      authHeaders()
+    );
+
+    const createdProfile = unwrapProfile(raw);
+
+    if (looksLikeProfile(createdProfile)) {
+      authStorage.saveProfile(createdProfile);
+      return createdProfile;
+    }
+
+    try {
+      const freshProfile = await this.getProfile(payload.user_id, true);
+      if (looksLikeProfile(freshProfile)) {
+        authStorage.saveProfile(freshProfile);
+        return freshProfile;
+      }
+    } catch {
+      // Keep going
+    }
+
+    return createdProfile;
+  },
+
+  /** PUT /affiliate/update/{userId} - updates an existing affiliate profile */
   async updateProfile(
     userId: number,
     payload: SaveProfilePayload
@@ -244,13 +272,9 @@ export const affiliateProfileService = {
 
     const updatedProfile = unwrapProfile(raw);
 
-    if (!looksLikeProfile(updatedProfile)) {
-      throw new Error(
-        "Profile update succeeded, but the server returned an invalid profile."
-      );
+    if (looksLikeProfile(updatedProfile)) {
+      authStorage.saveProfile(updatedProfile);
     }
-
-    authStorage.saveProfile(updatedProfile);
 
     try {
       const freshProfile = await this.getProfile(userId, true);
@@ -266,7 +290,29 @@ export const affiliateProfileService = {
     return updatedProfile;
   },
 
-  async saveProfile(payload: SaveProfilePayload): Promise<AffiliateProfile> {
-    return this.updateProfile(payload.user_id, payload);
+  /**
+   * Dispatches to POST /affiliate/profile for initial profile creation,
+   * or PUT /affiliate/update/{userId} for subsequent edits, with automatic fallback.
+   */
+  async saveProfile(
+    userId: number,
+    payload: SaveProfilePayload,
+    isInitial = false
+  ): Promise<AffiliateProfile> {
+    if (isInitial) {
+      try {
+        return await this.createProfile(payload);
+      } catch (err) {
+        // Fall back to update if profile already exists on backend
+        return await this.updateProfile(userId, payload);
+      }
+    } else {
+      try {
+        return await this.updateProfile(userId, payload);
+      } catch (err) {
+        // Fall back to create if profile doesn't exist yet on backend
+        return await this.createProfile(payload);
+      }
+    }
   },
 };

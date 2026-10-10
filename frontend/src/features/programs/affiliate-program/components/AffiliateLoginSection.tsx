@@ -376,12 +376,27 @@ export default function AffiliateLoginSection() {
     openModal("success", "You have been logged out.");
   };
 
+  const isProfileCompleted = Boolean(
+    account?.user?.id &&
+      (authStorage.isProfileCompleted(account.user.id) ||
+        PROFILE_LINK_FIELDS.some(({ key }) =>
+          Boolean((account?.profile?.[key] as string | null | undefined)?.trim())
+        ) ||
+        Boolean(account?.profile?.notes?.trim()) ||
+        Boolean(
+          account?.profile?.order_amount != null &&
+          String(account?.profile?.order_amount).trim() !== ""
+        ))
+  );
+
   return (
     <section>
       <SectionHeaderblog
         eyebrow={
           showDashboard
-            ? "Affiliate account"
+            ? isProfileCompleted
+              ? "Affiliate account"
+              : "Affiliate onboarding"
             : view === "verify-otp"
             ? "Email verification"
             : view === "forgot-password" || view === "reset-otp" || view === "reset-password"
@@ -390,7 +405,9 @@ export default function AffiliateLoginSection() {
         }
         title={
           showDashboard
-            ? "Your affiliate"
+            ? isProfileCompleted
+              ? "Your affiliate"
+              : "Complete your"
             : view === "verify-otp"
             ? "Confirm your"
             : view === "forgot-password"
@@ -403,7 +420,9 @@ export default function AffiliateLoginSection() {
         }
         highlight={
           showDashboard
-            ? "dashboard."
+            ? isProfileCompleted
+              ? "dashboard."
+              : "profile."
             : view === "verify-otp"
             ? "identity."
             : view === "forgot-password"
@@ -416,7 +435,9 @@ export default function AffiliateLoginSection() {
         }
         description={
           showDashboard
-            ? "Your account is ready. Find your affiliate status and program details below."
+            ? isProfileCompleted
+              ? "Your account is ready. Find your affiliate status and program details below."
+              : "Please fill in your profile and platform details before submitting your application."
             : view === "verify-otp"
             ? "Enter the 6-digit verification code sent to your email to continue."
             : view === "forgot-password"
@@ -581,21 +602,32 @@ function AffiliateDashboard({
   onUpdateAccount: (account: AuthResponse) => void;
   onLogout: () => void;
 }) {
-  const status = account?.profile?.status ?? "Signed in";
-  const isPending = status.toLowerCase() === "pending";
+  const status = account?.profile?.status ?? "Pending";
+  const isPending = status.trim().toLowerCase() === "pending";
 
   const hasSavedDetails =
-    PROFILE_LINK_FIELDS.some(({ key }) => Boolean(account?.profile?.[key])) ||
-    account?.profile?.order_amount != null ||
-    Boolean(account?.profile?.notes?.trim());
+    PROFILE_LINK_FIELDS.some(({ key }) =>
+      Boolean((account?.profile?.[key] as string | null | undefined)?.trim())
+    ) ||
+    Boolean(account?.profile?.notes?.trim()) ||
+    Boolean(
+      account?.profile?.order_amount != null &&
+      String(account?.profile?.order_amount).trim() !== ""
+    );
 
-  // First-time users (nothing saved yet) start directly in edit mode.
-  const [isEditing, setIsEditing] = useState(!hasSavedDetails);
+  const profileCompleted =
+    hasSavedDetails || authStorage.isProfileCompleted(account?.user?.id);
+
+  const [isEditing, setIsEditing] = useState(!profileCompleted);
   const [form, setForm] = useState<ProfileFormState>(() => toFormState(account?.profile));
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<FormField, string>>>({});
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // If the user has not completed their profile yet, ALWAYS show the profile form first.
+  // Once completed, show the form only when editing mode is active.
+  const showForm = !profileCompleted || isEditing;
 
   // True only when the form differs from what is saved.
   const isDirty = (() => {
@@ -616,7 +648,7 @@ function AffiliateDashboard({
   };
 
   const startEditing = () => {
-    setForm(toFormState(account?.profile)); // always start from the saved data
+    setForm(toFormState(account?.profile));
     setFieldErrors({});
     setFormError("");
     setSaveSuccess(false);
@@ -628,13 +660,15 @@ function AffiliateDashboard({
     setForm(toFormState(account?.profile));
     setFieldErrors({});
     setFormError("");
-    setIsEditing(false);
+    if (profileCompleted) {
+      setIsEditing(false);
+    }
   };
 
   const saveProfile = async () => {
     if (!account?.user?.id) return;
 
-    if (!isDirty) {
+    if (profileCompleted && !isDirty) {
       setIsEditing(false);
       return;
     }
@@ -693,16 +727,14 @@ function AffiliateDashboard({
       );
 
       /*
-       * IMPORTANT:
-       * This now calls:
-       *
-       * PUT /api/v1/affiliate/update/{userId}
-       *
-       * The service also refreshes the apiClient GET cache after the PUT.
+       * Initial onboarding uses POST /affiliate/profile.
+       * Subsequent profile updates use PUT /affiliate/update/{userId}.
        */
-      const savedProfile = await affiliateProfileService.updateProfile(
+      const isInitial = !profileCompleted;
+      const savedProfile = await affiliateProfileService.saveProfile(
         account.user.id,
-        payload
+        payload,
+        isInitial
       );
 
       // Use the server's actual response as the source of truth.
@@ -713,6 +745,9 @@ function AffiliateDashboard({
 
       // Persist the newest profile for page refreshes.
       authStorage.saveProfile(mergedProfile);
+      if (account.user.id) {
+        authStorage.markProfileCompleted(account.user.id);
+      }
 
       // Update React state immediately.
       onUpdateAccount({
@@ -738,7 +773,7 @@ function AffiliateDashboard({
   };
 
   const handleLogoutClick = () => {
-    if (isEditing && isDirty && !window.confirm("You have unsaved changes. Log out anyway?")) {
+    if (showForm && isDirty && !window.confirm("You have unsaved changes. Log out anyway?")) {
       return;
     }
     onLogout();
@@ -747,8 +782,8 @@ function AffiliateDashboard({
   return (
     <SectionGlow>
       <div className="mx-auto my-6 w-full max-w-193.5 rounded-xl border border-white/10 bg-[#111] p-6 text-white sm:p-8">
-        {/* Pending review: show nothing else */}
-        {isPending ? (
+        {!showForm && isPending ? (
+          /* Pending review: show only after profile details have been submitted */
           <div className="flex flex-col items-center justify-center gap-5 py-14 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full border border-yellow-400/30 bg-yellow-400/10">
               <svg
@@ -781,264 +816,299 @@ function AffiliateDashboard({
               </p>
             </div>
 
-            <button type="button" onClick={onLogout} className={`mt-2 ${logoutButtonClass}`}>
-              Log out
-              <LogOut size={14} aria-hidden />
-            </button>
+            {saveSuccess && (
+              <p role="status" className="font-space-grotesk text-sm text-green-400">
+                Profile details submitted successfully!
+              </p>
+            )}
+
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={startEditing}
+                className="inline-flex h-9 items-center gap-2 rounded-md bg-[#e63946] px-4 font-space-grotesk text-xs font-bold text-white transition hover:bg-[#c92e3a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                <Pencil size={14} aria-hidden />
+                Edit submitted details
+              </button>
+
+              <button type="button" onClick={handleLogoutClick} className={logoutButtonClass}>
+                Log out
+                <LogOut size={14} aria-hidden />
+              </button>
+            </div>
           </div>
         ) : (
           <>
-            {/* Dashboard header */}
+            {/* Header */}
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="font-space-grotesk text-xs font-bold uppercase tracking-[1px] text-[#e63946]">
-                  Affiliate dashboard
+                  {!profileCompleted
+                    ? "Affiliate onboarding"
+                    : isPending
+                    ? "Pending application"
+                    : "Affiliate dashboard"}
                 </p>
                 <h3 className="mt-2 font-space-grotesk text-2xl font-bold">
                   Welcome{account?.user?.name ? `, ${account.user.name}` : " back"}.
                 </h3>
                 <p className="mt-2 font-space-grotesk text-sm text-white/65">
-                  Your affiliate account is connected. Your program details will appear here.
+                  {!profileCompleted
+                    ? "Please complete your profile details to submit your affiliate application."
+                    : isPending
+                    ? "Update your submitted application details below."
+                    : "Your affiliate account is connected. Your program details will appear here."}
                 </p>
               </div>
 
-            <div className="flex items-center gap-3">
-  <span className="rounded-full border border-[#e63946]/40 bg-[#e63946]/10 px-3 py-1 font-space-grotesk text-xs capitalize text-[#ff7b82]">
-    {status}
-  </span>
+              <div className="flex items-center gap-3">
+                <span
+                  className={`rounded-full border px-3 py-1 font-space-grotesk text-xs capitalize ${
+                    isPending
+                      ? "border-yellow-400/40 bg-yellow-400/10 text-yellow-400"
+                      : "border-[#e63946]/40 bg-[#e63946]/10 text-[#ff7b82]"
+                  }`}
+                >
+                  {status}
+                </span>
 
-  {isEditing ? (
-    <button
-      type="button"
-      onClick={cancelEditing}
-      className="inline-flex h-9 items-center gap-2 rounded-md border border-white/20 px-4 font-space-grotesk text-xs font-bold text-white transition hover:border-white/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-    >
-      Back to profile
-    </button>
-  ) : (
-    <button
-      type="button"
-      onClick={handleLogoutClick}
-      className={logoutButtonClass}
-    >
-      Log out
-      <LogOut size={14} aria-hidden />
-    </button>
-  )}
-</div>
+                {profileCompleted && showForm ? (
+                  <button
+                    type="button"
+                    onClick={cancelEditing}
+                    className="inline-flex h-9 items-center gap-2 rounded-md border border-white/20 px-4 font-space-grotesk text-xs font-bold text-white transition hover:border-white/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  >
+                    {isPending ? "Back to status" : "Back to profile"}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleLogoutClick}
+                    className={logoutButtonClass}
+                  >
+                    Log out
+                    <LogOut size={14} aria-hidden />
+                  </button>
+                )}
+              </div>
             </div>
 
-            {account?.profile && (
-              <div className="mt-6 border-t border-white/10 pt-6">
-                {/* Section header with Edit button (view mode only) */}
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p className="font-space-grotesk text-xs font-bold uppercase tracking-[1px] text-[#e63946]">
-                      Your profile
-                    </p>
-                    <h3 className="mt-2 font-space-grotesk text-xl font-bold">
-                      {isEditing
+            <div className="mt-6 border-t border-white/10 pt-6">
+              {/* Profile section header with Edit button (view mode only) */}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="font-space-grotesk text-xs font-bold uppercase tracking-[1px] text-[#e63946]">
+                    Your profile
+                  </p>
+                  <h3 className="mt-2 font-space-grotesk text-xl font-bold">
+                    {showForm
+                      ? profileCompleted
                         ? "Edit website, social links, order amount and notes"
-                        : "Website, social links, order amount and notes"}
-                    </h3>
-                  </div>
-
-                  {!isEditing && (
-                    <button
-                      type="button"
-                      onClick={startEditing}
-                      className="inline-flex h-9 items-center gap-2 rounded-md bg-[#e63946] px-4 font-space-grotesk text-xs font-bold text-white transition hover:bg-[#c92e3a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                    >
-                      <Pencil size={14} aria-hidden />
-                      Edit profile
-                    </button>
-                  )}
+                        : "Website, social links, order amount and notes"
+                      : "Website, social links, order amount and notes"}
+                  </h3>
                 </div>
 
-                {/* VIEW MODE */}
-                {!isEditing && (
-                  <>
-                    {saveSuccess && (
-                      <p role="status" className="mt-4 font-space-grotesk text-sm text-green-400">
-                        Profile saved successfully!
-                      </p>
-                    )}
-
-                    <dl className="mt-5 grid gap-4 sm:grid-cols-3">
-                      <div>
-                        <dt className="font-space-grotesk text-xs text-white/50">Email</dt>
-                        <dd className="mt-1 break-all font-space-grotesk text-sm">
-                          {account.user.email}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="font-space-grotesk text-xs text-white/50">Commission</dt>
-                        <dd className="mt-1 font-space-grotesk text-sm">
-                          {account.profile.commission_percentage}%
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="font-space-grotesk text-xs text-white/50">Affiliate tier</dt>
-                        <dd className="mt-1 font-space-grotesk text-sm">
-                          {account.profile.badge_tier}
-                        </dd>
-                      </div>
-
-                      <div>
-                        <dt className="font-space-grotesk text-xs text-white/50">Order amount</dt>
-                        <dd className="mt-1 font-space-grotesk text-sm">
-                          {account.profile.order_amount != null ? (
-                            formatAmount(account.profile.order_amount)
-                          ) : (
-                            <span className="text-white/40">Not provided</span>
-                          )}
-                        </dd>
-                      </div>
-
-                      {PROFILE_LINK_FIELDS.map(({ key, label }) => {
-                        const value = account.profile[key];
-                        return (
-                          <div key={key}>
-                            <dt className="font-space-grotesk text-xs text-white/50">{label}</dt>
-                            <dd className="mt-1 break-all font-space-grotesk text-sm">
-                              {value && isSafeProfileUrl(value) ? (
-                                <a
-                                  href={value}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="text-white underline decoration-white/30 underline-offset-4 hover:text-[#ff7b82]"
-                                >
-                                  {value}
-                                </a>
-                              ) : value ? (
-                                value
-                              ) : (
-                                <span className="text-white/40">Not provided</span>
-                              )}
-                            </dd>
-                          </div>
-                        );
-                      })}
-
-                      <div className="sm:col-span-3">
-                        <dt className="font-space-grotesk text-xs text-white/50">Notes</dt>
-                        <dd className="mt-1 whitespace-pre-line break-words font-space-grotesk text-sm">
-                          {account.profile.notes?.trim() ? (
-                            account.profile.notes
-                          ) : (
-                            <span className="text-white/40">No notes</span>
-                          )}
-                        </dd>
-                      </div>
-                    </dl>
-                  </>
-                )}
-
-                {/* EDIT MODE */}
-                {isEditing && (
-                  <form
-                    onSubmit={(event) => {
-                      event.preventDefault();
-                      saveProfile();
-                    }}
+                {!showForm && (
+                  <button
+                    type="button"
+                    onClick={startEditing}
+                    className="inline-flex h-9 items-center gap-2 rounded-md bg-[#e63946] px-4 font-space-grotesk text-xs font-bold text-white transition hover:bg-[#c92e3a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                   >
-                    <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                      {PROFILE_LINK_FIELDS.map(({ key, label, placeholder }) => (
-                        <label
-                          key={key}
-                          className="flex flex-col gap-2 font-space-grotesk text-xs text-white/70"
-                        >
-                          {label}
-                          <input
-                            type="text"
-                            inputMode="url"
-                            value={form[key]}
-                            onChange={(event) => updateField(key, event.target.value)}
-                            disabled={submitting}
-                            placeholder={placeholder}
-                            aria-invalid={Boolean(fieldErrors[key])}
-                            aria-describedby={fieldErrors[key] ? `${key}-error` : undefined}
-                            className={`h-11 ${inputClass(Boolean(fieldErrors[key]))}`}
-                          />
-                          {fieldErrors[key] && (
-                            <span id={`${key}-error`} className="text-xs text-red-300">
-                              {fieldErrors[key]}
-                            </span>
-                          )}
-                        </label>
-                      ))}
+                    <Pencil size={14} aria-hidden />
+                    Edit profile
+                  </button>
+                )}
+              </div>
 
-                      <label className="flex flex-col gap-2 font-space-grotesk text-xs text-white/70">
-                        Order amount ($)
-                        <input
-                          type="text"
-                          inputMode="decimal"
-                          value={form.order_amount}
-                          onChange={(event) => updateField("order_amount", event.target.value)}
-                          disabled={submitting}
-                          placeholder="0.00"
-                          aria-invalid={Boolean(fieldErrors.order_amount)}
-                          aria-describedby={
-                            fieldErrors.order_amount ? "order_amount-error" : undefined
-                          }
-                          className={`h-11 ${inputClass(Boolean(fieldErrors.order_amount))}`}
-                        />
-                        {fieldErrors.order_amount && (
-                          <span id="order_amount-error" className="text-xs text-red-300">
-                            {fieldErrors.order_amount}
-                          </span>
-                        )}
-                      </label>
+              {/* VIEW MODE */}
+              {!showForm && account?.profile && (
+                <>
+                  {saveSuccess && (
+                    <p role="status" className="mt-4 font-space-grotesk text-sm text-green-400">
+                      Profile saved successfully!
+                    </p>
+                  )}
 
-                      <label className="flex flex-col gap-2 font-space-grotesk text-xs text-white/70 sm:col-span-2">
-                        <span className="flex items-center justify-between">
-                          Notes
-                          <span className="text-white/30">
-                            {form.notes.length}/{NOTES_MAX_LENGTH}
-                          </span>
-                        </span>
-                        <textarea
-                          value={form.notes}
-                          onChange={(event) =>
-                            updateField("notes", event.target.value.slice(0, NOTES_MAX_LENGTH))
-                          }
-                          disabled={submitting}
-                          rows={4}
-                          placeholder="Anything you'd like us to know..."
-                          aria-invalid={Boolean(fieldErrors.notes)}
-                          aria-describedby={fieldErrors.notes ? "notes-error" : undefined}
-                          className={`resize-none py-3 ${inputClass(Boolean(fieldErrors.notes))}`}
-                        />
-                        {fieldErrors.notes && (
-                          <span id="notes-error" className="text-xs text-red-300">
-                            {fieldErrors.notes}
-                          </span>
-                        )}
-                      </label>
+                  <dl className="mt-5 grid gap-4 sm:grid-cols-3">
+                    <div>
+                      <dt className="font-space-grotesk text-xs text-white/50">Email</dt>
+                      <dd className="mt-1 break-all font-space-grotesk text-sm">
+                        {account.user.email}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="font-space-grotesk text-xs text-white/50">Commission</dt>
+                      <dd className="mt-1 font-space-grotesk text-sm">
+                        {account.profile.commission_percentage}%
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="font-space-grotesk text-xs text-white/50">Affiliate tier</dt>
+                      <dd className="mt-1 font-space-grotesk text-sm">
+                        {account.profile.badge_tier}
+                      </dd>
                     </div>
 
-                    {formError && (
-                      <p role="alert" className="mt-4 font-space-grotesk text-sm text-red-300">
-                        {formError}
-                      </p>
-                    )}
-
-                    <div className="mt-5 flex flex-wrap items-center gap-3">
-                      <button
-                        type="submit"
-                        disabled={submitting || !isDirty}
-                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[#e63946] px-5 font-space-grotesk text-sm font-bold text-white transition hover:bg-[#c92e3a] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                      >
-                        {submitting ? (
-                          <>
-                            <Loader2 size={14} className="animate-spin" />
-                            Saving…
-                          </>
+                    <div>
+                      <dt className="font-space-grotesk text-xs text-white/50">Order amount</dt>
+                      <dd className="mt-1 font-space-grotesk text-sm">
+                        {account.profile.order_amount != null ? (
+                          formatAmount(account.profile.order_amount)
                         ) : (
-                          "Save changes"
+                          <span className="text-white/40">Not provided</span>
                         )}
-                      </button>
+                      </dd>
+                    </div>
 
+                    {PROFILE_LINK_FIELDS.map(({ key, label }) => {
+                      const value = account.profile[key];
+                      return (
+                        <div key={key}>
+                          <dt className="font-space-grotesk text-xs text-white/50">{label}</dt>
+                          <dd className="mt-1 break-all font-space-grotesk text-sm">
+                            {value && isSafeProfileUrl(value) ? (
+                              <a
+                                href={value}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-white underline decoration-white/30 underline-offset-4 hover:text-[#ff7b82]"
+                              >
+                                {value}
+                              </a>
+                            ) : value ? (
+                              value
+                            ) : (
+                              <span className="text-white/40">Not provided</span>
+                            )}
+                          </dd>
+                        </div>
+                      );
+                    })}
+
+                    <div className="sm:col-span-3">
+                      <dt className="font-space-grotesk text-xs text-white/50">Notes</dt>
+                      <dd className="mt-1 whitespace-pre-line break-words font-space-grotesk text-sm">
+                        {account.profile.notes?.trim() ? (
+                          account.profile.notes
+                        ) : (
+                          <span className="text-white/40">No notes</span>
+                        )}
+                      </dd>
+                    </div>
+                  </dl>
+                </>
+              )}
+
+              {/* FORM MODE */}
+              {showForm && (
+                <form
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    saveProfile();
+                  }}
+                >
+                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                    {PROFILE_LINK_FIELDS.map(({ key, label, placeholder }) => (
+                      <label
+                        key={key}
+                        className="flex flex-col gap-2 font-space-grotesk text-xs text-white/70"
+                      >
+                        {label}
+                        <input
+                          type="text"
+                          inputMode="url"
+                          value={form[key]}
+                          onChange={(event) => updateField(key, event.target.value)}
+                          disabled={submitting}
+                          placeholder={placeholder}
+                          aria-invalid={Boolean(fieldErrors[key])}
+                          aria-describedby={fieldErrors[key] ? `${key}-error` : undefined}
+                          className={`h-11 ${inputClass(Boolean(fieldErrors[key]))}`}
+                        />
+                        {fieldErrors[key] && (
+                          <span id={`${key}-error`} className="text-xs text-red-300">
+                            {fieldErrors[key]}
+                          </span>
+                        )}
+                      </label>
+                    ))}
+
+                    <label className="flex flex-col gap-2 font-space-grotesk text-xs text-white/70">
+                      Order amount ($)
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        value={form.order_amount}
+                        onChange={(event) => updateField("order_amount", event.target.value)}
+                        disabled={submitting}
+                        placeholder="0.00"
+                        aria-invalid={Boolean(fieldErrors.order_amount)}
+                        aria-describedby={
+                          fieldErrors.order_amount ? "order_amount-error" : undefined
+                        }
+                        className={`h-11 ${inputClass(Boolean(fieldErrors.order_amount))}`}
+                      />
+                      {fieldErrors.order_amount && (
+                        <span id="order_amount-error" className="text-xs text-red-300">
+                          {fieldErrors.order_amount}
+                        </span>
+                      )}
+                    </label>
+
+                    <label className="flex flex-col gap-2 font-space-grotesk text-xs text-white/70 sm:col-span-2">
+                      <span className="flex items-center justify-between">
+                        Notes
+                        <span className="text-white/30">
+                          {form.notes.length}/{NOTES_MAX_LENGTH}
+                        </span>
+                      </span>
+                      <textarea
+                        value={form.notes}
+                        onChange={(event) =>
+                          updateField("notes", event.target.value.slice(0, NOTES_MAX_LENGTH))
+                        }
+                        disabled={submitting}
+                        rows={4}
+                        placeholder="Anything you'd like us to know..."
+                        aria-invalid={Boolean(fieldErrors.notes)}
+                        aria-describedby={fieldErrors.notes ? "notes-error" : undefined}
+                        className={`resize-none py-3 ${inputClass(Boolean(fieldErrors.notes))}`}
+                      />
+                      {fieldErrors.notes && (
+                        <span id="notes-error" className="text-xs text-red-300">
+                          {fieldErrors.notes}
+                        </span>
+                      )}
+                    </label>
+                  </div>
+
+                  {formError && (
+                    <p role="alert" className="mt-4 font-space-grotesk text-sm text-red-300">
+                      {formError}
+                    </p>
+                  )}
+
+                  <div className="mt-5 flex flex-wrap items-center gap-3">
+                    <button
+                      type="submit"
+                      disabled={submitting || (profileCompleted ? !isDirty : false)}
+                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[#e63946] px-5 font-space-grotesk text-sm font-bold text-white transition hover:bg-[#c92e3a] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    >
+                      {submitting ? (
+                        <>
+                          <Loader2 size={14} className="animate-spin" />
+                          Saving…
+                        </>
+                      ) : profileCompleted ? (
+                        "Save changes"
+                      ) : (
+                        "Submit details"
+                      )}
+                    </button>
+
+                    {profileCompleted && (
                       <button
                         type="button"
                         onClick={cancelEditing}
@@ -1047,11 +1117,11 @@ function AffiliateDashboard({
                       >
                         Cancel
                       </button>
-                    </div>
-                  </form>
-                )}
-              </div>
-            )}
+                    )}
+                  </div>
+                </form>
+              )}
+            </div>
           </>
         )}
       </div>

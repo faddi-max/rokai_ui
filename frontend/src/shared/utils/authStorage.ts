@@ -100,7 +100,7 @@ clearProfileCompleted(userId?: number) {
     safe(() => localStorage.removeItem(SESSION_TOKEN_KEY), undefined);
   },
 
-  /* ------------------------ Logout / reset all ---------------------- */
+
   clearAll() {
     safe(() => {
       localStorage.removeItem(SIGNUP_TOKEN_KEY);
