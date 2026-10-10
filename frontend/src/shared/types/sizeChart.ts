@@ -1,31 +1,25 @@
-export interface SizeChartMeasurement {
-  cm: number;
-  inch: number;
+export interface ApiSizeChart {
+  id: number;
+  subtitle: string | null;
+  title: string;
+  description: string | null;
+  image_path: string | null;
+  image_url: string | null;
+  table_html: string | null;
 }
 
-export interface SizeChartColumn {
-  key: string;
-  label: string;
-}
-
-export interface SizeChartRow {
-  size: string;
-  /** keyed by SizeChartColumn.key */
-  measurements: Record<string, SizeChartMeasurement>;
-}
-
-export interface SizeChartData {
+/** Shape the SizeChartSection renders (works for any number of columns). */
+export interface SizeChartTableData {
   id: string;
   breadcrumb?: string;
-  titleWhite: string;
-  titleRed: string;
-  tolerance?: string;
+  title: string;
+  description?: string;
   image: string;
   imageAlt: string;
   tableLabel: string;
   unitsLabel: string;
   noteLabel: string;
   note: string;
-  columns: SizeChartColumn[];
-  rows: SizeChartRow[];
+  headers: string[];
+  rows: string[][];
 }

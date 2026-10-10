@@ -37,13 +37,6 @@ export interface AffiliateProfile {
   updated_at?: string;
 }
 
-/**
- * Payload used by the affiliate dashboard.
- *
- * `user_id`, `status`, `commission_percentage`, and `badge_tier`
- * are kept here for compatibility with the rest of the frontend,
- * but the PUT update endpoint does NOT send them to Laravel.
- */
 export interface SaveProfilePayload {
   user_id: number;
 
@@ -84,14 +77,9 @@ export const PROFILE_DEFAULTS: ProfileDefaults = {
   badge_tier: "Starter",
 };
 
-const PROFILE_DEFAULTS_BY_ROLE: Record<
-  string,
-  Partial<ProfileDefaults>
-> = {};
+const PROFILE_DEFAULTS_BY_ROLE: Record<string, Partial<ProfileDefaults>> = {};
 
-export function getProfileDefaults(
-  role?: string
-): ProfileDefaults {
+export function getProfileDefaults(role?: string): ProfileDefaults {
   const overrides = role
     ? PROFILE_DEFAULTS_BY_ROLE[role.toLowerCase()]
     : undefined;
@@ -121,19 +109,12 @@ export function buildProfilePayload(
   existing: Partial<AffiliateProfile> | null | undefined,
   values: ProfileEditableValues
 ): SaveProfilePayload {
-  /*
-   * Keep these values in the local payload because other frontend code may
-   * use them when merging the saved account.
-   *
-   * IMPORTANT:
-   * affiliateProfileService.updateProfile() strips all backend-controlled
-   * fields before sending the actual PUT request.
-   */
   const defaults = getProfileDefaults(role);
 
   const payload: SaveProfilePayload = {
     user_id: userId,
 
+    // Existing status is kept (so approved users are not reset); new users get "Pending".
     status: existing?.status ?? defaults.status,
 
     commission_percentage:
@@ -141,8 +122,7 @@ export function buildProfilePayload(
         ? Number(existing.commission_percentage)
         : defaults.commission_percentage,
 
-    badge_tier:
-      existing?.badge_tier ?? defaults.badge_tier,
+    badge_tier: existing?.badge_tier ?? defaults.badge_tier,
   };
 
   for (const key of LINK_FIELDS) {
@@ -176,24 +156,9 @@ export function buildProfilePayload(
 const authHeaders = (): HeadersInit => {
   const token = authStorage.getSession();
 
-  return token
-    ? { Authorization: `Bearer ${token}` }
-    : {};
+  return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-/**
- * apiClient already unwraps:
- *
- * {
- *   success: true,
- *   data: {...}
- * }
- *
- * so normally `raw` is already the AffiliateProfile.
- *
- * The extra handling keeps this service tolerant if a different apiClient
- * implementation returns the envelope.
- */
 function unwrapProfile(raw: unknown): AffiliateProfile {
   if (
     raw &&
@@ -216,9 +181,7 @@ function unwrapProfile(raw: unknown): AffiliateProfile {
   return raw as AffiliateProfile;
 }
 
-function looksLikeProfile(
-  value: unknown
-): value is AffiliateProfile {
+function looksLikeProfile(value: unknown): value is AffiliateProfile {
   return (
     typeof value === "object" &&
     value !== null &&
@@ -236,43 +199,33 @@ function looksLikeProfile(
 /* -------------------------------------------------------------------------- */
 
 export const affiliateProfileService = {
-  /**
-   * GET /affiliate/profile/{userId}
-   *
-   * Normal GETs use the apiClient cache.
-   * forceRefresh=true bypasses the existing cache and then stores the
-   * fresh result back into the GET cache.
-   */
+  /** GET /affiliate/profile/{userId} */
   async getProfile(
     userId: number,
     forceRefresh = false
   ): Promise<AffiliateProfile> {
-    const raw = await apiClient.get<unknown>(
-      `${PROFILE_ENDPOINT}/${userId}`,
-      {
-        headers: authHeaders(),
-        forceRefresh,
-      }
-    );
+    const raw = await apiClient.get<unknown>(`${PROFILE_ENDPOINT}/${userId}`, {
+      headers: authHeaders(),
+      forceRefresh,
+    });
 
     const profile = unwrapProfile(raw);
 
     if (!looksLikeProfile(profile)) {
-      throw new Error(
-        "Invalid affiliate profile returned by the server."
-      );
+      throw new Error("Invalid affiliate profile returned by the server.");
     }
 
     return profile;
   },
 
-  
+  /** PUT /affiliate/update/{userId} */
   async updateProfile(
     userId: number,
     payload: SaveProfilePayload
   ): Promise<AffiliateProfile> {
-
     const updatePayload = {
+      // Sent on every save: "Pending" for new users, existing status otherwise.
+      status: payload.status ?? PROFILE_DEFAULTS.status,
       website_url: payload.website_url ?? null,
       linkedin: payload.linkedin ?? null,
       youtube: payload.youtube ?? null,
@@ -283,18 +236,12 @@ export const affiliateProfileService = {
       notes: payload.notes ?? null,
     };
 
-    const raw = await apiClient.put<
-      unknown,
-      typeof updatePayload
-    >(
+    const raw = await apiClient.put<unknown, typeof updatePayload>(
       `${UPDATE_PROFILE_ENDPOINT}/${userId}`,
       updatePayload,
       authHeaders()
     );
 
-    console.log(raw)
-
-   
     const updatedProfile = unwrapProfile(raw);
 
     if (!looksLikeProfile(updatedProfile)) {
@@ -303,45 +250,23 @@ export const affiliateProfileService = {
       );
     }
 
-    /*
-     * apiClient.put() already clears the entire GET cache.
-     *
-     * Save the successful server response immediately so the UI/storage
-     * has the latest data even if the refresh GET fails.
-     */
     authStorage.saveProfile(updatedProfile);
 
     try {
-      /*
-       * Force a fresh GET.
-       *
-       * Because apiClient.get(..., { forceRefresh: true }) still writes
-       * the result into its cache, this repopulates the cache with the
-       * newest profile.
-       */
-      const freshProfile =
-        await this.getProfile(userId, true);
+      const freshProfile = await this.getProfile(userId, true);
 
       if (looksLikeProfile(freshProfile)) {
         authStorage.saveProfile(freshProfile);
         return freshProfile;
       }
     } catch {
-      /*
-       * PUT already succeeded.
-       * If GET refresh fails, safely keep the PUT response.
-       */
+      // PUT already succeeded; keep the PUT response if the refresh fails.
     }
 
     return updatedProfile;
   },
 
-  async saveProfile(
-    payload: SaveProfilePayload
-  ): Promise<AffiliateProfile> {
-    return this.updateProfile(
-      payload.user_id,
-      payload
-    );
+  async saveProfile(payload: SaveProfilePayload): Promise<AffiliateProfile> {
+    return this.updateProfile(payload.user_id, payload);
   },
 };

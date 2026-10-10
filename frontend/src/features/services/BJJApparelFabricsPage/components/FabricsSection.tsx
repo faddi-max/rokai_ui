@@ -1,39 +1,100 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import SectionGlow from "@/shared/components/layout/SectionGlow";
-import type { FabricCollection } from "@/shared/types/fabrics";
+import type { FabricTableData } from "@/shared/types/fabrics";
 
 interface FabricsSectionProps {
-  data: FabricCollection;
+  data: FabricTableData;
 }
 
 const HAIRLINE = "0.73px solid #242424";
-const COLUMN_WIDTHS = ["16%", "11%", "13%", "22%", "22%", "16%"];
-const HEADERS = [
-  "Fabric Name",
-  "GSM / Weave Type",
-  "Composition",
-  "Key Features",
-  "Athletic Benefits",
-  "Training Tier / Use Case",
-];
+
+/* -------------------------------------------------------------------------- */
+/*  Helpers                                                                   */
+/* -------------------------------------------------------------------------- */
+
+// "1. Cotton … 2. Twill …" or "A • B • C"  ->  separate lines
+function splitItems(text: string): string[] {
+  const numberedMarkers = text.match(/(?:^|\s)\d{1,2}\.\s/g)?.length ?? 0;
+
+  if (numberedMarkers >= 2) {
+    return text.split(/(?:^|\s)\d{1,2}\.\s+/).map((s) => s.trim()).filter(Boolean);
+  }
+  if (text.includes("•")) {
+    return text.split("•").map((s) => s.trim()).filter(Boolean);
+  }
+  return [text];
+}
+
+// "220 GSM / Compression Lycra Inner" -> ["220 GSM", "Compression Lycra Inner"]
+function splitSpec(text: string): [string, string] {
+  const i = text.indexOf(" / ");
+  return i === -1 ? [text, ""] : [text.slice(0, i), text.slice(i + 3)];
+}
+
+// Splits "Griappling" + " / " lines for the last (use case) column
+function splitUseCase(text: string): string[] {
+  return text.split(" / ").map((s) => s.trim()).filter(Boolean);
+}
+
+// Splits the title in two halves (white / red)
+function splitTitle(title: string) {
+  const words = title.trim().split(/\s+/);
+  if (words.length < 3) return { white: title, red: "" };
+  const mid = Math.ceil(words.length / 2);
+  return { white: words.slice(0, mid).join(" "), red: words.slice(mid).join(" ") };
+}
+
+function TextCell({ value, bold = false }: { value: string; bold?: boolean }) {
+  if (!value) return null;
+
+  const items = splitItems(value);
+
+  if (items.length > 1) {
+    return (
+      <ul className="flex flex-col gap-1.5">
+        {items.map((item, i) => (
+          <li key={i} className="flex items-start gap-2 text-[10px] leading-[16px] text-white/55">
+            <span aria-hidden className="mt-[7px] h-px w-2 shrink-0 bg-[#E51B24]" />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  return bold ? (
+    <span className="block text-[11px] font-bold leading-[15px] text-white">{value}</span>
+  ) : (
+    <span className="block text-[10px] leading-[16px] text-white/55">{value}</span>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Section                                                                   */
+/* -------------------------------------------------------------------------- */
 
 export default function FabricsSection({ data }: FabricsSectionProps) {
   const {
     id,
     breadcrumb,
-    titleWhite,
-    titleRed,
+    title,
     description,
     image,
     imageAlt,
     tableLabel,
     tableMeta,
     note,
+    headers,
     rows,
   } = data;
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const { white, red } = splitTitle(title);
+
+  const lastIndex = headers.length - 1;
+  const hasUseCaseColumn = /use case|tier/i.test(headers[lastIndex] ?? "");
+  const compositionIndex = headers.findIndex((h) => /composition/i.test(h));
 
   return (
     <SectionGlow className="relative overflow-hidden">
@@ -52,22 +113,25 @@ export default function FabricsSection({ data }: FabricsSectionProps) {
             </div>
             <h2 className="font-space-grotesk font-bold uppercase leading-[1.05]">
               <span className="block text-[32px] text-white sm:text-[40px] lg:text-[48px]">
-                {titleWhite}
+                {white}
               </span>
-              <span className="block text-[32px] text-[#E51B24] sm:text-[40px] lg:text-[48px]">
-                {titleRed}
-              </span>
+              {red && (
+                <span className="block text-[32px] text-[#E51B24] sm:text-[40px] lg:text-[48px]">
+                  {red}
+                </span>
+              )}
             </h2>
           </div>
 
-          <p className="max-w-[340px] border-l-2 border-[#E51B24] pl-4 font-space-grotesk text-[12px] font-light leading-[19px] text-white/65">
-            {description}
-          </p>
+          {description && (
+            <p className="max-w-[340px] border-l-2 border-[#E51B24] pl-4 font-space-grotesk text-[12px] font-light leading-[19px] text-white/65">
+              {description}
+            </p>
+          )}
         </div>
 
-        {/* Image + table — 64px gap, both centered in the 1440 frame */}
         <div className="flex w-full flex-col items-center gap-10 lg:gap-16">
-          {/* Image: 1258 × 616, radius 14, bg #00000057 */}
+          {/* Image */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -84,13 +148,13 @@ export default function FabricsSection({ data }: FabricsSectionProps) {
             <div className="pointer-events-none absolute inset-0 bg-black/30" />
           </motion.div>
 
-          {/* Table card: 1265 × 912.12, radius 15.37, bg #171717 */}
+          {/* Table card (height follows the content) */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.05 }}
             transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="relative flex w-full max-w-[1265px] flex-col overflow-hidden bg-[#171717] lg:h-[912.12px]"
+            className="relative flex w-full max-w-[1265px] flex-col overflow-hidden bg-[#171717]"
             style={{
               borderRadius: "15.37px",
               border: HAIRLINE,
@@ -113,21 +177,16 @@ export default function FabricsSection({ data }: FabricsSectionProps) {
               )}
             </div>
 
-            {/* Table: flex-1 so the rows stretch to fill the fixed card height */}
-            <div className="min-h-0 flex-1 overflow-x-auto">
-              <table className="h-full w-full min-w-[1000px] table-fixed border-collapse font-space-grotesk">
-                <colgroup>
-                  {COLUMN_WIDTHS.map((w, i) => (
-                    <col key={i} style={{ width: w }} />
-                  ))}
-                </colgroup>
-
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[1000px] table-fixed border-collapse font-space-grotesk">
                 <thead>
                   <tr style={{ height: 52, borderBottom: HAIRLINE }}>
-                    {HEADERS.map((h, i) => (
+                    {headers.map((h, i) => (
                       <th
-                        key={h}
-                        className="px-6 text-left text-[9px] font-bold uppercase leading-[12px] tracking-[0.12em] text-white/60"
+                        key={`${h}-${i}`}
+                        className={`px-6 text-left text-[9px] font-bold uppercase leading-[12px] tracking-[0.12em] text-white/60 ${
+                          i === 0 ? "w-[17%]" : ""
+                        }`}
                         style={i > 0 ? { borderLeft: HAIRLINE } : undefined}
                       >
                         {h}
@@ -137,85 +196,96 @@ export default function FabricsSection({ data }: FabricsSectionProps) {
                 </thead>
 
                 <tbody>
-                  {rows.map((r, i) => {
-                    const isActive = i === activeIndex;
+                  {rows.map((row, rowIndex) => {
+                    const isActive = rowIndex === activeIndex;
+
                     return (
                       <tr
-                        key={r.id}
-                        onMouseEnter={() => setActiveIndex(i)}
-                        className="align-middle transition-colors duration-200"
+                        key={`${row[0]}-${rowIndex}`}
+                        onMouseEnter={() => setActiveIndex(rowIndex)}
+                        className="align-top transition-colors duration-200"
                         style={{
-                          minHeight: 100,
-                          borderBottom: i === rows.length - 1 ? undefined : HAIRLINE,
+                          borderBottom: rowIndex === rows.length - 1 ? undefined : HAIRLINE,
                           backgroundColor: isActive ? "#3C3C3C80" : "transparent",
                         }}
                       >
-                        {/* Fabric name */}
-                        <td className="px-6 py-5">
-                          <div className="flex items-center gap-3">
-                            <span aria-hidden className="h-[34px] w-[2px] shrink-0 bg-[#E51B24]" />
-                            <div>
-                              <span className="block text-[9px] font-bold uppercase tracking-[0.12em] text-white">
-                                {r.brand}
-                              </span>
-                              <span className="mt-0.5 block text-[13px] font-bold leading-[16px] text-white">
-                                {r.name}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
+                        {row.map((value, cellIndex) => {
+                          const cellStyle =
+                            cellIndex > 0 ? { borderLeft: HAIRLINE } : undefined;
 
-                        {/* GSM / weave */}
-                        <td className="px-6 py-5" style={{ borderLeft: HAIRLINE }}>
-                          <span className="block text-[12px] font-bold text-white">{r.gsm}</span>
-                          <span className="mt-1 block text-[9px] text-white/40">{r.weave}</span>
-                        </td>
+                          /* Column 0: fabric name */
+                          if (cellIndex === 0) {
+                            return (
+                              <td key={cellIndex} className="px-6 py-5">
+                                <div className="flex items-start gap-3">
+                                  <span
+                                    aria-hidden
+                                    className="mt-0.5 h-[34px] w-[2px] shrink-0 bg-[#E51B24]"
+                                  />
+                                  <div>
+                                    <span className="block text-[9px] font-bold uppercase tracking-[0.12em] text-white">
+                                      ROKAI
+                                    </span>
+                                    <span className="mt-0.5 block text-[13px] font-bold leading-[16px] text-white">
+                                      {value.replace(/^ROKAI\s+/i, "")}
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+                            );
+                          }
 
-                        {/* Composition */}
-                        <td className="px-6 py-5" style={{ borderLeft: HAIRLINE }}>
-                          <span className="block text-[11px] font-bold leading-[15px] text-white">
-                            {r.composition}
-                          </span>
-                          {r.compositionNote && (
-                            <span className="block text-[11px] font-bold leading-[15px] text-white">
-                              {r.compositionNote}
-                            </span>
-                          )}
-                        </td>
+                          /* Column 1: GSM / weave */
+                          if (cellIndex === 1) {
+                            const [main, sub] = splitSpec(value);
+                            return (
+                              <td key={cellIndex} className="px-6 py-5" style={cellStyle}>
+                                <span className="block text-[12px] font-bold text-white">
+                                  {main}
+                                </span>
+                                {sub && (
+                                  <span className="mt-1 block text-[9px] text-white/40">{sub}</span>
+                                )}
+                              </td>
+                            );
+                          }
 
-                        {/* Key features */}
-                        <td
-                          className="px-6 py-5 text-[10px] leading-[16px] text-white/55"
-                          style={{ borderLeft: HAIRLINE }}
-                        >
-                          {r.keyFeatures}
-                        </td>
+                          /* Last column: use case / tier */
+                          if (hasUseCaseColumn && cellIndex === lastIndex) {
+                            return (
+                              <td key={cellIndex} className="px-6 py-5" style={cellStyle}>
+                                {value && (
+                                  <>
+                                    <span
+                                      aria-hidden
+                                      className={`mb-2 block h-[2px] w-[18px] transition-colors duration-200 ${
+                                        isActive ? "bg-[#E51B24]" : "bg-[#E51B24]/80"
+                                      }`}
+                                    />
+                                    {splitUseCase(value).map((u) => (
+                                      <span
+                                        key={u}
+                                        className="block text-[10px] leading-[14px] text-white/80"
+                                      >
+                                        {u}
+                                      </span>
+                                    ))}
+                                  </>
+                                )}
+                              </td>
+                            );
+                          }
 
-                        {/* Athletic benefits */}
-                        <td
-                          className="px-6 py-5 text-[10px] leading-[16px] text-white/55"
-                          style={{ borderLeft: HAIRLINE }}
-                        >
-                          {r.athleticBenefits}
-                        </td>
-
-                        {/* Training tier / use case */}
-                        <td className="px-6 py-5" style={{ borderLeft: HAIRLINE }}>
-                          <span
-                            aria-hidden
-                            className={`mb-2 block h-[2px] w-[18px] transition-colors duration-200 ${
-                              isActive ? "bg-[#E51B24]" : "bg-[#E51B24]/80"
-                            }`}
-                          />
-                          {r.useCase.map((u) => (
-                            <span
-                              key={u}
-                              className="block text-[10px] leading-[14px] text-white/80"
-                            >
-                              {u}
-                            </span>
-                          ))}
-                        </td>
+                          /* Everything else (composition, features, benefits…) */
+                          return (
+                            <td key={cellIndex} className="px-6 py-5" style={cellStyle}>
+                              <TextCell
+                                value={value}
+                                bold={cellIndex === compositionIndex && value.length <= 40}
+                              />
+                            </td>
+                          );
+                        })}
                       </tr>
                     );
                   })}

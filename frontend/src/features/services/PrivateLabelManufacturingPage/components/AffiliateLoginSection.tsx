@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogOut, Loader2,Pencil } from "lucide-react";
+import { LogOut, Loader2, Pencil } from "lucide-react";
 import SectionHeaderblog from "@/shared/components/sections/SectionHeaderblog";
 import LoginCard from "@/shared/components/sections/LoginCard";
 import SignupCard, { type SignupValues } from "@/shared/components/sections/SignupCard";
@@ -181,7 +181,6 @@ export default function AffiliateLoginSection() {
   };
 
   const handleVerifyOtp = async (otp: string) => {
-    // Validate the code before hitting the API
     const otpMessage = validateOtp(otp);
     if (otpMessage) {
       openModal("error", otpMessage);
@@ -369,6 +368,7 @@ export default function AffiliateLoginSection() {
   // Client-side logout: clears every stored affiliate value and resets the UI.
   // (The backend /affiliate/logout endpoint currently deletes the account, so it is NOT called here.)
   const handleLogout = () => {
+    authStorage.clearProfileCompleted(account?.user?.id);
     authStorage.clearAll();
     apiClient.clearCache();
     setAccount(null);
@@ -591,14 +591,19 @@ function AffiliateDashboard({
   const status = account?.profile?.status ?? "Signed in";
   const isPending = status.toLowerCase() === "pending";
 
+  // order_amount is intentionally excluded: the backend returns a default
+  // value (0 / "0.00") for brand new profiles, which is not "saved details".
   const hasSavedDetails =
-    PROFILE_LINK_FIELDS.some(({ key }) => Boolean(account?.profile?.[key])) ||
-    account?.profile?.order_amount != null ||
-    Boolean(account?.profile?.notes?.trim());
+    PROFILE_LINK_FIELDS.some(({ key }) =>
+      Boolean((account?.profile?.[key] as string | null | undefined)?.trim())
+    ) || Boolean(account?.profile?.notes?.trim());
 
-  // A successful sign-in always starts with profile completion. Users without
-  // saved details also enter edit mode when restoring an existing session.
-  const [isEditing, setIsEditing] = useState(startInEditMode || !hasSavedDetails);
+  const profileCompleted =
+    hasSavedDetails || authStorage.isProfileCompleted(account?.user?.id);
+
+  // Form opens right after signup/login, and on any session where the
+  // profile has never been submitted.
+  const [isEditing, setIsEditing] = useState(startInEditMode || !profileCompleted);
   const [form, setForm] = useState<ProfileFormState>(() => toFormState(account?.profile));
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<FormField, string>>>({});
   const [formError, setFormError] = useState("");
@@ -684,6 +689,7 @@ function AffiliateDashboard({
     setSaveSuccess(false);
 
     try {
+      // buildProfilePayload sets status to the existing one, or "Pending" for new users.
       const payload = buildProfilePayload(
         account.user.id,
         account.user.role,
@@ -700,14 +706,7 @@ function AffiliateDashboard({
         }
       );
 
-      /*
-       * IMPORTANT:
-       * This now calls:
-       *
-       * PUT /api/v1/affiliate/update/{userId}
-       *
-       * The service also refreshes the apiClient GET cache after the PUT.
-       */
+      // PUT /api/v1/affiliate/update/{userId}
       const savedProfile = await affiliateProfileService.updateProfile(
         account.user.id,
         payload
@@ -719,19 +718,17 @@ function AffiliateDashboard({
         ...savedProfile,
       };
 
-      // Persist the newest profile for page refreshes.
       authStorage.saveProfile(mergedProfile);
 
-      // Update React state immediately.
       onUpdateAccount({
         ...account,
         profile: mergedProfile,
       });
 
-      // Reset the form from the actual server response.
       setForm(toFormState(mergedProfile));
 
       setSaveSuccess(true);
+      authStorage.markProfileCompleted(account.user.id);
       setIsEditing(false);
     } catch (err) {
       // Keep edit mode and preserve what the user typed.
@@ -755,7 +752,7 @@ function AffiliateDashboard({
   return (
     <SectionGlow>
       <div className="mx-auto my-6 w-full max-w-193.5 rounded-xl border border-white/10 bg-[#111] p-6 text-white sm:p-8">
-        {/* Show the pending state only after the profile form has been saved. */}
+        {/* Pending card shows only after the profile form has been saved. */}
         {isPending && !isEditing ? (
           <div className="flex flex-col items-center justify-center gap-5 py-14 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full border border-yellow-400/30 bg-yellow-400/10">
@@ -810,30 +807,30 @@ function AffiliateDashboard({
                 </p>
               </div>
 
-            <div className="flex items-center gap-3">
-  <span className="rounded-full border border-[#e63946]/40 bg-[#e63946]/10 px-3 py-1 font-space-grotesk text-xs capitalize text-[#ff7b82]">
-    {status}
-  </span>
+              <div className="flex items-center gap-3">
+                <span className="rounded-full border border-[#e63946]/40 bg-[#e63946]/10 px-3 py-1 font-space-grotesk text-xs capitalize text-[#ff7b82]">
+                  {status}
+                </span>
 
-  {isEditing ? (
-    <button
-      type="button"
-      onClick={cancelEditing}
-      className="inline-flex h-9 items-center gap-2 rounded-md border border-white/20 px-4 font-space-grotesk text-xs font-bold text-white transition hover:border-white/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-    >
-      Back to profile
-    </button>
-  ) : (
-    <button
-      type="button"
-      onClick={handleLogoutClick}
-      className={logoutButtonClass}
-    >
-      Log out
-      <LogOut size={14} aria-hidden />
-    </button>
-  )}
-</div>
+                {isEditing ? (
+                  <button
+                    type="button"
+                    onClick={cancelEditing}
+                    className="inline-flex h-9 items-center gap-2 rounded-md border border-white/20 px-4 font-space-grotesk text-xs font-bold text-white transition hover:border-white/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  >
+                    Back to profile
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleLogoutClick}
+                    className={logoutButtonClass}
+                  >
+                    Log out
+                    <LogOut size={14} aria-hidden />
+                  </button>
+                )}
+              </div>
             </div>
 
             {account?.profile && (

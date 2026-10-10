@@ -4,6 +4,8 @@ const RESET_EMAIL_KEY = "rokai_affiliate_reset_email";
 const SESSION_TOKEN_KEY = "rokai_affiliate_session";
 const USER_KEY = "rokai_affiliate_user";
 const PROFILE_KEY = "rokai_affiliate_profile";
+const PROFILE_DONE_KEY = "rokai_affiliate_profile_done";
+
 
 const safe = <T,>(fn: () => T, fallback: T): T => {
   try {
@@ -32,6 +34,19 @@ export const authStorage = {
     }, undefined);
   },
 
+markProfileCompleted(userId: number) {
+  safe(() => localStorage.setItem(`${PROFILE_DONE_KEY}_${userId}`, "1"), undefined);
+},
+isProfileCompleted: (userId?: number) =>
+  safe(
+    () => (userId ? localStorage.getItem(`${PROFILE_DONE_KEY}_${userId}`) === "1" : false),
+    false
+  ),
+clearProfileCompleted(userId?: number) {
+  safe(() => {
+    if (userId) localStorage.removeItem(`${PROFILE_DONE_KEY}_${userId}`);
+  }, undefined);
+},
   /* ------------------------ Password reset ------------------------ */
   saveResetEmail(email: string) {
     safe(() => localStorage.setItem(RESET_EMAIL_KEY, email), undefined);
@@ -96,4 +111,4 @@ export const authStorage = {
       localStorage.removeItem(PROFILE_KEY);
     }, undefined);
   },
-};
+};
