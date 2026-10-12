@@ -2,10 +2,12 @@ import { Outlet } from "react-router-dom";
 import Navbar from "@/shared/components/layout/Navbar";
 import Footer from "@/shared/components/layout/Footer";
 import ScrollToTop from "@/shared/components/layout/ScrollToTop";
+import SeoHead from "@/shared/seo/SeoHead";
 
 export default function RootLayout() {
   return (
     <div className="flex min-h-screen flex-col bg-black text-white selection:bg-[#E51B24] selection:text-white">
+      <SeoHead />
       <ScrollToTop />
       <Navbar />
       <main className="flex-1">

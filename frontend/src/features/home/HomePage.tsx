@@ -28,7 +28,7 @@ export default function HomePage() {
 
   return (
     <>
-      <SeoHead {...homeSeo} jsonLd={homeJsonLd} />
+      <SeoHead pageKey="home" {...homeSeo} jsonLd={homeJsonLd} />
       <main className="min-h-screen">
         <HeroSection />
         <HeroTrustBadges />

@@ -19,8 +19,12 @@ export type {
   PartnershipApplicationResponse,
 } from "./services/partnershipApplicationsService";
 export { inquiriesService } from "./services/inquiriesService";
+export { seoService } from "./services/seoService";
 export type {
-  InquiryPayload,
-  InquiryResponse,
-  ApiInquiryData,
-} from "./services/inquiriesService";
+  SeoRecord,
+  SeoPageResponseData,
+  SeoAllResponseData,
+  SeoStaticPageEntry,
+  SeoOg,
+  SeoTwitter,
+} from "@/shared/types/seo";
