@@ -1,4 +1,4 @@
-import { bloghero, capabilityCatalogueImage } from "@/assets";
+import { bloghero } from "@/assets";
 import type { HeroContent } from "@/shared/types/hero";
 
 export const catalogueHeroContent: HeroContent = {

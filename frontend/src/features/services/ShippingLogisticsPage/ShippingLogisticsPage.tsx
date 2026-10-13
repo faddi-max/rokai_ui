@@ -11,9 +11,9 @@ import MapSection from "../PrivateLabelManufacturingPage/components/MapSection";
 import DefineBrandPresenceSection from "../PrivateLabelManufacturingPage/components/DefineBrandPresenceSection";
 
 import { shippinglabelhero } from "./data/shippinglabelHero";
-import ShippingOverviewSection from "./components/shippingOverviewSection";
+import ShippingOverviewSection from "./components/ShippingOverviewSection";
 import { shippingoverview, shippingproperty, shippingprotocol } from "@/assets";
-import ShippingProprietaryCapabilities from "./components/shippingProprietaryCapabilities";
+import ShippingProprietaryCapabilities from "./components/ShippingProprietaryCapabilities";
 import WhatWeManufactureGridSection from "../PrivateLabelManufacturingPage/components/WhatWeManufactureGridSection";
 import ShippingProtocolSection from "./components/shippingProtocolSection";
 

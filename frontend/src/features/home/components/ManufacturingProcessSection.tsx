@@ -1,6 +1,4 @@
-import { Play } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useRef, useState } from "react";
+﻿import { useRef } from "react";
 import SectionEyebrow from "./SectionEyebrow";
 import { manufacturingProcess } from "@/features/home/data/manufacturingProcess";
 import { gsap, motion as gsapMotion, revealLeft, revealVisible, useGSAP } from "@/shared/animations";
@@ -9,20 +7,10 @@ import { usePrefersReducedMotion } from "@/shared/hooks/usePrefersReducedMotion"
 const ManufacturingProcessSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [hasStarted, setHasStarted] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
-  const { eyebrow, titleTop, titleBottom, description, image, videoUrl } =
+  const { eyebrow, titleTop, titleBottom, description, videoUrl } =
     manufacturingProcess;
 
-  const handlePlay = () => {
-    if (videoRef.current) {
-      if (videoRef.current.ended) {
-        videoRef.current.currentTime = 0;
-      }
-      void videoRef.current.play();
-      setHasStarted(true);
-    }
-  };
 
   useGSAP(
     () => {
@@ -135,3 +123,5 @@ const ManufacturingProcessSection = () => {
 };
 
 export default ManufacturingProcessSection;
+
+

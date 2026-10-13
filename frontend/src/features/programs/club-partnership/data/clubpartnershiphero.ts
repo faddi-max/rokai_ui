@@ -1,4 +1,4 @@
-import { ambassadorProgramhero, sponserhero } from "@/assets";
+import { sponserhero } from "@/assets";
 
 import type { HeroContent } from "@/shared/types/hero";
 

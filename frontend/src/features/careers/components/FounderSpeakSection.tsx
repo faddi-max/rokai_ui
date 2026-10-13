@@ -1,3 +1,4 @@
+import type { Variants } from "framer-motion";
 import { motion } from "framer-motion";
 import SectionGlow from "@/shared/components/layout/SectionGlow";
 import { founderImage } from "@/assets";
@@ -30,7 +31,7 @@ const contentVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 14 },
   visible: {
     opacity: 1,

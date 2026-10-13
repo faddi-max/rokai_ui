@@ -18,7 +18,7 @@ export default function SinglePageBlog() {
       blogsService.getBlogCategories(),
     ]);
     return { post, categories };
-  }, [slug]);
+  }, { deps: [slug] });
 
   if (!loading && !data?.post) {
     return (
@@ -41,9 +41,9 @@ export default function SinglePageBlog() {
     >
       {({ post, categories }) => (
         <div>
-          <BlogHeroDetail post={post} />
+          <BlogHeroDetail post={post!} />
         
-          <BlogContentSection post={post} categories={categories} />
+          <BlogContentSection post={post!} categories={categories} />
           <TrendingBlogsSection
             eyebrow="Keep reading"
             title="RELATED"

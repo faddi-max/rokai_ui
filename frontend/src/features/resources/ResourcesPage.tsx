@@ -4,13 +4,10 @@ import { useAsyncData } from "@/shared/hooks/useAsyncData";
 import { categoriesService } from "@/shared/api/services/categoriesService";
 import { DataLoader, PageLoader } from "@/shared/components/feedback";
 
-import HowWeWorkSection from "@/features/categories/data/HowWeWorkSection";
-import ClientFeedbackSection from "@/features/categories/componnets/ClientFeedbackSection";
 import FAQSection from "@/features/home/components/FAQSection";
 import TrendingBlogsSection from "../blogs/components/TrendingBlogsSection";
 import ResourceCategoriesSection from "./components/ResourceCategoriesSection";
 import InteractiveToolsSection from "./components/InteractiveToolsSection";
-import ResourceSearchBar from "@/shared/components/sections/SearchBar";
 
 
 export default function ResourcesPage() {

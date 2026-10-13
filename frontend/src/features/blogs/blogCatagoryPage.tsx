@@ -22,7 +22,7 @@ export default function BlogCategoryPage() {
       category,
       posts,
     };
-  }, [slug]);
+  }, { deps: [slug] });
 
   if (!loading && (!data?.category)) {
     return (

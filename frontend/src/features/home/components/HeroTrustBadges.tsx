@@ -1,3 +1,4 @@
+import type { Variants } from "framer-motion";
 import { Factory, Globe, Ruler, TrendingUp, type LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import {
@@ -17,7 +18,7 @@ type HeroTrustBadgesProps = {
   blocks?: TrustBlock[];
 };
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: {},
   visible: {
     transition: {
@@ -27,7 +28,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: {
     opacity: 0,
     y: 30,

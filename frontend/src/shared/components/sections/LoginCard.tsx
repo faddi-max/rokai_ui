@@ -1,3 +1,4 @@
+import type { Variants } from "framer-motion";
 import { ArrowUpRight, Check, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -8,7 +9,7 @@ import {
   validateLoginPassword,
 } from "@/shared/utils/formValidation";
 
-const formVariants = {
+const formVariants: Variants = {
   hidden: {},
   visible: {
     transition: {
@@ -17,7 +18,7 @@ const formVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: {
     opacity: 0,
     y: 12,

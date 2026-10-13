@@ -1,3 +1,4 @@
+import type { Variants } from "framer-motion";
 import { ArrowUpRight, Check, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -34,12 +35,12 @@ const FIELD_IDS: Record<FieldKey, string> = {
   terms: "signup-terms",
 };
 
-const formVariants = {
+const formVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } },
 };

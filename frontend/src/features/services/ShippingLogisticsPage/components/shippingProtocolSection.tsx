@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import SectionGlow from "@/shared/components/layout/SectionGlow";
 import SectionHeaderblog from "@/shared/components/sections/SectionHeaderblog";
 
 export interface IndustrialProtocolStat {

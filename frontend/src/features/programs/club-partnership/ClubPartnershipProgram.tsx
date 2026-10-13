@@ -4,13 +4,10 @@ import { useAsyncData } from "@/shared/hooks/useAsyncData";
 import { programsService } from "@/shared/api/services/programsService";
 import { DataLoader, PageLoader } from "@/shared/components/feedback";
 
-import ClientFeedbackSection from "@/features/categories/componnets/ClientFeedbackSection";
-import HowWeWorkSection from "@/features/categories/data/HowWeWorkSection";
 import FAQSection from "../../home/components/FAQSection";
 import ProgramOverviewSection from "../ambassador-program/components/ProgramOverviewSection";
 import { clubPartnershipOverview } from "./data/programData";
 import WhoIsForSection from "../ambassador-program/components/WhoIsForSection";
-import BenefitsSection from "../ambassador-program/components/BenefitsSection";
 import WhatYourClubUnlocksSection from "./components/Whatyourclubunlockssection";
 import ExpectationsSection from "../ambassador-program/components/ExpectationsSection";
 import ROIBreakdownSection from "./components/ROIBreakdownSection";

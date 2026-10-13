@@ -23,3 +23,43 @@ export interface SizeChartTableData {
   headers: string[];
   rows: string[][];
 }
+/* ---------- Legacy fixed-column shapes (used by local fallback data) ---------- */
+
+export type SizeChartColumnKey =
+  | "wingspan"
+  | "chest"
+  | "length"
+  | "waist"
+  | "hips"
+  | "pantLength";
+
+export interface SizeChartColumn {
+  key: SizeChartColumnKey;
+  label: string;
+}
+
+export interface SizeChartMeasurement {
+  cm: number;
+  inch: number;
+}
+
+export interface SizeChartRow {
+  size: string;
+  measurements: Record<SizeChartColumnKey, SizeChartMeasurement>;
+}
+
+export interface SizeChartData {
+  id: string;
+  breadcrumb: string;
+  titleWhite: string;
+  titleRed: string;
+  tolerance: string;
+  image: string;
+  imageAlt: string;
+  tableLabel: string;
+  unitsLabel: string;
+  noteLabel: string;
+  note: string;
+  columns: SizeChartColumn[];
+  rows: SizeChartRow[];
+}

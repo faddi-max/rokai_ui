@@ -1,3 +1,4 @@
+import type { Variants } from "framer-motion";
 import { Star } from "lucide-react";
 import { motion } from "framer-motion";
 import { testimonialHeroData } from "../data/testimonialHeroData";
@@ -15,12 +16,12 @@ export interface TestimonialHeroData {
 
 const BG_COLOR = "#111111";
 
-const container = {
+const container: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
 };
 
-const item = {
+const item: Variants = {
   hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
 };

@@ -1,4 +1,4 @@
-import { mockComments } from "@/features/blogs/data/mockDiscussionData";
+﻿import { mockComments } from "@/features/blogs/data/mockDiscussionData";
 import { apiClient } from "../apiClient";
 import type {
   CommentsPage,
@@ -8,15 +8,13 @@ import type {
   DiscussionReply,
 } from "@/shared/types/discussion";
 
-
-
 const BASE = "/blog-comments";
 const MOCK_NETWORK_DELAY_MS = 500;
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 let hasWarnedAboutMock = false;
 function warnMockFallback(context: string) {
-  if (hasWarnedAboutMock || process.env.NODE_ENV === "production") return;
+  if (hasWarnedAboutMock || import.meta.env.PROD) return;
   hasWarnedAboutMock = true;
   // eslint-disable-next-line no-console
   console.warn(
@@ -27,10 +25,13 @@ function warnMockFallback(context: string) {
 export const discussionService = {
   async getComments(postId: string, page = 1, limit = 10): Promise<CommentsPage> {
     try {
-      const { data } = await apiClient.get<CommentsPage>(BASE, {
-        params: { postId, page, limit, sort: "newest" },
+      const query = new URLSearchParams({
+        postId,
+        page: String(page),
+        limit: String(limit),
+        sort: "newest",
       });
-      return data;
+      return await apiClient.get<CommentsPage>(`${BASE}?${query.toString()}`, { cache: false });
     } catch {
       warnMockFallback("getComments");
       await delay(MOCK_NETWORK_DELAY_MS);
@@ -46,8 +47,7 @@ export const discussionService = {
 
   async postComment(payload: CreateCommentPayload): Promise<DiscussionComment> {
     try {
-      const { data } = await apiClient.post<DiscussionComment>(BASE, payload);
-      return data;
+      return await apiClient.post<DiscussionComment>(BASE, payload);
     } catch {
       warnMockFallback("postComment");
       await delay(MOCK_NETWORK_DELAY_MS);
@@ -67,11 +67,7 @@ export const discussionService = {
 
   async postReply(payload: CreateReplyPayload): Promise<DiscussionReply> {
     try {
-      const { data } = await apiClient.post<DiscussionReply>(
-        `${BASE}/${payload.commentId}/replies`,
-        payload
-      );
-      return data;
+      return await apiClient.post<DiscussionReply>(`${BASE}/${payload.commentId}/replies`, payload);
     } catch {
       warnMockFallback("postReply");
       await delay(MOCK_NETWORK_DELAY_MS);

@@ -1,7 +1,6 @@
 import {
   whatisambassador,
   sponser,
-  partnershipImage,
   clubpartnershipoverview,
 } from "@/assets";
 

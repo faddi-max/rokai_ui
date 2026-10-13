@@ -7,7 +7,7 @@ import ProgramOverviewSection from "./components/ProgramOverviewSection";
 import PartnershipSection from "./components/PartnershipSection";
 import WhoIsForSection from "./components/WhoIsForSection";
 import BenefitsSection from "./components/BenefitsSection";
-import ExpectationsSection from "./components/ExpectationsSection";;
+;
 import ClientFeedbackSection from "@/features/categories/componnets/ClientFeedbackSection";
 import HowWeWorkSection from "@/features/categories/data/HowWeWorkSection";
 import FAQSection from "../../home/components/FAQSection";

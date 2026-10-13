@@ -1,3 +1,4 @@
+import type { Variants } from "framer-motion";
 import { motion } from "framer-motion";
 import SectionGlow from "@/shared/components/layout/SectionGlow";
 
@@ -5,7 +6,7 @@ interface AudienceTagsSectionProps {
   tags: string[];
 }
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -16,7 +17,7 @@ const containerVariants = {
   },
 };
 
-const tagVariants = {
+const tagVariants: Variants = {
   hidden: { opacity: 0, y: 20, scale: 0.95 },
   visible: {
     opacity: 1,

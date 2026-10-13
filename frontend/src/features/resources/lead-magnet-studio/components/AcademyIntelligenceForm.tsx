@@ -1,3 +1,4 @@
+import type { Variants } from "framer-motion";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Loader2 } from "lucide-react";
@@ -66,12 +67,12 @@ const buildInitialValues = (): AcademyFormValues => ({
 /*  Shared styles — identical to the affiliate Login / Signup cards           */
 /* -------------------------------------------------------------------------- */
 
-const formVariants = {
+const formVariants: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.08 } },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 12 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
 };

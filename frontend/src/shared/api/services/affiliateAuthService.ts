@@ -26,6 +26,8 @@ export interface MessageResponse {
   message: string;
 }
 export interface AuthResponse {
+  message?: string;
+  is_verified?: boolean;
   user: {
     id: number;
     name: string;

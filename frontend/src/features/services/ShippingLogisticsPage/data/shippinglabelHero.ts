@@ -1,4 +1,4 @@
-import { customlabel, oemhero } from "@/assets";
+import { customlabel } from "@/assets";
 import type { HeroContent } from "@/shared/types/hero";
 
 export const shippinglabelhero: HeroContent = {

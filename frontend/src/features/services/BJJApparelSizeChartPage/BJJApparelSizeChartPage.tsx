@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { bespokehero, sizeChartMen } from "@/assets";
+import { bespokehero } from "@/assets";
 import { useAsyncData } from "@/shared/hooks/useAsyncData";
 import { DataLoader, PageLoader } from "@/shared/components/feedback";
 import HowWeWorkSection from "@/features/categories/data/HowWeWorkSection";

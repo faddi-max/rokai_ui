@@ -13,7 +13,6 @@ export default function ResourceSearchBar({
   placeholder = "Search guides, tools, reports and templates...",
   buttonText = "Search",
   onSearch,
-  className = "",
 }: ResourceSearchBarProps) {
   const [query, setQuery] = useState("");
 

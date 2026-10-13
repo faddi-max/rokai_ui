@@ -1,3 +1,4 @@
+import type { MotionProps } from "framer-motion";
 import { motion } from "framer-motion";
 import { Step } from "@/features/programs/affiliate-program/data/steps.data";
 
@@ -125,7 +126,7 @@ export default function StepCard({
 
   const baseClassName = `group flex w-full max-w-[360.16px] flex-col rounded-[8.03px] border border-white/10 bg-[#111111] shadow-[0px_0px_9.37px_4.02px_#E51B2447] transition-all duration-300 ${sizeClassName} ${className}`;
 
-  const motionProps = {
+  const motionProps: MotionProps = {
     initial: { opacity: 0, y: 30 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true, amount: 0.2 },

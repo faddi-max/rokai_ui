@@ -63,7 +63,7 @@ export default function BlogHeroDetail({ post, meta = {} }: BlogHeroDetailProps)
     secondaryImage,
   } = meta;
 
-  const { lead, accent } = splitTitle(post.title);
+  const { lead, accent } = splitTitle(post.title ?? "");
   const dateLabel = formatDate(post.date);
 
   // If the caller passes an explicit `lastReviewed`, that wins. Otherwise
