@@ -1,0 +1,479 @@
+import { ArrowUpRight } from "lucide-react";
+import { useRef, useState } from "react";
+import { gsap, motion, revealLeft, revealRight, revealUp, revealVisible, useGSAP } from "@/shared/animations";
+import Button from "@/shared/components/ui/Button";
+import AnimatedArrow from "@/shared/components/ui/AnimatedArrow";
+import { usePrefersReducedMotion } from "@/shared/hooks/usePrefersReducedMotion";
+import type { HeroContent, HeroGlow } from "@/shared/types/hero";
+import SectionGlow from "../layout/SectionGlow";
+import { herocatagory } from "@/assets";
+
+const DEFAULT_GLOWS: HeroGlow[] = [
+  { width: 601, height: 901, top: 9, left: 783, color: "#E51B24C4", blur: 500 },
+  { width: 315, height: 315, top: 167, left: 688, color: "#E51B2487", blur: 500 },
+];
+
+/** One radius for every rectangular hero photo (desktop, mobile stack, side image). Cutouts get none. */
+const HERO_IMAGE_RADIUS = "rounded-2xl";
+/** Width of the Figma hero frame that glow / image positions are measured against. */
+const FIGMA_FRAME_PX = 1512;
+
+export default function HeroSection({
+  eyebrow,
+  headingLines,
+  description,
+  primaryCta,
+  secondaryCta,
+  secondaryRow,
+  visual,
+  background,
+  subscribe,
+  featureTags,
+  brandCard,
+  fullWidthBackground = false,
+}: HeroContent & { fullWidthBackground?: boolean }) {
+  const heroRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const isModelVisual = visual.type === "model";
+  const isBackgroundVisual = visual.type === "background";
+  const isSideBackgroundVisual =
+    isBackgroundVisual && visual.position.left > 0 && !fullWidthBackground;
+  // Transparent PNG of a person/product: sized by width, bottom-anchored, never rounded or dimmed.
+  const isCutoutBackground = isBackgroundVisual && !fullWidthBackground && visual.cutout === true;
+  const isCutoutImage = visual.type === "image" && visual.cutout === true;
+  const glows = background?.glows ?? DEFAULT_GLOWS;
+  const [email, setEmail] = useState("");
+
+  // CHANGED: renamed from sectionBgColor. Only used for the photo dimming
+  // overlays now. The section itself is transparent so the global bg shows.
+  // `||` (not `??`) because some heroes pass bgColor: "".
+  const overlayColor = background?.bgColor || "#111111";
+  const sectionHeightPx = isBackgroundVisual ? background?.heightPx ?? 560 : undefined;
+  const photoOpacity = isBackgroundVisual ? visual.position.opacity ?? 1 : 1;
+
+  const renderBadgeValue = (value: string) => {
+    const accent = value.match(/(%|\+|\/7)$/)?.[0];
+    if (!accent) return value;
+    return (
+      <>
+        {value.slice(0, -accent.length)}
+        <span className="bg-[linear-gradient(180deg,#E51B24_0%,#7F0F14_100%)] bg-clip-text text-transparent">
+          {accent}
+        </span>
+      </>
+    );
+  };
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    subscribe?.onSubmit?.(email);
+  };
+
+  useGSAP(
+    () => {
+      if (prefersReducedMotion) return;
+      const tl = gsap.timeline()
+        .fromTo("[data-hero-heading]", revealLeft(), revealVisible)
+        .fromTo("[data-hero-divider], [data-hero-description]", revealLeft(), { ...revealVisible, stagger: motion.stagger }, "-=0.2")
+        .fromTo("[data-hero-ctas]", revealLeft(), revealVisible, "-=0.15");
+      if (document.querySelector("[data-hero-tags]")) tl.fromTo("[data-hero-tags]", revealLeft(), revealVisible, "-=0.15");
+      if (document.querySelector("[data-hero-proof]")) tl.fromTo("[data-hero-proof]", revealLeft(), revealVisible, "-=0.15");
+      if (document.querySelector("[data-hero-visual]")) {
+        tl.fromTo("[data-hero-visual]", revealUp(32), revealVisible, "-=0.2");
+      }
+      if (document.querySelector("[data-hero-product-card], [data-hero-caption]")) {
+        tl.fromTo("[data-hero-product-card], [data-hero-caption]", revealRight(), { ...revealVisible, stagger: motion.stagger }, "-=0.25");
+      }
+      if (document.querySelector("[data-hero-brand-card]")) {
+        tl.fromTo("[data-hero-brand-card]", revealUp(20), revealVisible, "-=0.2");
+      }
+    },
+    { scope: heroRef, dependencies: [prefersReducedMotion], revertOnUpdate: true }
+  );
+
+  return (
+    <SectionGlow>
+    <section
+      ref={heroRef}
+      className={`relative overflow-hidden pb-8 lg:pb-9 ${background?.sectionClassName ?? ""}`}
+      style={{
+        // CHANGED: transparent so the global RootLayout background shows through
+        backgroundColor: "transparent",
+        ...(sectionHeightPx ? { minHeight: sectionHeightPx } : {}),
+      }}
+    >
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          // mx-auto: the content grid below is centered, so this Figma-sized frame must be
+          // centered too. Without it the image/glows hug the left edge on screens wider than 1512px.
+          className={fullWidthBackground ? "absolute inset-0" : "relative mx-auto hidden max-w-[1512px] lg:block"}
+          // A cutout is bottom-anchored to the real section height so it always runs behind the trust card.
+          style={sectionHeightPx && !isCutoutBackground ? { height: sectionHeightPx } : { height: "100%" }}
+        >
+          {glows.map((glow, index) => (
+            <div
+              key={index}
+              className="absolute"
+              style={{
+                width: glow.width,
+                height: glow.height,
+                top: glow.top,
+                left: glow.left,
+                backgroundColor: glow.color,
+                filter: `blur(${glow.blur}px)`,
+              }}
+            />
+          ))}
+          {isBackgroundVisual && (
+            <div
+              className="absolute overflow-hidden"
+              // explicit top/right/bottom/left instead of `inset: 0`
+              // to avoid the "Removing a style property during rerender" warning.
+              style={
+                fullWidthBackground
+                  ? { top: 0, right: 0, bottom: 0, left: 0 }
+                  : isCutoutBackground
+                  ? {
+                      // Scales with the 1512px Figma frame (601px wide at 1512, proportionally
+                      // smaller below it) and keeps its natural aspect ratio, so the model is
+                      // never squashed or cropped. The bottom stays glued to the section bottom.
+                      width: `min(${visual.position.width}px, ${(
+                        (visual.position.width / FIGMA_FRAME_PX) * 100
+                      ).toFixed(2)}vw)`,
+                      aspectRatio: `${visual.position.width} / ${visual.position.height}`,
+                      bottom: 0,
+                      // The trust card ends ~5px above the section bottom, so the last few px of the
+                      // photo (hoodie hem / cuffs) would peek out under it. Hide them.
+                      clipPath: "inset(0 0 12px 0)",
+                      right: `min(${FIGMA_FRAME_PX - visual.position.left - visual.position.width}px, ${(
+                        ((FIGMA_FRAME_PX - visual.position.left - visual.position.width) / FIGMA_FRAME_PX) *
+                        100
+                      ).toFixed(2)}vw)`,
+                    }
+                  : {
+                      width: isSideBackgroundVisual
+                        ? `min(${visual.position.width}px, 52vw)`
+                        : visual.position.width,
+                      height: isSideBackgroundVisual
+                        ? `min(${visual.position.height}px, 100%)`
+                        : visual.position.height,
+                      top: visual.position.top,
+                      left: isSideBackgroundVisual ? undefined : visual.position.left,
+                      right: isSideBackgroundVisual ? 0 : undefined,
+                      transform: visual.position.angle ? `rotate(${visual.position.angle}deg)` : undefined,
+                    }
+              }
+            >
+              <img
+                data-hero-visual
+                src={visual.image}
+                alt={visual.imageAlt}
+                className={
+                  isCutoutBackground
+                    ? "h-full w-full object-contain object-bottom"
+                    : `h-full w-full object-cover ${fullWidthBackground ? "" : HERO_IMAGE_RADIUS}`
+                }
+              />
+              {/* CHANGED: overlayColor instead of sectionBgColor */}
+              <div
+                className="absolute inset-0"
+                style={{ backgroundColor: overlayColor, opacity: 1 - photoOpacity }}
+              />
+              {background?.imageOverlay && (
+                <div
+                  className="pointer-events-none absolute inset-0"
+                  style={{ background: background.imageOverlay }}
+                />
+              )}
+            </div>
+          )}
+
+          {brandCard && (
+            <div
+              data-hero-brand-card
+              className="pointer-events-auto z-20 absolute  flex flex-col justify-center  px-5"
+              style={{
+                width: brandCard.position.width,
+                height: brandCard.position.height,
+                top: isSideBackgroundVisual
+                  ? `min(${brandCard.position.top}px, calc(100% - ${brandCard.position.height}px - 2rem))`
+                  : brandCard.position.top,
+                left: isSideBackgroundVisual
+                  ? `calc(100% - min(${visual.position.width}px, 52vw) - 3.5rem)`
+                  : brandCard.position.left,
+                transform: brandCard.position.angle ? `rotate(${brandCard.position.angle}deg)` : undefined,
+                opacity: brandCard.position.opacity ?? 1,
+                borderRadius: brandCard.position.borderRadius ?? 10,
+                backgroundColor: brandCard.bgColor ?? "#E51B24",
+              }}
+            >
+              <p className="font-space-grotesk text-[25px] font-bold uppercase leading-[18px] text-white">
+                {brandCard.title}
+              </p>
+              <p className="mt-1 font-space-grotesk text-[12px] py-2 font-normal uppercase leading-[12px] tracking-wide text-white/80">
+                {brandCard.subtitle}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div
+          className="absolute -right-1/3 -top-1/4 h-[70vw] w-[70vw] max-h-[420px] max-w-[420px] rounded-full lg:hidden"
+          style={{ backgroundColor: "#E51B2470", filter: "blur(120px)" }}
+        />
+      </div>
+
+      <div
+        className={`relative mx-auto grid max-w-[1512px] items-center gap-8 px-5 py-10 sm:px-8 md:px-10 ${isBackgroundVisual ? "" : "lg:grid-cols-2 lg:gap-5"} lg:px-16`}
+        style={sectionHeightPx ? { minHeight: undefined } : undefined}
+      >
+        <div
+          className={`relative z-10 flex min-w-0 flex-col gap-6 ${
+            isBackgroundVisual
+              ? isSideBackgroundVisual
+                ? "lg:max-w-[52%]"
+                : "max-w-2xl"
+              : ""
+          }`}
+        >
+          {eyebrow && (
+            <p className="font-space-grotesk text-xs font-medium uppercase tracking-[0.2em] text-white/70">
+              {eyebrow}
+            </p>
+          )}
+
+          <h1 data-hero-heading className="font-space-grotesk text-[clamp(2rem,8.5vw,2.75rem)] font-bold uppercase leading-[1.02] text-white sm:text-[clamp(2.5rem,6vw,3.5rem)] lg:text-[clamp(3rem,5vw,4.375rem)] lg:leading-[0.98]">
+            {headingLines.map((line, index) => (
+              <span
+                key={`${line.text}-${index}`}
+                className={
+                  line.highlight
+                    ? "bg-[linear-gradient(90deg,#E51B24_0%,#690106_100%)] bg-clip-text text-transparent lg:whitespace-nowrap lg:text-[clamp(3rem,4.6vw,3.9375rem)] lg:leading-[1.05]"
+                    : undefined
+                }
+              >
+                {line.text}
+                {index < headingLines.length - 1 && (
+                  <>
+                    {" "}
+                    <br />
+                  </>
+                )}
+              </span>
+            ))}
+          </h1>
+
+          <div data-hero-divider className="flex items-center gap-2">
+            <span className="h-[3px] w-12 bg-white" />
+            <span className="h-[3px] w-3 bg-white" />
+          </div>
+
+          <p data-hero-description className="max-w-md font-space-grotesk text-sm leading-6 text-white/80 sm:text-base sm:leading-7">{description}</p>
+
+          <div data-hero-ctas className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
+            {subscribe ? (
+              <form onSubmit={handleSubscribe} className="flex w-full flex-col gap-3 sm:max-w-xl sm:flex-row">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={subscribe.placeholder}
+                  className="h-[44px] w-full min-w-0 flex-1 rounded-md bg-white px-4 font-space-grotesk text-sm text-black placeholder:text-black/40 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  className="flex h-[44px] w-full shrink-0 items-center justify-center gap-2 rounded-md bg-[#E51B24] px-6 font-space-grotesk text-sm font-medium text-white transition hover:bg-[#c41720] sm:w-auto"
+                >
+                  {subscribe.buttonLabel}
+                  <AnimatedArrow icon={ArrowUpRight} size={16} />
+                </button>
+              </form>
+            ) : (
+              primaryCta && (
+                <>
+                  <Button
+                    href={primaryCta.href}
+                    variant={secondaryCta ? "outline" : "primary"}
+                    icon={ArrowUpRight}
+                    className="h-[44px] w-full px-4 sm:w-auto sm:px-6"
+                  >
+                    {primaryCta.label}
+                  </Button>
+                  {secondaryCta && (
+                    <Button href={secondaryCta.href} icon={ArrowUpRight} className="h-[44px] w-full px-4 sm:w-auto sm:px-6">
+                      {secondaryCta.label}
+                    </Button>
+                  )}
+                </>
+              )
+            )}
+          </div>
+
+          {/* Small uppercase feature-tag row under the CTAs */}
+          {featureTags && featureTags.length > 0 && (
+            <div  className="flex flex-wrap items-center gap-y-2 pt-1">
+              {featureTags.map((tag, i) => (
+                <span key={tag} className="flex items-center ">
+                  {i > 0 && <span aria-hidden className="mx-3 h-3 w-px bg-white/20" />}
+                  <span className="whitespace-nowrap  border-1 border-[#FFFFFF1A] p-2 font-space-grotesk text-[11px] font-medium uppercase  text-white/50">
+                    {tag}
+                  </span>
+                </span>
+              ))}
+            </div>
+          )}
+
+          {secondaryRow && (
+            <div data-hero-proof>
+              {secondaryRow.type === "join" ? (
+                /* Social-proof row: overlapping avatars + one line of copy */
+                <div className="mt-5 flex items-center gap-3.5">
+                  <div className="flex shrink-0 items-center -space-x-5">
+                    {secondaryRow.avatars.map((avatar, index) => (
+                      <img
+                        key={`${avatar}-${index}`}
+                        src={avatar}
+                        alt=""
+                        className="h-10 w-10 rounded-full border-[1.5px] border-white/40 object-cover"
+                      />
+                    ))}
+                  </div>
+                  <p className="font-space-grotesk text-[14px] font-normal leading-5 text-white/85">
+                    {secondaryRow.joinText}
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-1 grid max-w-xl grid-cols-2 gap-y-4 border-t border-white/20 pt-4 sm:grid-cols-4 sm:gap-0">
+                  {secondaryRow.badges.map((badge, index) => (
+                    <div key={badge.label} className={index > 0 ? "border-white/20 sm:border-l sm:pl-5" : undefined}>
+                      <p className="font-space-grotesk text-[28px] font-bold leading-[34px] text-white lg:text-[39.32px] lg:leading-[47.43px]">
+                        {renderBadgeValue(badge.value)}
+                      </p>
+                      <p className="mt-1 font-space-grotesk text-[10px] uppercase tracking-wide text-white/60">{badge.label}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {!isBackgroundVisual && (
+          <div className="relative flex w-full items-end justify-center gap-8 lg:gap-15">
+            <div className={`relative z-10 w-full max-w-[320px] sm:max-w-[420px] lg:max-w-[480px] ${isModelVisual ? "lg:-translate-x-10" : ""}`}>
+              <img
+                data-hero-visual
+                src={visual.image || herocatagory}
+                alt={visual.imageAlt}
+                decoding="async"
+                fetchPriority="high"
+                className={`h-auto w-full object-contain ${isCutoutImage ? "" : HERO_IMAGE_RADIUS}`}
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = herocatagory;
+                }}
+              />
+
+              {visual.floatingBadges?.map((badge, index) => (
+                <div
+                  key={`${badge.label}-${index}`}
+                  data-hero-badge
+                  className="absolute z-20 rounded-md bg-black/80 px-2 py-1.5 backdrop-blur-sm sm:px-3 sm:py-2"
+                  style={{
+                    top: badge.position.top,
+                    bottom: badge.position.bottom,
+                    left: badge.position.left,
+                    right: badge.position.right,
+                    animation: prefersReducedMotion
+                      ? undefined
+                      : `float-badge 3s ease-in-out ${index * 0.4}s infinite`,
+                  }}
+                >
+                  <p className="font-space-grotesk text-[10px] font-bold leading-none text-white sm:text-sm">
+                    {badge.value}
+                  </p>
+                  <p className="mt-1 font-space-grotesk text-[7px] uppercase leading-none tracking-wide text-white/60 sm:text-[9px]">
+                    {badge.label}
+                  </p>
+                </div>
+              ))}
+
+              {isModelVisual && (
+                <div data-hero-product-card className="absolute -top-1 right-0 flex w-[112px] flex-col rounded-md bg-white p-2.5 shadow-lg sm:-top-4 sm:-right-10 sm:w-[140px] sm:p-3 lg:-right-24">
+                  <img src={visual.productCard.image} alt={visual.productCard.imageAlt} className="h-[88px] w-full rounded object-contain object-top sm:h-[110px]" />
+                  <p className="mt-2 text-center font-space-grotesk text-[10px] font-normal uppercase leading-[13px] text-black sm:text-[12px] sm:leading-[15px]">{visual.productCard.name}</p>
+                </div>
+              )}
+            </div>
+            {isModelVisual && visual.caption && (
+              <div data-hero-caption className="relative z-10 mb-16 hidden flex-col items-start gap-2 lg:flex">
+                <span className="whitespace-nowrap font-space-grotesk text-[20px] font-bold leading-[30px] tracking-[0.2em] text-white">{visual.caption}</span>
+                <div className="absolute left-1/2 top-10 h-[10px] w-[58px] -translate-x-1/2 -translate-y-1/2 bg-white" />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* added `!fullWidthBackground` so the stacked mobile image
+          doesn't duplicate the full-bleed background image. */}
+      {isCutoutBackground && (
+        // Cutout (model): natural aspect ratio, centered, no crop / radius / dimming. The trust
+        // card below overlaps its bottom edge, same as the desktop layout.
+        <div className="relative mx-auto mt-2 w-full px-5 sm:px-8 md:px-10 lg:hidden">
+          <img
+            src={visual.image}
+            alt={visual.imageAlt}
+            width={visual.position.width}
+            height={visual.position.height}
+            decoding="async"
+            className="mx-auto h-auto w-full max-w-[300px] object-contain sm:max-w-[380px] md:max-w-[420px]"
+          />
+        </div>
+      )}
+
+      {isBackgroundVisual && !fullWidthBackground && !isCutoutBackground && (
+        // Same page gutters and radius as the desktop photo, instead of an edge-to-edge square block.
+        <div className="relative mt-6 w-full px-5 sm:px-8 md:px-10 lg:hidden">
+        <div className={`relative overflow-hidden ${HERO_IMAGE_RADIUS}`}>
+          <img
+            src={visual.image}
+            alt={visual.imageAlt}
+            className="h-[220px] w-full object-cover sm:h-[280px] md:h-[340px]"
+          />
+          {/* CHANGED: overlayColor instead of sectionBgColor */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ backgroundColor: overlayColor, opacity: 1 - photoOpacity }}
+          />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(17,17,17,0.15) 0%, rgba(17,17,17,0) 30%, rgba(17,17,17,0.85) 100%)",
+            }}
+          />
+          {/* Mobile version of the brand card, stacked instead of absolutely positioned */}
+          {brandCard && (
+            <div
+              className="absolute bottom-4 left-4 flex max-w-[180px] flex-col justify-center px-4 py-3"
+              style={{
+                borderRadius: brandCard.position.borderRadius ?? 10,
+                backgroundColor: brandCard.bgColor ?? "#E51B24",
+              }}
+            >
+              <p className="font-space-grotesk text-[13px] font-bold uppercase leading-[16px] text-white">
+                {brandCard.title}
+              </p>
+              <p className="mt-1 font-space-grotesk text-[8px] font-medium uppercase leading-[11px] tracking-wide text-white/80">
+                {brandCard.subtitle}
+              </p>
+            </div>
+          )}
+        </div>
+        </div>
+      )}
+    </section>
+    </SectionGlow>
+  );
+}

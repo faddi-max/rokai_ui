@@ -36,9 +36,7 @@ export default function HeroSection({
   const glows = background?.glows ?? DEFAULT_GLOWS;
   const [email, setEmail] = useState("");
 
-  // CHANGED: renamed from sectionBgColor. Only used for the photo dimming
-  // overlays now. The section itself is transparent so the global bg shows.
-  // `||` (not `??`) because some heroes pass bgColor: "".
+
   const overlayColor = background?.bgColor || "#111111";
   const sectionHeightPx = isBackgroundVisual ? background?.heightPx ?? 560 : undefined;
   const photoOpacity = isBackgroundVisual ? visual.position.opacity ?? 1 : 1;
@@ -87,7 +85,7 @@ export default function HeroSection({
     <SectionGlow>
     <section
       ref={heroRef}
-      className={`relative overflow-hidden pb-8 lg:pb-9 ${background?.sectionClassName ?? ""}`}
+      className={`relative overflow-hidden pb-8 lg:pb-14 ${background?.sectionClassName ?? ""}`}
       style={{
         // CHANGED: transparent so the global RootLayout background shows through
         backgroundColor: "transparent",
@@ -116,8 +114,7 @@ export default function HeroSection({
           {isBackgroundVisual && (
             <div
               className="absolute overflow-hidden"
-              // explicit top/right/bottom/left instead of `inset: 0`
-              // to avoid the "Removing a style property during rerender" warning.
+            
               style={
                 fullWidthBackground
                   ? { top: 0, right: 0, bottom: 0, left: 0 }

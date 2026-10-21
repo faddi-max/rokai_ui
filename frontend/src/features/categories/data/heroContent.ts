@@ -13,14 +13,13 @@ export const heroContent: HeroContent = {
   primaryCta: { label: "Start your project", href: "/contact" },
   secondaryCta: { label: "Explore manufacturing", href: "/custom-fightwear-manufacturing/" },
 
-  // Avatar row from the Figma hero
+
   secondaryRow: {
     type: "join",
     avatars: [avatar1, avatar2, avatar3, avatar4],
     joinText: "Join 100+ academies and brands growing with ROKAI",
   },
 
-  // Figma: image 601 x 901 at top 9 / left 783, used as the hero background
   visual: {
     type: "background",
     image: heroMain,
@@ -29,11 +28,12 @@ export const heroContent: HeroContent = {
   },
 
   background: {
-    // Hero is 910px tall on desktop so the photo runs behind the full trust card.
+  
     heightPx: 910,
-    // No hero glows: the global site background image is the only backdrop.
+  
     glows: [],
-    // Inline min-height is 910 everywhere; drop it below lg so mobile isn't tall and empty.
+  
     sectionClassName: "max-lg:!min-h-0",
   },
 };
+export const categoryHeroContent = heroContent;
