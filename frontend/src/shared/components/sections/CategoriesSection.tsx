@@ -39,7 +39,7 @@ export default function CategoriesSection({
   return (
     <section
       aria-labelledby={headingId}
-      className="relative overflow-hidden bg-black py-14 sm:py-20 lg:py-28"
+      className="relative overflow-hidden  py-14 sm:py-20 lg:py-28"
     >
       <div
         aria-hidden="true"

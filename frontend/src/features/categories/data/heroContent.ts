@@ -1,33 +1,39 @@
-import { herocatagory } from "@/assets";
+import { heroMain, avatar1, avatar2, avatar3, avatar4 } from "@/assets";
 import type { HeroContent } from "@/shared/types/hero";
 
-export const categoryHeroContent: HeroContent = {
+export const heroContent: HeroContent = {
+  eyebrow: "B2B Combat Sports Apparel Manufacturing",
   headingLines: [
-    { text: "CUSTOM JIU" },
-    { text: "JITSU" },
-    { text: "GIS BUILT TO PERFORM.", highlight: true },
+    { text: "Custom combat sports apparel" },
+    { text: "built around" },
+    { text: "your brand.", highlight: true },
   ],
-  description: "Custom BJJ Gis engineered for performance, durability and your brand.",
-  primaryCta: { label: "Get Your Free Assessment", href: "#assessment" },
-  secondaryCta: { label: "Get a Quote", href: "#quote" },
+  description:
+    "ROKAI develops and manufactures custom fightwear for combat sports brands, academies, gyms and teams, from product development and sampling to bulk production and worldwide delivery.",
+  primaryCta: { label: "Start your project", href: "/contact" },
+  secondaryCta: { label: "Explore manufacturing", href: "/custom-fightwear-manufacturing/" },
+
+  // Avatar row from the Figma hero
   secondaryRow: {
-    type: "badges",
-    badges: [
-      { value: "96%", label: "Client Satisfaction" },
-      { value: "5+", label: "Years Experience" },
-      { value: "800+", label: "Products Developed" },
-      { value: "24/7", label: "Client Support" },
-    ],
+    type: "join",
+    avatars: [avatar1, avatar2, avatar3, avatar4],
+    joinText: "Join 100+ academies and brands growing with ROKAI",
   },
+
+  // Figma: image 601 x 901 at top 9 / left 783, used as the hero background
   visual: {
-    type: "image",
-    image: herocatagory,
-    imageAlt: "ROKAI custom Jiu-Jitsu gi",
+    type: "background",
+    image: heroMain,
+    imageAlt: "Custom hoodie manufactured by ROKAI, worn by a model",
+    position: { width: 601, height: 901, top: 9, left: 783, opacity: 1 },
   },
+
   background: {
-    glows: [
-      { width: 640, height: 880, top: 10, left: 800, color: "#E51B24B3", blur: 500 },
-      { width: 300, height: 300, top: 170, left: 760, color: "#E51B247A", blur: 500 },
-    ],
+    // Hero is 910px tall on desktop so the photo runs behind the full trust card.
+    heightPx: 910,
+    // No hero glows: the global site background image is the only backdrop.
+    glows: [],
+    // Inline min-height is 910 everywhere; drop it below lg so mobile isn't tall and empty.
+    sectionClassName: "max-lg:!min-h-0",
   },
 };

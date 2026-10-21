@@ -294,18 +294,21 @@ export default function HeroSection({
           {secondaryRow && (
             <div data-hero-proof>
               {secondaryRow.type === "join" ? (
-                <div className="mt-2 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-                  <div className="flex shrink-0 -space-x-3">
+                /* Social-proof row: overlapping avatars + one line of copy */
+                <div className="mt-5 flex items-center gap-3.5">
+                  <div className="flex shrink-0 items-center -space-x-5">
                     {secondaryRow.avatars.map((avatar, index) => (
                       <img
                         key={`${avatar}-${index}`}
                         src={avatar}
                         alt=""
-                        className="h-10 w-10 rounded-full border-2 border-black object-cover"
+                        className="h-10 w-10 rounded-full border-[1.5px] border-white/40 object-cover"
                       />
                     ))}
                   </div>
-                  <p className="font-space-grotesk text-sm text-white/80">{secondaryRow.joinText}</p>
+                  <p className="font-space-grotesk text-[14px] font-normal leading-5 text-white/85">
+                    {secondaryRow.joinText}
+                  </p>
                 </div>
               ) : (
                 <div className="mt-1 grid max-w-xl grid-cols-2 gap-y-4 border-t border-white/20 pt-4 sm:grid-cols-4 sm:gap-0">
