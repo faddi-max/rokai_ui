@@ -43,8 +43,7 @@ const PartnershipProgramsSection = () => {
   );
 
   return (
-    <section ref={sectionRef} className="relative mt-20 w-full overflow-hidden bg-[#111111]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_85%,rgba(150,15,20,0.28),transparent_55%)]" />
+    <section ref={sectionRef} className="relative mt-20 w-full overflow-hidden">
 
       <div className="relative mx-auto w-full max-w-[1512px] px-6 py-16 sm:px-10 md:py-20 lg:px-20 lg:py-24">
         {/* Header */}

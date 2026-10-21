@@ -12,7 +12,7 @@ export default function CTASection({
   secondaryCta,
 }: CTASectionProps) {
   return (
-    <section className="relative w-full overflow-hidden bg-black py-20 lg:py-28">
+    <section className="relative w-full overflow-hidden py-20 lg:py-28">
       {/* Background Radial Glow */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,27,36,0.22),transparent_70%)]" />
 

@@ -71,7 +71,7 @@ export default function EnquiryToExportSection({
   steps = DEFAULT_STEPS,
 }: EnquiryToExportSectionProps) {
   return (
-    <section className="relative overflow-hidden bg-[#0a0a0a]">
+    <section className="relative overflow-hidden">
       <img
         src={image}
         alt={imageAlt}

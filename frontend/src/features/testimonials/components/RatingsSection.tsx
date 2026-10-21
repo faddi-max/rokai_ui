@@ -201,7 +201,7 @@ function RatingRow({ platform, index }: { platform: RatingPlatform; index: numbe
 
 export default function RatingsSection({ platforms = DEFAULT_PLATFORMS }: RatingsSectionProps) {
   return (
-    <div className="relative bg-black overflow-hidden">
+    <div className="relative overflow-hidden">
       {/* Red glow rising from the bottom edge */}
       <div
         aria-hidden

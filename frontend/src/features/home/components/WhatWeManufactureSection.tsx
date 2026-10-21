@@ -11,7 +11,7 @@ const WhatWeManufactureSection = () => {
     whatWeManufactureHeading;
 
   return (
-    <section className="relative w-full overflow-hidden bg-black">
+    <section className="relative w-full overflow-hidden">
       {/* Bottom red glow behind the slider */}
       <div
         aria-hidden

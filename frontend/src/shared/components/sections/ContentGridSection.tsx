@@ -22,9 +22,8 @@ export default function ContentGridSection({
   }[columns];
 
   return (
-    <section className={`relative w-full overflow-hidden bg-black py-16 sm:py-20 lg:py-24 ${className}`}>
+    <section className={`relative w-full overflow-hidden py-16 sm:py-20 lg:py-24 ${className}`}>
       {/* Background Subtle Gradient */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(150,15,20,0.25),transparent_60%)]" />
 
       <div className="relative mx-auto w-full max-w-[1512px] px-6 sm:px-10 lg:px-16">
         <SectionHeader {...header} />

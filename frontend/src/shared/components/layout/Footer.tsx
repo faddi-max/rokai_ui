@@ -135,7 +135,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-black text-white">
+    <footer className="text-white">
       <div className="mx-auto w-full max-w-[1250px] px-5 pb-8 pt-12 sm:px-8 md:pt-14 lg:px-0 lg:pt-16">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.35fr_repeat(5,1fr)] lg:gap-0">
           <div className="lg:pr-12">

@@ -55,7 +55,7 @@ export default function ContactHero({
   return (
     <section
       className="relative overflow-hidden"
-      style={{ backgroundColor: BG_COLOR }}
+      style={{ backgroundColor: "transparent" }}
     >
       <div className="pointer-events-none absolute inset-0">
         <img src={image} alt={imageAlt} className="h-full w-full object-cover object-center" />

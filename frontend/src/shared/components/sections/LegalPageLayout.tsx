@@ -161,9 +161,9 @@ export default function LegalPageLayout({
   };
 
   return (
-    <div className="relative w-full" style={{ backgroundColor: CONTENT_BG }}>
+    <div className="relative w-full" style={{ backgroundColor: "transparent" }}>
       {/* --- Header — image-overlay hero, same treatment as ContactHero --- */}
-      <section className="relative overflow-hidden" style={{ backgroundColor: BG_COLOR }}>
+      <section className="relative overflow-hidden" style={{ backgroundColor: "transparent" }}>
         <div className="pointer-events-none absolute inset-0">
           {image ? (
             <img src={image} alt={imageAlt} className="h-full w-full object-cover object-center" />

@@ -107,7 +107,9 @@ import rokaiManufacturingVideo from './rokai manufacturing video.mp4'
 import rokailogo from './rokailogo.png'
 import mainimage from './mainimage.png'
 import secondaryimage from './secondaryImage.jpg'
+import sitebg from './siteBg.png'
 export {
+  sitebg,
   mainimage,
   secondaryimage,
   rokaiManufacturingVideo,

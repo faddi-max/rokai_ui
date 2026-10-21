@@ -7,7 +7,7 @@ const FAQSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <section className="w-full bg-black">
+    <section className="w-full">
       <div className="mx-auto w-full max-w-[1250px] px-5 py-16 sm:px-8 md:py-20 lg:px-0 lg:py-28">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
           <motion.div

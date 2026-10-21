@@ -82,7 +82,7 @@ export default function BespokeFeaturesSection({
   features = DEFAULT_FEATURES,
 }: BespokeFeaturesSectionProps) {
   return (
-    <section className="relative w-full overflow-hidden bg-[#0d0808]">
+    <section className="relative w-full overflow-hidden">
       {/* Dark maroon wash + red glow rising from the bottom */}
       <div
         aria-hidden

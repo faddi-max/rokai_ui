@@ -10,7 +10,7 @@ const ToolsResourcesSection = () => {
     toolsResourcesHeading;
 
   return (
-    <section className="relative w-full overflow-hidden bg-black">
+    <section className="relative w-full overflow-hidden">
       {/* Top red glow */}
       <div
         aria-hidden

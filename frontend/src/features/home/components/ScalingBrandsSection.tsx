@@ -51,8 +51,7 @@ export default function ScalingBrands() {
   );
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden bg-black py-16 lg:py-20">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(150,15,20,0.3),transparent_60%)]" />
+    <section ref={sectionRef} className="relative overflow-hidden py-16 lg:py-20">
 
       <div className="relative mx-auto grid max-w-[1512px] items-center gap-10 px-6 md:px-10 lg:grid-cols-2 lg:gap-14 lg:px-16">
         <div

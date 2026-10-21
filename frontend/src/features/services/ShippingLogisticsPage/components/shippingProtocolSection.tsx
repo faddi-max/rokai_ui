@@ -42,7 +42,7 @@ export default function ShippingProtocolSection({
   imageNumber = "ROKAI / OEM",
 }: IndustrialProtocolSectionProps) {
   return (
-    <div className="relative overflow-hidden bg-black">
+    <div className="relative overflow-hidden">
       <SectionHeaderblog
         bare
         eyebrow={eyebrow}

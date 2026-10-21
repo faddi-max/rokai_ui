@@ -36,7 +36,7 @@ export default function StartProjectCtaSection({
   watermark = "ROKAI",
 }: StartProjectCtaSectionProps) {
   return (
-    <div className="relative bg-black overflow-hidden">
+    <div className="relative overflow-hidden">
       {/* Red haze, right side */}
       <div
         aria-hidden

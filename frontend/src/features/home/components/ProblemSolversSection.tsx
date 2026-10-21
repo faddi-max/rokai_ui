@@ -34,7 +34,7 @@ const ProblemSolversSection = () => {
   );
 
   return (
-    <section ref={sectionRef} className="w-full bg-black">
+    <section ref={sectionRef} className="w-full">
       <div className="mx-auto w-full max-w-[1512px] px-5 py-14 sm:px-8 sm:py-16 md:px-10 md:py-20 lg:px-20 lg:py-24">
         <div className="mb-10 flex flex-col gap-6 lg:mb-16 lg:flex-row lg:items-start lg:justify-between">
           <div>

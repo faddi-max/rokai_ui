@@ -22,7 +22,7 @@ export default function SinglePageBlog() {
 
   if (!loading && !data?.post) {
     return (
-      <section className="flex min-h-[50vh] flex-col items-center justify-center gap-4 bg-black px-5 py-16 text-center text-white">
+      <section className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-5 py-16 text-center text-white">
         <p className="text-lg">This post doesn't exist.</p>
         <Link to="/blogs" className="text-sm font-semibold text-[#E63946] underline">
           Back to all posts

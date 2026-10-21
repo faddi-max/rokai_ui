@@ -25,7 +25,7 @@ export default function FAQSection({
   };
 
   return (
-    <section className={`relative w-full overflow-hidden bg-black py-16 sm:py-20 lg:py-24 ${className}`}>
+    <section className={`relative w-full overflow-hidden py-16 sm:py-20 lg:py-24 ${className}`}>
       <div className="relative mx-auto max-w-[1250px] px-6 sm:px-10 lg:px-16">
         <SectionHeader {...header} />
 

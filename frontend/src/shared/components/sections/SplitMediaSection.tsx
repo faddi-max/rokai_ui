@@ -33,7 +33,6 @@ export default function SplitMediaSection({
     <section
       className={`relative w-full overflow-hidden bg-black py-16 sm:py-20 lg:py-28 ${className}`}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(150,15,20,0.25),transparent_60%)]" />
 
       <div className="relative mx-auto grid max-w-[1512px] items-center gap-12 px-6 sm:px-10 lg:grid-cols-2 lg:gap-16 lg:px-16">
         {/* Media Block */}

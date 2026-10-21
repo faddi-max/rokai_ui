@@ -39,7 +39,7 @@ const EngineeredBenchmarkSection = () => {
   );
 
   return (
-    <section ref={sectionRef} className="w-full bg-black">
+    <section ref={sectionRef} className="w-full">
       <div className="mx-auto w-full max-w-[1512px] px-6 py-16 sm:px-10 md:py-20 lg:px-20 lg:py-24">
         <div className="mb-10 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-start lg:justify-between">
           <h2 data-benchmark-intro className="font-space-grotesk text-white">

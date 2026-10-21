@@ -1,5 +1,7 @@
 @import "tailwindcss";
-
+.site-bg main :is(section, div).bg-black:not([class*="rounded"]) {
+  background-color: transparent;
+}
 @theme {
   --font-space-grotesk: "Space Grotesk", sans-serif;
 }

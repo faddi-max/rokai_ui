@@ -26,7 +26,7 @@ export default function BlogCategoryPage() {
 
   if (!loading && (!data?.category)) {
     return (
-      <section className="flex min-h-[50vh] flex-col items-center justify-center gap-4 bg-black px-5 py-16 text-center text-white">
+      <section className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-5 py-16 text-center text-white">
         <p className="text-lg">This category doesn't exist.</p>
         <Link to="/blogs" className="text-sm font-semibold text-[#E63946] underline">
           Back to all categories
@@ -54,8 +54,7 @@ export default function BlogCategoryPage() {
                   description={category.description}
                 />
               )}
-       <section className="relative overflow-hidden bg-black px-5 py-16 sm:px-8 md:px-10 lg:px-16">
-  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(150,15,20,0.3),transparent_60%)]" />
+       <section className="relative overflow-hidden px-5 py-16 sm:px-8 md:px-10 lg:px-16">
 
   <div className="relative mx-auto w-full max-w-[1512px]">
     {posts.length === 0 ? (

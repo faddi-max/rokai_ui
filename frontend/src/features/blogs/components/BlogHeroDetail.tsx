@@ -98,7 +98,7 @@ export default function BlogHeroDetail({ post, meta = {} }: BlogHeroDetailProps)
   ].filter(Boolean);
 
   return (
-    <section className="relative isolate min-h-140 overflow-hidden bg-[#0a0a0a] px-6 py-16 font-space-grotesk text-white md:px-10 lg:px-6">
+    <section className="relative isolate min-h-140 overflow-hidden px-6 py-16 font-space-grotesk text-white md:px-10 lg:px-6">
       <div className="relative z-10 mx-auto w-full max-w-378">
         <div className="mb-6 flex items-center gap-2">
           <span className="h-[2px] w-6 bg-[#E63946]" />

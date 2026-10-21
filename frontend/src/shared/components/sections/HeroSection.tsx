@@ -36,7 +36,10 @@ export default function HeroSection({
   const glows = background?.glows ?? DEFAULT_GLOWS;
   const [email, setEmail] = useState("");
 
-  const sectionBgColor = background?.bgColor ?? "#000000";
+  // CHANGED: renamed from sectionBgColor. Only used for the photo dimming
+  // overlays now. The section itself is transparent so the global bg shows.
+  // `||` (not `??`) because some heroes pass bgColor: "".
+  const overlayColor = background?.bgColor || "#111111";
   const sectionHeightPx = isBackgroundVisual ? background?.heightPx ?? 560 : undefined;
   const photoOpacity = isBackgroundVisual ? visual.position.opacity ?? 1 : 1;
 
@@ -86,7 +89,8 @@ export default function HeroSection({
       ref={heroRef}
       className={`relative overflow-hidden pb-8 lg:pb-9 ${background?.sectionClassName ?? ""}`}
       style={{
-        backgroundColor: sectionBgColor,
+        // CHANGED: transparent so the global RootLayout background shows through
+        backgroundColor: "transparent",
         ...(sectionHeightPx ? { minHeight: sectionHeightPx } : {}),
       }}
     >
@@ -112,7 +116,7 @@ export default function HeroSection({
           {isBackgroundVisual && (
             <div
               className="absolute overflow-hidden"
-              // CHANGED: explicit top/right/bottom/left instead of `inset: 0`
+              // explicit top/right/bottom/left instead of `inset: 0`
               // to avoid the "Removing a style property during rerender" warning.
               style={
                 fullWidthBackground
@@ -137,9 +141,10 @@ export default function HeroSection({
                 alt={visual.imageAlt}
                 className={`h-full w-full object-cover ${fullWidthBackground ? "" : "rounded-2xl"}`}
               />
+              {/* CHANGED: overlayColor instead of sectionBgColor */}
               <div
                 className="absolute inset-0"
-                style={{ backgroundColor: sectionBgColor, opacity: 1 - photoOpacity }}
+                style={{ backgroundColor: overlayColor, opacity: 1 - photoOpacity }}
               />
               {background?.imageOverlay && (
                 <div
@@ -376,7 +381,7 @@ export default function HeroSection({
         )}
       </div>
 
-      {/* CHANGED: added `!fullWidthBackground` so the stacked mobile image
+      {/* added `!fullWidthBackground` so the stacked mobile image
           doesn't duplicate the full-bleed background image. */}
       {isBackgroundVisual && !fullWidthBackground && (
         <div className="relative mt-6 w-full overflow-hidden lg:hidden">
@@ -385,9 +390,10 @@ export default function HeroSection({
             alt={visual.imageAlt}
             className="h-[220px] w-full object-cover sm:h-[280px] md:h-[340px]"
           />
+          {/* CHANGED: overlayColor instead of sectionBgColor */}
           <div
             className="pointer-events-none absolute inset-0"
-            style={{ backgroundColor: sectionBgColor, opacity: 1 - photoOpacity }}
+            style={{ backgroundColor: overlayColor, opacity: 1 - photoOpacity }}
           />
           <div
             className="pointer-events-none absolute inset-0"

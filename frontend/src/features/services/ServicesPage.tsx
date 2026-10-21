@@ -35,12 +35,12 @@ export default function ServicesPage() {
         const { hero, service, allServices } = pageData;
 
         return (
-          <div className="w-full bg-black text-white">
+          <div className="w-full text-white">
             {/* Dynamic Hero Section */}
             <HeroSection {...hero} />
 
             {/* Services Overview Grid */}
-            <section className="relative overflow-hidden bg-black py-16 sm:py-20 lg:py-24">
+            <section className="relative overflow-hidden py-16 sm:py-20 lg:py-24">
               <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-[68px]">
                 <div className="mb-12 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
                   <div>

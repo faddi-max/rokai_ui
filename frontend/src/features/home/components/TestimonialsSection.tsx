@@ -9,8 +9,7 @@ import {
 
 const TestimonialsSection = () => {
   return (
-    <section className="relative w-full overflow-hidden bg-black">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(150,15,20,0.3),transparent_60%)]" />
+    <section className="relative w-full overflow-hidden">
 
       <div className="relative mx-auto w-full max-w-[1512px] px-6 py-16 sm:px-10 md:py-20 lg:px-16 lg:py-24">
         <div className="mb-10 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-start lg:justify-between">

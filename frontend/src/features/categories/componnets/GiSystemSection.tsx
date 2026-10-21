@@ -31,7 +31,7 @@ export default function GiSystemSection({
   );
 
   return (
-    <section ref={sectionRef} className="bg-black font-space-grotesk">
+    <section ref={sectionRef} className="font-space-grotesk">
       <div className="mx-auto max-w-[1440px] px-5 py-14 sm:px-10 sm:py-16 md:py-20 lg:py-[70px] lg:pl-[49px] lg:pr-[72px]">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-[61px]">
           <div className="flex flex-col">

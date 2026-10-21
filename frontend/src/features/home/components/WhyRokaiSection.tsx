@@ -39,8 +39,7 @@ export default function WhyRokai() {
   );
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden bg-black py-16 lg:py-24">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_75%,rgba(150,15,20,0.28),transparent_55%)]" />
+    <section ref={sectionRef} className="relative overflow-hidden py-16 lg:py-24">
 
       <div className="relative mx-auto grid max-w-[1512px] gap-12 px-6 md:px-10 lg:grid-cols-2 lg:gap-16 lg:px-16">
         {/* Left column — eyebrow, heading, mockup stack */}

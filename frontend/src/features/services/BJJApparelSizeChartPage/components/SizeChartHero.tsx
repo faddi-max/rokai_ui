@@ -35,7 +35,7 @@ export default function SizeChartHero({
   return (
     <section
       className="relative overflow-hidden lg:h-[449px]"
-      style={{ backgroundColor: BG_COLOR }}
+      style={{ backgroundColor: "transparent" }}
     >
       {/* Background image over #111111 */}
       <div className="pointer-events-none absolute inset-0">
