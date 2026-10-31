@@ -51,10 +51,11 @@ const DEFAULT_TOOLS: ToolCardData[] = [
     description: "Improve product-page copy.",
   },
   {
-    id: "order-margin-calculator",
+    id: "combat-apparel-profit-calculator",
     label: "Business Tool",
-    title: "Order Margin Calculator",
-    description: "Estimate order profitability.",
+    title: "Combat Apparel Profit Calculator",
+    description: "Estimate profit after costs, fees and ads.",
+    href: "/resources/combat-apparel-profit-calculator",
   },
   {
     id: "gi-sizing-scanner",
@@ -69,6 +70,13 @@ const DEFAULT_TOOLS: ToolCardData[] = [
     title: "Lead Magnet Studio",
     description: "Shape a useful content offer for your audience.",
     href: "/resources/lead-magnet-studio",
+  },
+  {
+    id: "combat-apparel-cost-calculator",
+    label: "Business Tool",
+    title: "Combat Apparel Cost Calculator",
+    description: "Estimate the cost of your combat apparel order.",
+    href: "/resources/combat-apparel-cost-calculator",
   },
 ];
 

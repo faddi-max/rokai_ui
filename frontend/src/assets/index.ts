@@ -108,7 +108,28 @@ import rokailogo from './rokailogo.png'
 import mainimage from './mainimage.png'
 import secondaryimage from './secondaryImage.jpg'
 import sitebg from './siteBg.png'
+import costEstimatorHero  from './calculator.jpg'
+import apparelRashguardLongsleeve from './apparel-rashguard-longsleeve.jpg'
+import apparelTshirt from './apparel-tshirt.jpg'
+import apparelShortsPattern from './apparel-shorts-pattern.jpg'
+import apparelHoodie from './apparel-hoodie.jpg'
+import apparelRashguardShortsleeve from './apparel-rashguard-shortsleeve.jpg'
+import apparelShortsMma from './apparel-shorts-mma.jpg'
+import apparelShortsRokai from './apparel-shorts-rokai.jpg'
+import martialArtsHero from './martial-arts-hero.png'
+import profitimg from './profitimage.jpg'
 export {
+  costEstimatorHero,
+  apparelRashguardLongsleeve,
+  apparelTshirt,
+  apparelShortsPattern,
+  apparelHoodie,
+  apparelRashguardShortsleeve,
+  apparelShortsMma,
+  apparelShortsRokai,
+  martialArtsHero,
+  profitimg,
+  profitimg as profitimage,
   sitebg,
   mainimage,
   secondaryimage,

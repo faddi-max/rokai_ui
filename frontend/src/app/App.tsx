@@ -16,6 +16,8 @@ import SinglePageBlog from "@/features/blogs/SingleBlogPage";
 import ProgramApplyPage from "@/features/programs/ProgramForm/ProgramApplyPage";
 import ResourcesPage from "@/features/resources/ResourcesPage";
 import LeadMagnetStudioPage from "@/features/resources/lead-magnet-studio/LeadMagnetStudioPage";
+import CombatApparelCostCalculatorPage from "@/features/resources/combat-apparel-cost-calculator/CombatApparelCostCalculatorPage";
+import CombatApparelProfitCalculatorPage from "@/features/resources/combat-apparel-profit-calculator/CombatApparelProfitCalculatorPage";
 
 import { OemManufacturingPage } from "@/features/services/OemManufacturingPage/OemManufacturingPage";
 import { CustomLabelPackagingPage } from "@/features/services/CustomLabelsPackagingPage/CustomLabelsPackagingPage";
@@ -130,6 +132,8 @@ export default function App() {
             <Route path="/blogs" element={<BlogsPage />} />
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/resources/lead-magnet-studio" element={<LeadMagnetStudioPage />} />
+            <Route path="/resources/combat-apparel-cost-calculator" element={<CombatApparelCostCalculatorPage />} />
+            <Route path="/resources/combat-apparel-profit-calculator" element={<CombatApparelProfitCalculatorPage />} />
             <Route path="/testimonials" element={<TestimonialPage />} />
             <Route path="/blogs/category/:slug" element={<BlogCategoryPage />} />
             <Route path="/blogs/:slug" element={<SinglePageBlog />} />
